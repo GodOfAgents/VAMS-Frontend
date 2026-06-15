@@ -390,7 +390,7 @@ export default function VAMS_Web3_Guild() {
           </div>
 
           <div className={`hidden md:flex gap-12 text-[10px] font-mono uppercase tracking-[0.15em] font-medium ${textSub}`}>
-            {['Vision', 'Manifesto', 'Stack'].map((item) => (
+            {['Vision', 'Manifesto', 'Stack', 'Innovations'].map((item) => (
               <a key={item} href={`#${item.toLowerCase()}`} className={`hover:${isDark ? 'text-white' : 'text-black'} transition-colors relative group`}>
                 {item}
                 <span className={`absolute -bottom-1 left-0 w-0 h-px ${isDark ? 'bg-white' : 'bg-black'} transition-all group-hover:w-full`}></span>
@@ -457,7 +457,7 @@ export default function VAMS_Web3_Guild() {
           </div>
 
           <p className={`font-sans text-lg md:text-xl ${textSub} max-w-xl leading-relaxed tracking-wide border-l-2 ${borderLight} pl-8 mt-12 mb-16 animate-fade-in-up`} style={{ animationDelay: '0.8s' }}>
-            A unified Layer 3 meta-architecture connecting $50B+ of fragmented DePIN infrastructure into a single, consumable API for autonomous software.
+            VAMS is a planetary-scale Web3 operating system for the agentic economy, connecting $50B+ of fragmented DePIN infrastructure into a single, consumable API. It enables sovereign AI agents to execute infinite-duration workflows independently, transact via machine money, and settle trustlessly on global consensus networks.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 animate-fade-in-up" style={{ animationDelay: '1s' }}>
@@ -590,6 +590,26 @@ export default function VAMS_Web3_Guild() {
               <p className={`font-serif text-2xl md:text-3xl leading-relaxed tracking-wide ${textMain}`}>
                 In 5 years, AI Agents will outnumber humans on Chains 100:1. They won't use Visa. They won't use AWS. They will use verifiable, decentralized, sovereign infrastructure.
               </p>
+              <div className="space-y-6 pt-4">
+                <div>
+                  <h4 className="font-serif text-xl mb-2">Planetary Autonomy</h4>
+                  <p className={`${textSub} text-sm leading-relaxed`}>
+                    By 2030, autonomous software agents will consume decentralized compute, bandwidth, and storage natively. VAMS provides the persistent, multi-agent OS layer necessary to run these agents indefinitely without relying on any centralized cloud provider.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-serif text-xl mb-2">The Core Mission</h4>
+                  <p className={`${textSub} text-sm leading-relaxed`}>
+                    Standardizing the developer suite for Web3 AI through six tightly integrated, vertically aligned modular packages: Data Availability (DA), Composer, Economics, Services, Sentinel, and Gateway.
+                  </p>
+                </div>
+                <div>
+                  <h4 className="font-serif text-xl mb-2">Operational Hardening (Pre-Testnet)</h4>
+                  <p className={`${textSub} text-sm leading-relaxed`}>
+                    Currently in its Pre-Testnet Candidate hardening phase, the VAMS protocol undergoes strict validation of cryptographic consensus, decentralized threshold cryptography, secure enclave execution, and robust fail-closed mechanics to prepare for global public deployment.
+                  </p>
+                </div>
+              </div>
               <p className={`font-mono text-sm ${textSub} uppercase tracking-widest border-l-2 ${borderLight} pl-4`}>
                 Mission: To be the backbone of the Agentic Economy by 2030.
               </p>
@@ -613,66 +633,66 @@ export default function VAMS_Web3_Guild() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {[
               {
-                title: "DePIN Utility Crisis",
-                web2: "Fragmented Resources",
-                vams: "Utilization Layer",
-                desc: "Billions in hardware, zero usability. VAMS aggregates it all.",
+                title: "Compute Fragmentation",
+                web2: "Idle GPU / Scattered Silos",
+                vams: "Unified Layer 3 Compute",
+                desc: "Aggregated idle GPUs on providers like io.net, Akash, and Render lack a unified, scalable runtime. VAMS solves this by aggregating compute clusters into a single, cohesive modular layer.",
                 icon: Layers,
                 span: "md:col-span-2"
               },
               {
                 title: "Developer Onboarding",
-                web2: "1% Web3 Native",
-                vams: "99% Web2 Native",
-                desc: "We bridge the gap. Use Python, get sovereign infra.",
+                web2: "Complex Web3 Protocols",
+                vams: "Standard Python APIs",
+                desc: "Bridging the gap for 99% of developers who are not Web3 native. Developers deploy state-of-the-art AI agents using standard Python frameworks while inheriting decentralized sovereignty.",
                 icon: Code,
                 span: "md:col-span-1"
               },
               {
-                title: "Agent Evolution",
-                web2: "Beta / Fragile",
-                vams: "Alpha / Immortal",
-                desc: "Web2 agents die; VAMS agents persist forever.",
+                title: "Agent Persistence",
+                web2: "Fragile Web2 VMs",
+                vams: "Immortal DBOS State",
+                desc: "Traditional agents on centralized VMs are vulnerable to server crashes and platform shutdowns. VAMS implements DBOS-backed durable execution to guarantee exactly-once execution semantics.",
                 icon: ShieldCheck,
                 span: "md:col-span-1"
               },
               {
-                title: "AI Verification",
-                web2: "Black Box",
-                vams: "Verifiable",
-                desc: "Cryptographic proof of inference. Don't trust, verify.",
+                title: "Verification & Trust",
+                web2: "Black-Box Inference",
+                vams: "TEE Cryptographic Proofs",
+                desc: "Black-box AI models can be manipulated or falsified. VAMS utilizes Phala TEE secure enclaves and the fail-closed VAMSTrustAggregator to guarantee tamper-proof cryptographic proofs of inference.",
                 icon: Eye,
                 span: "md:col-span-1"
               },
               {
                 title: "Censorship Resistance",
-                web2: "Platform Risk",
-                vams: "Unstoppable",
-                desc: "Sovereign execution that no corporation can turn off.",
+                web2: "Corporate Control",
+                vams: "Unstoppable Sovereign Execution",
+                desc: "Corporate VMs can terminate agent processes at will. VAMS ensures true sovereignty, deploying agents onto decentralized nodes that cannot be shut down or censored by any single entity.",
                 icon: Unlock,
                 span: "md:col-span-2"
               },
               {
                 title: "Cost Efficiency",
-                web2: "AWS Premium",
-                vams: "-80% Costs",
-                desc: "Market-based pricing. No monopolistic markups.",
+                web2: "AWS Monopoly Pricing",
+                vams: "-80% Resource Costs",
+                desc: "Web2 cloud platforms charge high margins on compute resources. VAMS uses a dynamic, decentralized marketplace to match agent jobs with DePIN suppliers, cutting infrastructure costs by up to 80%.",
                 icon: DollarSign,
                 span: "md:col-span-1"
               },
               {
                 title: "Research Freedom",
-                web2: "Geopolitics",
-                vams: "Neutral Ground",
-                desc: "Permissionless research labs unaffected by borders.",
+                web2: "Geopolitical Restrictions",
+                vams: "Neutral Global Network",
+                desc: "Permissionless open research is increasingly gated by borders and corporate compliance. VAMS establishes a globally distributed, neutral environment for agent-driven scientific research.",
                 icon: Globe,
                 span: "md:col-span-2"
               },
               {
-                title: "Payment Rails",
-                web2: "Visa / Stripe",
-                vams: "Machine Money",
-                desc: "Micropayments (x402) designed for software, not humans.",
+                title: "Payment Friction",
+                web2: "Visa / KYC Rails",
+                vams: "x402 Machine Money",
+                desc: "Legacy financial systems require human identities and KYC verification. VAMS provides machine-native x402 Micropayments and gas-abstracted ERC-4337 session keys for automated agent transactions.",
                 icon: Zap,
                 span: "md:col-span-2"
               }
@@ -812,6 +832,64 @@ export default function VAMS_Web3_Guild() {
         </div>
       </SectionWrapper>
 
+      {/* SECTION: CORE INNOVATIONS & BREAKTHROUGHS */}
+      <SectionWrapper id="innovations">
+        <header className="mb-24">
+          <span className={`font-mono text-[10px] uppercase ${textSub} tracking-[0.2em] mb-4 block`}>Technological Milestones</span>
+          <SmokeHeader text="Core Innovations" isDark={isDark} className="font-serif text-4xl md:text-6xl mb-6 block" />
+          <p className={`max-w-2xl ${textSub} leading-relaxed font-light text-lg tracking-wide`}>
+            VAMS introduces state-of-the-art meta-architectural breakthroughs designed to establish a verifiable, tamper-resistant, and autonomous agent environment.
+          </p>
+        </header>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {[
+            {
+              title: "AUTOSKILL Intelligence Layer",
+              desc: "Unsupervised PCA-driven model skill discovery. VAMS dynamically discovers, evaluates, and registers model skills on-chain through advanced activation capture pipelines, enabling agents to dynamically scale their capabilities at runtime.",
+              icon: Cpu,
+              tag: "v1.3.0-oms"
+            },
+            {
+              title: "Order Management System (OMS) Engine",
+              desc: "Enterprise-grade RPC routing and stablecoin payout flows designed specifically for machine-to-machine tasks. The OMS ensures transaction velocity, stablecoin routing, and P3 compliance (Predictable, Persistent, and Proven).",
+              icon: Terminal,
+              tag: "v1.3.0-oms"
+            },
+            {
+              title: "Fail-Closed Verification Pipelines",
+              desc: "A fail-closed proof aggregation framework. If validation components or TEE environments experience downtime or compute mismatch, the execution pipeline automatically halts rather than reverting to unsecured execution, guaranteeing zero universal bypasses.",
+              icon: ShieldCheck,
+              tag: "Security Hardened"
+            },
+            {
+              title: "Commit-Reveal Oracle (CRO)",
+              desc: "Decentralized entropy and ceiling-division based quorum consensus. Ensures that oracle consensus and multi-agent quorums are cryptographically secure, preventing front-running, collusion, or bias in agent operations.",
+              icon: Key,
+              tag: "Consensus Layer"
+            }
+          ].map((item, i) => (
+            <article
+              key={i}
+              className={`p-8 rounded-[9px] border ${borderLight} ${borderHover} bg-white/5 backdrop-blur-[2px] transition-all duration-300 flex flex-col justify-between group`}
+            >
+              <div>
+                <div className="flex items-center justify-between mb-6">
+                  <div className={`p-2 rounded-lg ${isDark ? 'bg-white/5' : 'bg-black/5'}`}>
+                    <item.icon className="w-6 h-6" />
+                  </div>
+                  <span className={`font-mono text-[9px] px-2 py-1 rounded border border-white/10 ${isDark ? 'bg-black/40 text-gray-400' : 'bg-white/40 text-gray-600'}`}>{item.tag}</span>
+                </div>
+                <h3 className="font-serif text-2xl mb-3">{item.title}</h3>
+                <p className={`text-sm ${textSub} leading-relaxed`}>{item.desc}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </SectionWrapper>
+
+      <Divider isDark={isDark} />
+
       {/* SECTION 4: DEEP TECH (CLR) */}
       <section id="router" className="bg-black text-white py-32 px-6 md:px-12 relative overflow-hidden border-t border-gray-900">
         <div className="absolute inset-0 z-0 opacity-10"
@@ -932,6 +1010,38 @@ export default function VAMS_Web3_Guild() {
                   { title: "Protocol Fees", val: "0.1% - 0.5%", desc: "Applied to every compute job, storage store, or inference." },
                   { title: "Gas Abstraction", val: "5% Premium", desc: "Charged for the convenience of paying in $VAMS while we handle swaps." },
                   { title: "L1 Licensing", val: "B2B", desc: "Enterprise agents paying for dedicated Avalanche L1 setups." }
+                ].map((item, i) => (
+                  <div key={i} className={`bg-white/10 backdrop-blur-[2px] p-6 border ${borderLight} ${borderHover} transition-colors duration-300 rounded-[9px]`}>
+                    <div className="flex justify-between items-baseline mb-2">
+                      <h4 className="font-bold text-lg font-serif">{item.title}</h4>
+                      <span className={`font-mono text-[10px] ${isDark ? 'bg-black/40' : 'bg-white/40'} px-2 py-1 rounded ${textSub} border border-white/10`}>{item.val}</span>
+                    </div>
+                    <p className={`text-sm ${textSub} leading-relaxed tracking-wide`}>{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+
+              <h3 className="font-serif text-2xl mb-8 mt-16 flex items-center gap-3">
+                Economic Yield Avenues
+                <div className={`h-px flex-1 ${isDark ? 'bg-gray-800' : 'bg-gray-200'}`}></div>
+              </h3>
+              <div className="space-y-8">
+                {[
+                  {
+                    title: "DePIN Infrastructure Mining",
+                    val: "Hardware Supply",
+                    desc: "Register your idle GPUs, CPUs, or storage nodes to execute compute and inference jobs for agents, earning direct infrastructure yields."
+                  },
+                  {
+                    title: "Regional Yield Chasing",
+                    val: "Geographic Bonus",
+                    desc: "Deploy physical infrastructure in underserved regions to earn a Regional Bonus distributed by the Regional Dynamic Emission Controller (DEC)."
+                  },
+                  {
+                    title: "Staking & Validation",
+                    val: "$VAMS Rewards",
+                    desc: "Secure the network state by staking $VAMS tokens to validate node compute assertions, logic states, and threshold signatures."
+                  }
                 ].map((item, i) => (
                   <div key={i} className={`bg-white/10 backdrop-blur-[2px] p-6 border ${borderLight} ${borderHover} transition-colors duration-300 rounded-[9px]`}>
                     <div className="flex justify-between items-baseline mb-2">

@@ -1,30 +1,37 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  build: {
-    // Minification target for smaller bundles
-    target: 'esnext',
-    // Enable minification
-    minify: 'esbuild',
-    // Code-splitting for Three.js (separate chunk)
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          // Separate Three.js into its own chunk for better caching
-          three: ['three'],
-          // React core
-          vendor: ['react', 'react-dom'],
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, '.', '')
+  const surface = env.VITE_VAMS_SURFACE || 'all'
+
+  return {
+    plugins: [react()],
+    build: {
+      target: 'esnext',
+      minify: 'esbuild',
+      outDir: surface === 'all' ? 'dist' : `dist/${surface}`,
+      emptyOutDir: true,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules/three')) return 'three-marketing'
+            if (id.includes('node_modules/react')) return 'react-vendor'
+          },
         },
       },
+      chunkSizeWarningLimit: 500,
     },
-    // Reduce chunk size warnings
-    chunkSizeWarningLimit: 500,
-  },
-  // Optimize dependencies
-  optimizeDeps: {
-    include: ['react', 'react-dom', 'three'],
-  },
+    optimizeDeps: {
+      include: ['react', 'react-dom', 'react-router-dom', 'zod'],
+    },
+    test: {
+      environment: 'node',
+      globals: true,
+      fileParallelism: false,
+      maxWorkers: 1,
+      minWorkers: 1,
+      testTimeout: 30000,
+    },
+  }
 })

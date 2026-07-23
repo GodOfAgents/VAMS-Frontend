@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "./styles/tokens.css";
+@import "./styles/global.css";
 
 /* Font fallback strategy - fonts loaded async via index.html */
 @font-face {
@@ -25,25 +27,7 @@
   src: local('JetBrains Mono');
 }
 
-:root {
-  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
-}
-
-@layer base {
-  html {
-    scroll-behavior: smooth;
-  }
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-}
-
-/* Custom Selection Styles */
 ::selection {
-  background-color: #a855f7;
-  /* purple-500 */
-  color: white;
+  background: var(--ink);
+  color: var(--canvas);
 }

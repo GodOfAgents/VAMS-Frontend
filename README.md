@@ -1,16 +1,40 @@
-# React + Vite
+# VAMS Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+One React/Vite source tree for the VAMS protocol website, read-only explorer, and verification status surface.
 
-Currently, two official plugins are available:
+## Surfaces
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+| Build | Intended host | Default route |
+| --- | --- | --- |
+| Marketing | `vams.network` | `/` |
+| Console | `app.vams.network` | `/overview` |
+| Status | `status.vams.network` | `/status` |
 
-## React Compiler
+Documentation remains repository-generated and is linked from the interface.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+The current profile is a hardened pre-testnet candidate. It exposes no wallet connection, payment, staking, rewards, governance, operator registration, provisioning, or settlement controls.
 
-## Expanding the ESLint configuration
+## Commands
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+npm ci
+npm run dev
+npm run dev:simulation
+npm run lint
+npm run test
+npm run build:marketing
+npm run build:console
+npm run build:status
+```
+
+`dev:simulation` is the only built-in mode that enables deterministic synthetic explorer records. The interface displays a persistent `SIMULATED` disclosure in that mode. Missing or malformed Gateway data never triggers an automatic fixture fallback.
+
+## Gateway configuration
+
+Copy `.env.example` and set `VITE_VAMS_GATEWAY_ORIGIN`. Non-local origins must use HTTPS and cannot contain credentials, a path, query parameters, or fragments.
+
+Explorer responses are schema validated and must use the common `/v1/explorer` envelope. See [docs/GATEWAY_EXPLORER_CONTRACT.md](docs/GATEWAY_EXPLORER_CONTRACT.md).
+
+## Architecture
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for routing, data provenance, capability intersection, Three.js isolation, and release boundaries.

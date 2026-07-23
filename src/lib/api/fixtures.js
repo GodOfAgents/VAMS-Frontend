@@ -1,0 +1,95 @@
+const timestamp = '2026-07-23T00:00:00.000Z'
+
+export const simulationFixtures = {
+  meta: {
+    capabilities: {
+      readOnly: true,
+      compositionDryRun: true,
+      compositionSubmission: false,
+      walletConnection: false,
+      staking: false,
+      rewards: false,
+      fiat: false,
+    },
+    gateway_status: 'SIMULATED',
+    release_profile: 'read-only-pre-testnet',
+  },
+  nodes: [
+    {
+      id: 'node_sim_ind_01',
+      status: 'ONLINE',
+      region: 'india-west',
+      last_heartbeat: timestamp,
+      resources: { cpu_cores: 32, memory_gb: 128, gpu: 'A10-class synthetic profile' },
+      skills: ['reasoning', 'retrieval', 'code'],
+      chc: { K: 0.84, RW: 0.8, M: 0.74, R: 0.91, WM: 0.76, MS: 0.81, MR: 0.83, V: 0.68, A: 0.55, S: 0.79 },
+      trust: { tee: true, tier: 'T2-SIMULATED', reputation: 0.88 },
+      indicative_cost_per_hour: 0.18,
+    },
+    {
+      id: 'node_sim_eu_02',
+      status: 'ONLINE',
+      region: 'eu-central',
+      last_heartbeat: timestamp,
+      resources: { cpu_cores: 16, memory_gb: 64, gpu: null },
+      skills: ['research', 'verification'],
+      chc: { K: 0.9, RW: 0.88, M: 0.72, R: 0.86, WM: 0.71, MS: 0.77, MR: 0.8, V: 0.62, A: 0.52, S: 0.7 },
+      trust: { tee: false, tier: 'T1-SIMULATED', reputation: 0.81 },
+      indicative_cost_per_hour: 0.11,
+    },
+  ],
+  blueprints: [
+    {
+      id: 'bp_research_verified_v1',
+      name: 'Verified research agent',
+      purpose: 'Compose a read-only research runtime with provenance and DA anchoring.',
+      trust_tier: 'T2',
+      required_compute: { cpu_cores: 8, memory_gb: 32, tee: true },
+      cognitive_requirements: { K: 0.75, RW: 0.8, R: 0.82, WM: 0.7 },
+      service_blocks: ['sb_oms_v1', 'sb_da_celestia_v1'],
+    },
+    {
+      id: 'bp_code_audit_v1',
+      name: 'Sovereign code audit',
+      purpose: 'Inspect source with explainable matching and immutable evidence output.',
+      trust_tier: 'T2',
+      required_compute: { cpu_cores: 12, memory_gb: 48, tee: true },
+      cognitive_requirements: { K: 0.8, M: 0.78, R: 0.86, WM: 0.76 },
+      service_blocks: ['sb_oms_v1', 'sb_storage_near_v1'],
+    },
+  ],
+  serviceBlocks: [
+    {
+      id: 'sb_oms_v1',
+      name: 'OMS identity',
+      category: 'IDENTITY',
+      description: 'Identity verification boundary for agent and operator claims.',
+      integration_state: 'IMPLEMENTED — LIVE EVIDENCE PENDING',
+      provenance: 'SIMULATED',
+      compatible_blueprints: ['bp_research_verified_v1', 'bp_code_audit_v1'],
+    },
+    {
+      id: 'sb_da_celestia_v1',
+      name: 'Celestia DA',
+      category: 'DATA AVAILABILITY',
+      description: 'Commit state evidence through the implemented Celestia adapter.',
+      integration_state: 'IMPLEMENTED — MOCK-BOUNDARY TESTED',
+      provenance: 'SIMULATED',
+      compatible_blueprints: ['bp_research_verified_v1'],
+    },
+  ],
+  daStatus: {
+    routes: [
+      { name: 'Celestia', implementation: 'REAL API CLIENT', operational_state: 'DEPLOYMENT PENDING', provenance: 'SIMULATED' },
+      { name: 'NEAR', implementation: 'REAL API CLIENT', operational_state: 'DEPLOYMENT PENDING', provenance: 'SIMULATED' },
+      { name: 'Avail', implementation: 'STUB', operational_state: 'BLOCKED', provenance: 'MOCK' },
+      { name: 'EigenDA', implementation: 'STUB', operational_state: 'BLOCKED', provenance: 'MOCK' },
+    ],
+  },
+  evidence: [
+    { id: 'ev_source', claim: 'Frontend architecture', state: 'SOURCE_IMPLEMENTED', source: 'GodOfAgents/VAMS-Frontend', verified_at: timestamp, detail: 'Route-ready frontend source exists on the active branch.' },
+    { id: 'ev_polygon', claim: 'Polygon Amoy execution deployment', state: 'DEPLOYMENT_PENDING', source: 'VAMS architecture profile', verified_at: null, detail: 'No commit-bound public deployment evidence is supplied to this frontend.' },
+    { id: 'ev_cardano', claim: 'Cardano Pre-Prod governance deployment', state: 'DEPLOYMENT_PENDING', source: 'VAMS architecture profile', verified_at: null, detail: 'No commit-bound public deployment evidence is supplied to this frontend.' },
+    { id: 'ev_release', claim: 'Public-testnet release readiness', state: 'BLOCKED', source: 'Frontend release gates', verified_at: timestamp, detail: 'Browser security, accessibility, phishing, CSP, Gateway, and evidence gates remain distinct prerequisites.' },
+  ],
+}

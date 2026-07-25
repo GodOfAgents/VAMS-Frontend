@@ -14,6 +14,9 @@ All notable frontend changes are documented here following Keep a Changelog.
 - Keyboard navigation, skip links, reduced-motion handling, mobile inspection navigation, and CHC text tables.
 - Marketing, console, and status production build profiles.
 - Contract, routing, simulation, malformed-response, and accessible-status tests.
+- Responsive motion primitives for route presence, in-view reveals, stagger groups, smoke text, magnetic links, drawers, and data-state transitions.
+- A deterministic shader-driven neural-topography hero with responsive quality profiles and static fallbacks.
+- Browser regression coverage for the responsive viewport matrix and cinematic-bundle isolation.
 
 ### Changed
 
@@ -21,6 +24,9 @@ All notable frontend changes are documented here following Keep a Changelog.
 - Reorganized public content around Protocol, Network, Build, Operate, Research, and Status.
 - Replaced Avalanche, active rewards/yield, and fixed-roadmap claims with Polygon Amoy/Cardano Pre-Prod deployment-pending architecture.
 - Restricted Three.js to a lazy, reduced-motion-aware marketing visual.
+- Replaced viewport-width container calculations with role-based percentage containers, responsive gutters, and component-aware grids.
+- Rebalanced hero, navigation, editorial, console, status, and evidence spacing from `320px` through ultrawide layouts.
+- Limited GSAP ScrollTrigger to the desktop homepage lifecycle; tablet and mobile use one-time in-view reveals.
 
 ### Removed
 
@@ -36,8 +42,10 @@ All notable frontend changes are documented here following Keep a Changelog.
 ### Testing
 
 - Added unit coverage for routing, capabilities, environment validation, response validation, simulation provenance, non-mutation, and text-based status semantics.
+- Added frozen reduced-motion visual baselines and separate animation behavior checks.
+- Added runtime assertions that console and status profiles do not request Three.js or GSAP chunks.
 
 ### Known release blocks
 
-- The dependency audit must be clean before public-testnet exposure.
+- `npm audit --omit=dev --audit-level=high` reports `GHSA-qwww-vcr4-c8h2` in React Router 7.18.1. VAMS does not expose React Server Components or action endpoints, but public-testnet exposure remains blocked until an upstream patched release is available or the router is replaced.
 - Gateway explorer implementation, public DTO redaction, signed commit-bound evidence export, CSP response headers, browser security, accessibility, and phishing reviews remain external gates.

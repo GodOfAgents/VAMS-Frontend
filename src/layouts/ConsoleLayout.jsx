@@ -10,6 +10,7 @@ import { ThemeToggle } from '../components/ui/ThemeToggle.jsx'
 import { StatusBadge } from '../components/ui/StatusBadge.jsx'
 import { useProtocol } from '../features/protocol/ProtocolProvider.jsx'
 import { useResource } from '../features/protocol/useResource.js'
+import { RouteMotion } from '../motion/primitives.jsx'
 
 const groups = [
   ['Mission control', [['/overview', 'Overview', LayoutDashboard]]],
@@ -80,7 +81,7 @@ export function ConsoleLayout() {
             <ThemeToggle />
           </div>
         </header>
-        <main id="console-content" className="console-content"><Outlet /></main>
+        <main id="console-content" className="console-content"><RouteMotion><Outlet /></RouteMotion></main>
         <nav className="mobile-bottom-nav" aria-label="Mobile console">
           <NavLink to="/overview"><LayoutDashboard aria-hidden="true" />Overview</NavLink>
           <NavLink to="/nodes"><Network aria-hidden="true" />Nodes</NavLink>

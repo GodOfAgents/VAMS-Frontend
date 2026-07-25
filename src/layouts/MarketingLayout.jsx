@@ -1,11 +1,14 @@
 import { ExternalLink, Github, Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
+import * as m from 'motion/react-m'
 import { Brand } from '../components/navigation/Brand.jsx'
 import { SimulationBanner } from '../components/disclosures/SimulationBanner.jsx'
 import { ThemeToggle } from '../components/ui/ThemeToggle.jsx'
 import { NoiseOverlay } from '../components/ui/NoiseOverlay.jsx'
 import { appEnvironment } from '../config/environment.js'
+import { useResponsiveMotion } from '../motion/ResponsiveMotionProvider.jsx'
+import { Reveal, RouteMotion } from '../motion/primitives.jsx'
 
 const links = [
   ['/protocol', 'Protocol'],
@@ -16,8 +19,12 @@ const links = [
   ['/status', 'Status'],
 ]
 
+const MotionNav = m.nav
+
 export function MarketingLayout() {
   const [open, setOpen] = useState(false)
+  const motion = useResponsiveMotion()
+  const expandedNavigation = motion.viewportWidth > 1050 || open
 
   return (
     <div className="site-shell">
@@ -26,10 +33,23 @@ export function MarketingLayout() {
       <header className="marketing-nav">
         <div className="marketing-nav__inner">
           <Brand />
-          <nav className={`marketing-nav__links ${open ? 'is-open' : ''}`} aria-label="Primary">
+          <MotionNav
+            animate={expandedNavigation ? 'open' : 'closed'}
+            aria-label="Primary"
+            className={`marketing-nav__links ${open ? 'is-open' : ''}`}
+            initial={false}
+            variants={{
+              closed: { opacity: 0, y: -8, transition: { duration: 0.16 } },
+              open: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: 0.24, ease: [0.16, 1, 0.3, 1], staggerChildren: 0.035 },
+              },
+            }}
+          >
             {links.map(([to, label]) => <NavLink key={to} to={to} onClick={() => setOpen(false)}>{label}</NavLink>)}
             <a href={appEnvironment.docsUrl}>Read docs <ExternalLink aria-hidden="true" size={13} /></a>
-          </nav>
+          </MotionNav>
           <div className="marketing-nav__actions">
             <ThemeToggle />
             <Link className="button button--small" to="/overview">Open console</Link>
@@ -39,9 +59,9 @@ export function MarketingLayout() {
           </div>
         </div>
       </header>
-      <main id="main-content"><Outlet /></main>
+      <main id="main-content"><RouteMotion><Outlet /></RouteMotion></main>
       <footer className="site-footer">
-        <div className="site-footer__grid">
+        <Reveal className="site-footer__grid">
           <div>
             <Brand />
             <p>Verifiable infrastructure for autonomous agents.</p>
@@ -54,7 +74,7 @@ export function MarketingLayout() {
             <a href="https://github.com/GodOfAgents/VAMS"><Github aria-hidden="true" size={16} /> Protocol source</a>
             <Link to="/evidence">Evidence center</Link>
           </div>
-        </div>
+        </Reveal>
       </footer>
       <NoiseOverlay />
     </div>

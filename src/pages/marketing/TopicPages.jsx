@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { PageHeader } from '../../components/ui/PageHeader.jsx'
 import { StatusBadge } from '../../components/ui/StatusBadge.jsx'
 import { appEnvironment } from '../../config/environment.js'
+import { Reveal, StaggerGroup, StaggerItem } from '../../motion/primitives.jsx'
 
 const content = {
   protocol: {
@@ -66,19 +67,19 @@ function TopicPage({ topic }) {
   const page = content[topic]
   return (
     <div className="topic-page">
-      <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description}>
+      <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description} smoke>
         <StatusBadge state="SOURCE_IMPLEMENTED" />
       </PageHeader>
-      <div className="topic-grid">
+      <StaggerGroup className="topic-grid">
         {page.pillars.map(([title, detail], index) => (
-          <article key={title}>
+          <StaggerItem as="article" key={title}>
             <span>0{index + 1}</span>
             <h2>{title}</h2>
             <p>{detail}</p>
-          </article>
+          </StaggerItem>
         ))}
-      </div>
-      <section className="topic-callout">
+      </StaggerGroup>
+      <Reveal as="section" className="topic-callout">
         <div>
           <p className="eyebrow">Current lifecycle boundary</p>
           <h2>Inspection and explicit simulation only.</h2>
@@ -89,11 +90,11 @@ function TopicPage({ topic }) {
           <li><CircleDashed aria-hidden="true" /> Deployment evidence pending</li>
           <li><CircleDashed aria-hidden="true" /> Economic actions unavailable</li>
         </ul>
-      </section>
-      <div className="topic-actions">
+      </Reveal>
+      <Reveal className="topic-actions">
         <Link className="button" to="/overview">Open read-only console <ArrowRight aria-hidden="true" size={16} /></Link>
         <a className="button button--ghost" href={appEnvironment.docsUrl}>Read repository docs <ExternalLink aria-hidden="true" size={15} /></a>
-      </div>
+      </Reveal>
     </div>
   )
 }

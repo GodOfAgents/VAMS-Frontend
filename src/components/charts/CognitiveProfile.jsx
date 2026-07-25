@@ -16,7 +16,7 @@ export function CognitiveProfile({ values = {} }) {
     <div className="chc-profile">
       <div className="chc-profile__visual" aria-hidden="true">
         {Object.entries(dimensions).map(([key]) => (
-          <div key={key}><span>{key}</span><i style={{ '--value': `${(values[key] || 0) * 100}%` }} /></div>
+          <div key={key}><span>{key}</span><i className="chc-profile__bar" style={{ '--value': `${(values[key] || 0) * 100}%` }} /></div>
         ))}
       </div>
       <table>

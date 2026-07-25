@@ -3,6 +3,7 @@ import { Link, Outlet } from 'react-router-dom'
 import { Brand } from '../components/navigation/Brand.jsx'
 import { SimulationBanner } from '../components/disclosures/SimulationBanner.jsx'
 import { ThemeToggle } from '../components/ui/ThemeToggle.jsx'
+import { RouteMotion } from '../motion/primitives.jsx'
 
 export function StatusLayout() {
   return (
@@ -18,7 +19,7 @@ export function StatusLayout() {
           <ThemeToggle />
         </div>
       </header>
-      <main id="status-content"><Outlet /></main>
+      <main id="status-content"><RouteMotion><Outlet /></RouteMotion></main>
     </div>
   )
 }

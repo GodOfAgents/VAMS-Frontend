@@ -76,6 +76,36 @@ The explorer is always read-only.
 
 Console and evidence routes do not import or execute Three.js at runtime.
 
+The marketing hero renders a deterministic shader-displaced neural topography:
+
+- `wide`, `desktop`, `tablet`, and `mobile` profiles independently cap geometry and device pixel ratio;
+- widths below `360px`, reduced-motion clients, low-power devices, and WebGL failures use the complete CSS topology;
+- pointer proof waves are available only to fine pointers;
+- rendering pauses when the hero or browser document is not visible;
+- geometry, materials, renderer state, observers, and the canvas are disposed on teardown.
+
+## Responsive composition boundary
+
+Four layout measures prevent viewport-width and scrollbar coupling:
+
+- hero: `1440px`
+- editorial: `1280px`
+- console/data: `1180px`
+- reading measure: `60–72ch`
+
+Page gutters, section rhythm, and heading gaps change at the `360px`, `480px`, `768px`, `1200px`, and `1600px` boundaries. Component grids also use container queries where panel width is more important than viewport width.
+
+## Motion ownership
+
+`ResponsiveMotionProvider` is the single source of motion capability, entrance distance, pointer type, and hero quality.
+
+- CSS/WAAPI owns focus, hover, borders, table rows, and CHC bar entrances.
+- Motion React owns route presence, in-view reveals, stagger groups, smoke text, magnetic links, drawers, and data-state transitions.
+- GSAP ScrollTrigger is dynamically imported only for the desktop marketing lifecycle.
+- Three.js owns only the marketing-home neural topography.
+
+A component is never transformed by Motion React and GSAP simultaneously. Reduced motion removes blur, transform distance, parallax, scrubbing, magnetic response, and looping cues while retaining the complete static composition.
+
 ## Release boundary
 
 Polygon Amoy and Cardano Pre-Prod are architectural deployment targets, not deployment claims. Public-testnet exposure remains blocked until browser security, accessibility, phishing, CSP, Gateway, evidence, and dependency gates pass.

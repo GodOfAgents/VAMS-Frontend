@@ -25,6 +25,7 @@ npm run test
 npm run build:marketing
 npm run build:console
 npm run build:status
+npm run test:browser
 ```
 
 `dev:simulation` is the only built-in mode that enables deterministic synthetic explorer records. The interface displays a persistent `SIMULATED` disclosure in that mode. Missing or malformed Gateway data never triggers an automatic fixture fallback.
@@ -37,4 +38,4 @@ Explorer responses are schema validated and must use the common `/v1/explorer` e
 
 ## Architecture
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for routing, data provenance, capability intersection, Three.js isolation, and release boundaries.
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for routing, data provenance, capability intersection, responsive container roles, motion ownership, Three.js isolation, and release boundaries.

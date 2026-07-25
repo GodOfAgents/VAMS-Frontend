@@ -16,6 +16,8 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks(id) {
             if (id.includes('node_modules/three')) return 'three-marketing'
+            if (id.includes('node_modules/gsap')) return 'gsap-marketing'
+            if (id.includes('node_modules/motion')) return 'motion-ui'
             if (id.includes('node_modules/react')) return 'react-vendor'
           },
         },
@@ -23,11 +25,12 @@ export default defineConfig(({ mode }) => {
       chunkSizeWarningLimit: 500,
     },
     optimizeDeps: {
-      include: ['react', 'react-dom', 'react-router-dom', 'zod'],
+      include: ['motion/react', 'react', 'react-dom', 'react-router-dom', 'zod'],
     },
     test: {
       environment: 'node',
       globals: true,
+      include: ['src/**/*.{test,spec}.{js,jsx}'],
       fileParallelism: false,
       maxWorkers: 1,
       minWorkers: 1,

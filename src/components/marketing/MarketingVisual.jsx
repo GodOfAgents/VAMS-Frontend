@@ -1,18 +1,32 @@
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useCallback, useMemo, useState } from 'react'
+import { useHeroQuality } from '../../motion/ResponsiveMotionProvider.jsx'
 
 const NeuralField = lazy(() => import('./NeuralField.jsx'))
 
+function isLowPowerDevice() {
+  if (typeof navigator === 'undefined') return true
+  const memoryConstrained = 'deviceMemory' in navigator && navigator.deviceMemory <= 2
+  const cpuConstrained = navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 2
+  return memoryConstrained || cpuConstrained
+}
+
 export function MarketingVisual() {
-  const [reducedMotion, setReducedMotion] = useState(true)
+  const requestedQuality = useHeroQuality()
+  const [failed, setFailed] = useState(false)
+  const handleFailure = useCallback(() => setFailed(true), [])
+  const quality = useMemo(
+    () => (isLowPowerDevice() && ['mobile', 'tablet'].includes(requestedQuality) ? 'static' : requestedQuality),
+    [requestedQuality],
+  )
 
-  useEffect(() => {
-    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const update = () => setReducedMotion(query.matches)
-    update()
-    query.addEventListener('change', update)
-    return () => query.removeEventListener('change', update)
-  }, [])
-
-  if (reducedMotion) return <div className="neural-field neural-field--static" aria-hidden="true" />
-  return <Suspense fallback={<div className="neural-field neural-field--static" aria-hidden="true" />}><NeuralField /></Suspense>
+  return (
+    <div className={`hero-visual hero-visual--${quality}`} aria-hidden="true">
+      <div className="neural-field neural-field--static" />
+      {!failed && quality !== 'static' && (
+        <Suspense fallback={null}>
+          <NeuralField onFailure={handleFailure} quality={quality} />
+        </Suspense>
+      )}
+    </div>
+  )
 }

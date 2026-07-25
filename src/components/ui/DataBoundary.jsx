@@ -1,29 +1,44 @@
 import { AlertTriangle, RefreshCw } from 'lucide-react'
+import { PresenceRegion } from '../../motion/primitives.jsx'
 
 export function DataBoundary({ resource, children, emptyMessage = 'No records are visible in this environment.', onRetry }) {
   if (resource.loading) {
-    return <div className="data-state" role="status"><span className="loading-mark" /> Retrieving protocol state…</div>
+    return (
+      <PresenceRegion className="data-boundary-presence" stateKey="loading">
+        <div className="data-state" role="status"><span className="loading-mark" /> Retrieving protocol state…</div>
+      </PresenceRegion>
+    )
   }
 
   if (resource.error) {
     return (
-      <div className="data-state data-state--error" role="alert">
-        <AlertTriangle aria-hidden="true" size={22} />
-        <div>
-          <strong>Gateway unavailable</strong>
-          <p>{resource.error.message}</p>
-          <p className="mono-note">No simulated data has been substituted.</p>
+      <PresenceRegion className="data-boundary-presence" stateKey="error">
+        <div className="data-state data-state--error" role="alert">
+          <AlertTriangle aria-hidden="true" size={22} />
+          <div>
+            <strong>Gateway unavailable</strong>
+            <p>{resource.error.message}</p>
+            <p className="mono-note">No simulated data has been substituted.</p>
+          </div>
+          {onRetry && <button className="text-button" type="button" onClick={onRetry}><RefreshCw aria-hidden="true" size={15} /> Retry</button>}
         </div>
-        {onRetry && <button className="text-button" type="button" onClick={onRetry}><RefreshCw aria-hidden="true" size={15} /> Retry</button>}
-      </div>
+      </PresenceRegion>
     )
   }
 
   if (!resource.result?.data || (Array.isArray(resource.result.data) && resource.result.data.length === 0)) {
-    return <div className="data-state">{emptyMessage}</div>
+    return (
+      <PresenceRegion className="data-boundary-presence" stateKey="empty">
+        <div className="data-state">{emptyMessage}</div>
+      </PresenceRegion>
+    )
   }
 
-  return children(resource.result.data, resource.result)
+  return (
+    <PresenceRegion className="data-boundary-presence" stateKey="ready">
+      {children(resource.result.data, resource.result)}
+    </PresenceRegion>
+  )
 }
 
 export function Provenance({ envelope }) {

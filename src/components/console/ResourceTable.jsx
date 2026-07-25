@@ -8,8 +8,12 @@ export function ResourceTable({ columns, rows, linkPrefix, label }) {
         <caption>{label}</caption>
         <thead><tr>{columns.map((column) => <th key={column.key} scope="col">{column.label}</th>)}</tr></thead>
         <tbody>
-          {rows.map((row) => (
-            <tr key={row.id}>
+          {rows.map((row, rowIndex) => (
+            <tr
+              className="resource-row"
+              key={row.id}
+              style={{ '--row-delay': `${Math.min(rowIndex * 32, 320)}ms` }}
+            >
               {columns.map((column, index) => {
                 const value = column.render ? column.render(row) : row[column.key]
                 const content = column.status ? <StatusBadge state={value} /> : value

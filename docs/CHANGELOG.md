@@ -17,6 +17,8 @@ All notable frontend changes are documented here following Keep a Changelog.
 - Responsive motion primitives for route presence, in-view reveals, stagger groups, smoke text, magnetic links, drawers, and data-state transitions.
 - A deterministic shader-driven neural-topography hero with responsive quality profiles and static fallbacks.
 - Browser regression coverage for the responsive viewport matrix and cinematic-bundle isolation.
+- A word-by-word hero heading reveal with a complete reduced-motion presentation.
+- Shared subtle, panel, and strong glass-surface treatments across marketing, console, and status views.
 
 ### Changed
 
@@ -27,6 +29,8 @@ All notable frontend changes are documented here following Keep a Changelog.
 - Replaced viewport-width container calculations with role-based percentage containers, responsive gutters, and component-aware grids.
 - Rebalanced hero, navigation, editorial, console, status, and evidence spacing from `320px` through ultrawide layouts.
 - Limited GSAP ScrollTrigger to the desktop homepage lifecycle; tablet and mobile use one-time in-view reveals.
+- Restored the original full-hero rolling topography, grayscale shimmer, fog depth, pointer lift, and camera drift using GPU vertex displacement.
+- Replaced the right-biased mobile hero stage with a full-background composition that keeps calls to action in the content flow.
 
 ### Removed
 

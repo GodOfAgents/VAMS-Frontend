@@ -36,7 +36,7 @@ export function HomePage() {
           <div className="hero__copy">
             <Reveal delay={0.05}><StatusBadge state="DEPLOYMENT_PENDING" prefix="Hardened pre-testnet candidate" /></Reveal>
             <Reveal delay={0.12}><p className="hero__kicker">VERIFIABLE AGENTIC MODULAR STACK</p></Reveal>
-            <SmokeText phrases={['Verifiable', 'infrastructure for', 'autonomous agents.']} />
+            <SmokeText mode="words" phrases={['Verifiable', 'infrastructure for', 'autonomous agents.']} />
             <Reveal delay={0.5}>
               <p className="hero__lede">Discover, compose, execute, verify, and coordinate agent infrastructure across decentralized networks—without hiding the operational evidence.</p>
             </Reveal>

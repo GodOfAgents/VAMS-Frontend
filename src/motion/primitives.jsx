@@ -87,49 +87,105 @@ export function StaggerItem({ as = 'div', children, className = '' }) {
   )
 }
 
-export function SmokeText({ as = 'h1', className = '', phrases }) {
+function SmokeLine({ mode, motion, phrase, phraseIndex, phrases, wordOffset }) {
+  return (
+    <span className="smoke-text__line" aria-hidden="true">
+      {phrase.split(' ').map((word, wordIndex) => {
+        const globalWordIndex = wordOffset + wordIndex
+
+        if (mode === 'words') {
+          return (
+            <m.span
+              className="smoke-text__word smoke-text__word--animated"
+              data-smoke-index={globalWordIndex}
+              initial={{
+                opacity: 0,
+                filter: `blur(${motion.isMobile ? 6 : 12}px)`,
+                y: motion.isMobile ? 8 : 20,
+                scale: motion.isMobile ? 1.03 : 1.08,
+              }}
+              animate={{ opacity: 1, filter: 'blur(0px)', y: 0, scale: 1 }}
+              transition={{
+                delay: globalWordIndex * (motion.isMobile ? 0.08 : 0.11),
+                duration: 0.9,
+                ease: [0.2, 0.65, 0.3, 0.9],
+              }}
+              key={`${phrase}-${word}-${wordIndex}`}
+            >
+              {word}
+            </m.span>
+          )
+        }
+
+        return (
+          <span className="smoke-text__word" key={`${phrase}-${word}-${wordIndex}`}>
+            {word.split('').map((letter, index) => {
+              const previousPhraseLetters = phrases
+                .slice(0, phraseIndex)
+                .reduce((total, item) => total + item.replaceAll(' ', '').length, 0)
+              const previousWordLetters = phrase
+                .split(' ')
+                .slice(0, wordIndex)
+                .reduce((total, item) => total + item.length, 0)
+              const letterIndex = previousPhraseLetters + previousWordLetters + index
+              const delay = Math.min(letterIndex * (motion.isMobile ? 0.018 : 0.028), 0.65)
+
+              return (
+                <m.span
+                  className="smoke-text__letter"
+                  initial={{ opacity: 0, filter: `blur(${motion.isMobile ? 6 : 12}px)`, y: motion.distance, scale: motion.isMobile ? 1.03 : 1.08 }}
+                  animate={{ opacity: 1, filter: 'blur(0px)', y: 0, scale: 1 }}
+                  transition={{ delay, duration: motion.isMobile ? 0.68 : 0.92, ease: [0.2, 0.65, 0.3, 0.9] }}
+                  key={`${word}-${index}`}
+                >
+                  {letter}
+                </m.span>
+              )
+            })}
+          </span>
+        )
+      })}
+    </span>
+  )
+}
+
+export function SmokeText({ as = 'h1', className = '', mode = 'letters', phrases }) {
   const motion = useResponsiveMotion()
   const Tag = as
+  const lines = phrases.map((phrase, phraseIndex) => ({
+    phrase,
+    phraseIndex,
+    wordOffset: phrases
+      .slice(0, phraseIndex)
+      .reduce((total, previousPhrase) => total + previousPhrase.split(' ').length, 0),
+  }))
 
   if (motion.reducedMotion) {
     return (
-      <Tag className={`smoke-text ${className}`} aria-label={phrases.join(' ')}>
-        {phrases.map((phrase) => <span className="smoke-text__line" key={phrase}>{phrase}</span>)}
+      <Tag className={`smoke-text ${className}`} aria-label={phrases.join(' ')} data-smoke-mode={mode}>
+        {lines.map(({ phrase, wordOffset: lineWordOffset }) => (
+          <span className="smoke-text__line" aria-hidden="true" key={phrase}>
+            {phrase.split(' ').map((word, wordIndex) => (
+              <span className="smoke-text__word" data-smoke-index={lineWordOffset + wordIndex} key={`${phrase}-${word}-${wordIndex}`}>{word}</span>
+            ))}
+          </span>
+        ))}
       </Tag>
     )
   }
 
   return (
-    <Tag className={`smoke-text ${className}`} aria-label={phrases.join(' ')}>
-      {phrases.map((phrase, phraseIndex) => (
-        <span className="smoke-text__line" aria-hidden="true" key={phrase}>
-          {phrase.split(' ').map((word, wordIndex) => (
-            <span className="smoke-text__word" key={`${phrase}-${word}-${wordIndex}`}>
-              {word.split('').map((letter, index) => {
-                const previousPhraseLetters = phrases
-                  .slice(0, phraseIndex)
-                  .reduce((total, item) => total + item.replaceAll(' ', '').length, 0)
-                const previousWordLetters = phrase
-                  .split(' ')
-                  .slice(0, wordIndex)
-                  .reduce((total, item) => total + item.length, 0)
-                const letterIndex = previousPhraseLetters + previousWordLetters + index
-                const delay = Math.min(letterIndex * (motion.isMobile ? 0.018 : 0.028), 0.65)
-                return (
-                  <m.span
-                    className="smoke-text__letter"
-                    initial={{ opacity: 0, filter: `blur(${motion.isMobile ? 6 : 12}px)`, y: motion.distance, scale: motion.isMobile ? 1.03 : 1.08 }}
-                    animate={{ opacity: 1, filter: 'blur(0px)', y: 0, scale: 1 }}
-                    transition={{ delay, duration: motion.isMobile ? 0.68 : 0.92, ease: [0.2, 0.65, 0.3, 0.9] }}
-                    key={`${word}-${index}`}
-                  >
-                    {letter}
-                  </m.span>
-                )
-              })}
-            </span>
-          ))}
-        </span>
+    <Tag className={`smoke-text ${className}`} aria-label={phrases.join(' ')} data-smoke-mode={mode}>
+      {lines.map(({ phrase, phraseIndex, wordOffset: lineWordOffset }) => (
+        <SmokeLine
+          mode={mode}
+          motion={motion}
+          phrase={phrase}
+          phraseIndex={phraseIndex}
+          phrases={phrases}
+          wordOffset={lineWordOffset}
+          key={phrase}
+        />
       ))}
     </Tag>
   )

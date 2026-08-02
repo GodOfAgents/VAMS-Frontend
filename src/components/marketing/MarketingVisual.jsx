@@ -15,12 +15,12 @@ export function MarketingVisual() {
   const [failed, setFailed] = useState(false)
   const handleFailure = useCallback(() => setFailed(true), [])
   const quality = useMemo(
-    () => (isLowPowerDevice() && ['mobile', 'tablet'].includes(requestedQuality) ? 'static' : requestedQuality),
+    () => (isLowPowerDevice() ? 'static' : requestedQuality),
     [requestedQuality],
   )
 
   return (
-    <div className={`hero-visual hero-visual--${quality}`} aria-hidden="true">
+    <div className={`hero-visual hero-visual--${quality}`} aria-hidden="true" data-hero-quality={quality}>
       <div className="neural-field neural-field--static" />
       {!failed && quality !== 'static' && (
         <Suspense fallback={null}>

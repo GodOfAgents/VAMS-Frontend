@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { AnimatePresence, useMotionValue, useSpring } from 'motion/react'
 import * as m from 'motion/react-m'
 import { Link, useLocation } from 'react-router-dom'
@@ -87,7 +87,7 @@ export function StaggerItem({ as = 'div', children, className = '' }) {
   )
 }
 
-function SmokeLine({ mode, motion, phrase, phraseIndex, phrases, wordOffset }) {
+function SmokeLine({ mode, motion, onFinalWordReveal, phrase, phraseIndex, phrases, totalWords, wordOffset }) {
   return (
     <span className="smoke-text__line" aria-hidden="true">
       {phrase.split(' ').map((word, wordIndex) => {
@@ -98,6 +98,7 @@ function SmokeLine({ mode, motion, phrase, phraseIndex, phrases, wordOffset }) {
             <m.span
               className="smoke-text__word smoke-text__word--animated"
               data-smoke-index={globalWordIndex}
+              data-smoke-final={globalWordIndex === totalWords - 1 ? 'true' : undefined}
               initial={{
                 opacity: 0,
                 filter: `blur(${motion.isMobile ? 6 : 12}px)`,
@@ -110,6 +111,7 @@ function SmokeLine({ mode, motion, phrase, phraseIndex, phrases, wordOffset }) {
                 duration: 0.9,
                 ease: [0.2, 0.65, 0.3, 0.9],
               }}
+              onAnimationComplete={globalWordIndex === totalWords - 1 ? onFinalWordReveal : undefined}
               key={`${phrase}-${word}-${wordIndex}`}
             >
               {word}
@@ -149,9 +151,16 @@ function SmokeLine({ mode, motion, phrase, phraseIndex, phrases, wordOffset }) {
   )
 }
 
-export function SmokeText({ as = 'h1', className = '', mode = 'letters', phrases }) {
+export function SmokeText({ as = 'h1', className = '', mode = 'letters', onRevealComplete, phrases }) {
   const motion = useResponsiveMotion()
+  const revealCompletedRef = useRef(false)
   const Tag = as
+  const totalWords = phrases.reduce((total, phrase) => total + phrase.split(' ').length, 0)
+  const handleFinalWordReveal = useCallback(() => {
+    if (revealCompletedRef.current) return
+    revealCompletedRef.current = true
+    onRevealComplete?.()
+  }, [onRevealComplete])
   const lines = phrases.map((phrase, phraseIndex) => ({
     phrase,
     phraseIndex,
@@ -159,6 +168,14 @@ export function SmokeText({ as = 'h1', className = '', mode = 'letters', phrases
       .slice(0, phraseIndex)
       .reduce((total, previousPhrase) => total + previousPhrase.split(' ').length, 0),
   }))
+
+  useEffect(() => {
+    if (mode !== 'words' || motion.reducedMotion || !onRevealComplete) return undefined
+    const staggerSeconds = motion.isMobile ? 0.08 : 0.11
+    const revealDurationMs = ((totalWords - 1) * staggerSeconds + 0.9) * 1000
+    const completionTimer = window.setTimeout(handleFinalWordReveal, revealDurationMs)
+    return () => window.clearTimeout(completionTimer)
+  }, [handleFinalWordReveal, mode, motion.isMobile, motion.reducedMotion, onRevealComplete, totalWords])
 
   if (motion.reducedMotion) {
     return (
@@ -180,9 +197,11 @@ export function SmokeText({ as = 'h1', className = '', mode = 'letters', phrases
         <SmokeLine
           mode={mode}
           motion={motion}
+          onFinalWordReveal={handleFinalWordReveal}
           phrase={phrase}
           phraseIndex={phraseIndex}
           phrases={phrases}
+          totalWords={totalWords}
           wordOffset={lineWordOffset}
           key={phrase}
         />

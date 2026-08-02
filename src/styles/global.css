@@ -2896,6 +2896,20 @@ body {
   pointer-events: none;
 }
 
+.hero-visual .neural-field--canvas {
+  opacity: 0;
+  transition: opacity 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-visual[data-hero-renderer="ready"] .neural-field--canvas {
+  opacity: 0.86;
+}
+
+.hero-visual[data-hero-renderer="ready"] .neural-field--static {
+  opacity: 0.34;
+  transition: opacity 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 .hero-visual .neural-field--static {
   overflow: hidden;
   opacity: 0.9;
@@ -2931,6 +2945,14 @@ body {
   background:
     linear-gradient(90deg, #050505 0%, rgba(5, 5, 5, 0.9) 36%, rgba(5, 5, 5, 0.5) 62%, rgba(5, 5, 5, 0.08) 88%),
     linear-gradient(180deg, rgba(5, 5, 5, 0.06) 58%, rgba(5, 5, 5, 0.62));
+}
+
+@media (min-width: 1600px) {
+  .hero::after {
+    background:
+      linear-gradient(90deg, #050505 0%, rgba(5, 5, 5, 0.91) 32%, rgba(5, 5, 5, 0.46) 58%, rgba(5, 5, 5, 0.04) 88%),
+      radial-gradient(ellipse at 73% 58%, transparent 0 26%, rgba(5, 5, 5, 0.2) 58%, rgba(5, 5, 5, 0.58));
+  }
 }
 
 .smoke-text__word--animated {
@@ -3090,6 +3112,14 @@ body {
       radial-gradient(ellipse at 72% 54%, rgba(255, 255, 255, 0.17), transparent 25%),
       radial-gradient(circle, rgba(225, 225, 219, 0.48) 0 0.7px, transparent 1.1px) 0 0 / 17px 14px,
       #050505;
+  }
+
+  .hero-visual[data-hero-renderer="ready"] .neural-field--canvas {
+    opacity: 0.76;
+  }
+
+  .hero-visual[data-hero-renderer="ready"] .neural-field--static {
+    opacity: 0.46;
   }
 }
 

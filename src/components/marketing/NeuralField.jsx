@@ -1,53 +1,67 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
+import {
+  createFrameBudgetController,
+  getNextLowerHeroTier,
+  getViewportHeroTier,
+  HERO_QUALITY_ORDER,
+} from '../../motion/heroQuality.js'
 
 const qualityProfiles = {
-  mobile: {
+  low: {
+    antialias: false,
+    budgetMs: 30,
     camera: [0, 4.6, 12.8],
-    dpr: 1.25,
+    density: 0.82,
     height: 18,
-    opacity: 0.58,
-    pointScale: 2.6,
+    opacity: 0.6,
+    pointScale: 2.75,
     pointerRadius: 4.2,
     position: [0, -3.2, -1.4],
     rotation: -1.14,
-    segments: [56, 40],
+    segments: [48, 32],
     width: 24,
   },
-  tablet: {
+  medium: {
+    antialias: false,
+    budgetMs: 30,
     camera: [0, 5, 12.4],
-    dpr: 1.25,
+    density: 0.88,
     height: 26,
-    opacity: 0.58,
-    pointScale: 2.45,
+    opacity: 0.61,
+    pointScale: 2.55,
     pointerRadius: 5.4,
     position: [0, -2.4, -1.1],
     rotation: -1.2,
-    segments: [88, 64],
+    segments: [72, 48],
     width: 38,
   },
-  desktop: {
+  high: {
+    antialias: true,
+    budgetMs: 22,
     camera: [0, 5.2, 12.4],
-    dpr: 1.5,
+    density: 0.94,
     height: 36,
-    opacity: 0.64,
-    pointScale: 2.3,
+    opacity: 0.67,
+    pointScale: 2.4,
     pointerRadius: 6.8,
     position: [0, -1.7, -0.9],
     rotation: -Math.PI / 2.5,
-    segments: [128, 88],
+    segments: [112, 72],
     width: 58,
   },
   wide: {
+    antialias: true,
+    budgetMs: 22,
     camera: [0, 5.6, 13.2],
-    dpr: 1.5,
+    density: 1,
     height: 42,
-    opacity: 0.66,
-    pointScale: 2.2,
+    opacity: 0.69,
+    pointScale: 2.3,
     pointerRadius: 7.4,
     position: [0, -1.4, -0.8],
     rotation: -Math.PI / 2.5,
-    segments: [144, 96],
+    segments: [128, 80],
     width: 68,
   },
 }
@@ -55,14 +69,21 @@ const qualityProfiles = {
 const terrainVertexShader = `
   uniform float uTime;
   uniform float uPixelRatio;
+  uniform float uPointDensity;
   uniform float uPointScale;
   uniform float uPointerRadius;
   uniform float uPointerStrength;
+  uniform float uProofProgress;
+  uniform float uScrollProgress;
+  uniform float uMotionScale;
   uniform vec2 uPointer;
+  attribute float aDensity;
   attribute float aShade;
   varying float vDepth;
   varying float vElevation;
+  varying float vProof;
   varying float vShade;
+  varying float vVisible;
   varying vec2 vUv;
 
   vec3 mod289(vec3 x) {
@@ -116,11 +137,14 @@ const terrainVertexShader = `
     return 130.0 * dot(m, gradient);
   }
 
-  vec3 displacedPosition(vec3 source) {
-    vec2 slowDrift = vec2(uTime * 0.042, -uTime * 0.026);
+  vec3 displacedPosition(vec3 source, vec2 terrainUv) {
+    vec2 slowDrift = vec2(uTime * 0.042, -uTime * 0.026) * uMotionScale;
     float broadTerrain = simplexNoise(source.xy * 0.105 + slowDrift);
     float terrainDetail = simplexNoise(source.xy * 0.29 - slowDrift * 1.3) * 0.32;
     float longRidge = simplexNoise(source.xy * vec2(0.052, 0.072) + vec2(-uTime * 0.018, uTime * 0.012));
+    float focalRidge = exp(-pow((terrainUv.x - 0.72) * 3.2, 2.0))
+      * exp(-pow((terrainUv.y - 0.54) * 2.2, 2.0))
+      * 0.92;
     float pointerDistance = distance(source.xy, uPointer);
     float pointerLift = smoothstep(uPointerRadius, 0.0, pointerDistance)
       * uPointerStrength
@@ -129,28 +153,39 @@ const terrainVertexShader = `
       * smoothstep(uPointerRadius * 1.35, 0.0, pointerDistance)
       * uPointerStrength
       * 0.16;
+    float proofPath = terrainUv.x * 0.76 + (1.0 - terrainUv.y) * 0.24;
+    float proofDistance = proofPath - uProofProgress;
+    float proofWave = exp(-pow(proofDistance * 18.0, 2.0))
+      * smoothstep(0.0, 0.12, uProofProgress)
+      * (1.0 - smoothstep(0.92, 1.12, uProofProgress));
+    float proofLift = proofWave * (0.7 + sin(terrainUv.y * 20.0) * 0.12);
+    float scrollFlatten = 1.0 - uScrollProgress * 0.18;
 
     vec3 transformed = source;
-    transformed.z = broadTerrain * 1.28
+    transformed.z = (broadTerrain * 1.28
       + terrainDetail
       + longRidge * 0.38
+      + focalRidge
       + pointerLift
-      + proofRipple;
+      + proofRipple
+      + proofLift) * scrollFlatten;
+    vProof = proofWave;
     return transformed;
   }
 
   void main() {
-    vec3 transformed = displacedPosition(position);
+    vec3 transformed = displacedPosition(position, uv);
     vec4 modelPosition = modelMatrix * vec4(transformed, 1.0);
     vec4 viewPosition = viewMatrix * modelPosition;
     vDepth = clamp((-viewPosition.z - 4.0) / 30.0, 0.0, 1.0);
     vElevation = transformed.z;
     vShade = aShade;
+    vVisible = step(aDensity, uPointDensity);
     vUv = uv;
     gl_Position = projectionMatrix * viewPosition;
     gl_PointSize = max(
       1.0,
-      uPointScale * uPixelRatio * (14.0 / max(3.5, -viewPosition.z))
+      uPointScale * uPixelRatio * (14.0 / max(3.5, -viewPosition.z)) * vVisible
     );
   }
 `
@@ -159,10 +194,13 @@ const pointFragmentShader = `
   uniform float uOpacity;
   varying float vDepth;
   varying float vElevation;
+  varying float vProof;
   varying float vShade;
+  varying float vVisible;
   varying vec2 vUv;
 
   void main() {
+    if (vVisible < 0.5) discard;
     float distanceToCenter = distance(gl_PointCoord, vec2(0.5));
     if (distanceToCenter > 0.5) discard;
 
@@ -171,8 +209,8 @@ const pointFragmentShader = `
     float edgeFadeX = smoothstep(0.0, 0.08, vUv.x) * smoothstep(0.0, 0.08, 1.0 - vUv.x);
     float edgeFadeY = smoothstep(0.0, 0.11, vUv.y) * smoothstep(0.0, 0.11, 1.0 - vUv.y);
     float elevationLight = clamp(0.72 + vElevation * 0.12, 0.42, 1.0);
-    float shade = clamp(vShade * elevationLight, 0.2, 0.88);
-    float alpha = pointEdge * horizonFog * edgeFadeX * edgeFadeY * uOpacity;
+    float shade = clamp(vShade * elevationLight + vProof * 0.34, 0.2, 1.0);
+    float alpha = pointEdge * horizonFog * edgeFadeX * edgeFadeY * uOpacity * (1.0 + vProof * 0.42);
 
     gl_FragColor = vec4(vec3(shade), alpha);
   }
@@ -187,32 +225,49 @@ function createTerrainGeometry(profile) {
   const [segmentsX, segmentsY] = profile.segments
   const geometry = new THREE.PlaneGeometry(profile.width, profile.height, segmentsX, segmentsY)
   const positions = geometry.attributes.position
+  const densities = new Float32Array(positions.count)
   const shades = new Float32Array(positions.count)
 
   for (let index = 0; index < positions.count; index += 1) {
     positions.setX(index, positions.getX(index) + (deterministicValue(index) - 0.5) * 0.08)
     positions.setY(index, positions.getY(index) + (deterministicValue(index, 23) - 0.5) * 0.08)
+    densities[index] = deterministicValue(index, 71)
     shades[index] = 0.28 + deterministicValue(index, 47) * 0.5
   }
 
   positions.needsUpdate = true
+  geometry.setAttribute('aDensity', new THREE.BufferAttribute(densities, 1))
   geometry.setAttribute('aShade', new THREE.BufferAttribute(shades, 1))
   return geometry
 }
 
-export default function NeuralField({ onFailure, quality = 'desktop' }) {
+export default function NeuralField({
+  onDegrade,
+  onFailure,
+  onReady,
+  proofSignal = 0,
+  quality,
+}) {
   const mountRef = useRef(null)
+  const proofSignalRef = useRef(proofSignal)
+  const triggerProofRef = useRef(null)
+
+  useEffect(() => {
+    proofSignalRef.current = proofSignal
+    if (proofSignal > 0) triggerProofRef.current?.()
+  }, [proofSignal])
 
   useEffect(() => {
     const container = mountRef.current
-    const profile = qualityProfiles[quality] || qualityProfiles.desktop
+    const tier = quality?.tier || 'high'
+    const profile = qualityProfiles[tier] || qualityProfiles.high
     if (!container) return undefined
 
     let renderer
     try {
       renderer = new THREE.WebGLRenderer({
         alpha: true,
-        antialias: true,
+        antialias: profile.antialias,
         powerPreference: 'high-performance',
       })
     } catch {
@@ -232,18 +287,22 @@ export default function NeuralField({ onFailure, quality = 'desktop' }) {
 
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.setClearAlpha(0)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, profile.dpr))
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality.maxDpr))
     renderer.setSize(container.clientWidth, container.clientHeight)
     container.appendChild(renderer.domElement)
 
     const geometry = createTerrainGeometry(profile)
     const uniforms = {
       uOpacity: { value: profile.opacity },
-      uPixelRatio: { value: Math.min(window.devicePixelRatio, profile.dpr) },
+      uMotionScale: { value: tier === 'low' ? 0.62 : tier === 'medium' ? 0.78 : 1 },
+      uPixelRatio: { value: Math.min(window.devicePixelRatio, quality.maxDpr) },
+      uPointDensity: { value: profile.density },
       uPointer: { value: new THREE.Vector2(0, 0) },
       uPointerRadius: { value: profile.pointerRadius },
       uPointerStrength: { value: 0 },
       uPointScale: { value: profile.pointScale },
+      uProofProgress: { value: -1 },
+      uScrollProgress: { value: 0 },
       uTime: { value: 0 },
     }
     const material = new THREE.ShaderMaterial({
@@ -260,26 +319,83 @@ export default function NeuralField({ onFailure, quality = 'desktop' }) {
     scene.add(terrain)
 
     const clock = new THREE.Clock()
+    const frameBudget = createFrameBudgetController({ thresholdMs: profile.budgetMs })
     const pointerTarget = new THREE.Vector2(0, 0)
+    const minimumFrameInterval = quality.targetFps ? 1000 / quality.targetFps : 0
+    let degradeRequested = false
+    let lastAnimationAt = null
+    let lastRenderAt = Number.NEGATIVE_INFINITY
     let pageVisible = document.visibilityState === 'visible'
-    let targetStrength = 0.16
+    let proofPlayed = false
+    let proofStartsAt = null
+    let readyReported = false
+    let scrollFrame = null
+    let scrollTarget = 0
+    let targetStrength = 0
     let visible = true
 
-    const render = () => {
+    const triggerProof = () => {
+      if (proofPlayed) return
+      proofPlayed = true
+      proofStartsAt = performance.now() + 250
+      container.dataset.proofCount = '1'
+      container.dataset.proofWave = 'scheduled'
+    }
+    triggerProofRef.current = triggerProof
+    container.dataset.proofCount = '0'
+    if (proofSignalRef.current > 0) triggerProof()
+
+    const render = (animationTime = performance.now()) => {
       if (!visible || !pageVisible) return
+
+      if (lastAnimationAt !== null && !degradeRequested) {
+        const frameInterval = animationTime - lastAnimationAt
+        if (frameBudget.record(frameInterval, animationTime)) {
+          degradeRequested = true
+          onDegrade?.(getNextLowerHeroTier(tier))
+        }
+      }
+      lastAnimationAt = animationTime
+
+      if (animationTime - lastRenderAt < minimumFrameInterval - 0.5) return
+      lastRenderAt = animationTime
+
       const time = clock.getElapsedTime()
       uniforms.uTime.value = time
       uniforms.uPointer.value.lerp(pointerTarget, 0.065)
       uniforms.uPointerStrength.value += (targetStrength - uniforms.uPointerStrength.value) * 0.055
+      uniforms.uScrollProgress.value += (scrollTarget - uniforms.uScrollProgress.value) * 0.075
 
-      if (quality === 'desktop' || quality === 'wide') {
+      if (proofStartsAt !== null && animationTime >= proofStartsAt) {
+        const proofProgress = (animationTime - proofStartsAt) / 1400
+        if (proofProgress <= 1.12) {
+          uniforms.uProofProgress.value = proofProgress
+          container.dataset.proofWave = 'active'
+        } else {
+          uniforms.uProofProgress.value = -1
+          container.dataset.proofWave = 'complete'
+          proofStartsAt = null
+        }
+      }
+
+      if (tier === 'high' || tier === 'wide') {
         camera.position.x = profile.camera[0] + Math.sin(time * 0.08) * 0.78
-        camera.position.y = profile.camera[1] + Math.cos(time * 0.065) * 0.13
-        camera.position.z = profile.camera[2] + Math.sin(time * 0.045) * 0.12
+        camera.position.y = profile.camera[1]
+          + Math.cos(time * 0.065) * 0.13
+          + uniforms.uScrollProgress.value * 0.18
+        camera.position.z = profile.camera[2]
+          + Math.sin(time * 0.045) * 0.12
+          - uniforms.uScrollProgress.value * profile.camera[2] * 0.04
         camera.lookAt(0, -0.8, 0)
       }
 
+      uniforms.uOpacity.value = profile.opacity * (1 - uniforms.uScrollProgress.value * 0.28)
       renderer.render(scene, camera)
+
+      if (!readyReported) {
+        readyReported = true
+        onReady?.()
+      }
     }
 
     const updateLoop = () => {
@@ -295,7 +411,7 @@ export default function NeuralField({ onFailure, quality = 'desktop' }) {
         && event.clientY <= bounds.bottom
 
       if (!withinHero) {
-        targetStrength = 0.16
+        targetStrength = 0
         return
       }
 
@@ -306,6 +422,19 @@ export default function NeuralField({ onFailure, quality = 'desktop' }) {
         (0.48 - normalizedY) * profile.height * 0.68,
       )
       targetStrength = 1
+    }
+
+    const updateScrollTarget = () => {
+      scrollFrame = null
+      const hero = container.closest('.hero')
+      if (!hero) return
+      const bounds = hero.getBoundingClientRect()
+      scrollTarget = THREE.MathUtils.clamp(-bounds.top / Math.max(bounds.height * 0.85, 1), 0, 1)
+    }
+
+    const handleScroll = () => {
+      if (scrollFrame !== null) return
+      scrollFrame = window.requestAnimationFrame(updateScrollTarget)
     }
 
     const handleVisibility = () => {
@@ -321,9 +450,15 @@ export default function NeuralField({ onFailure, quality = 'desktop' }) {
 
     const resize = () => {
       if (!container.clientWidth || !container.clientHeight) return
+      const viewportTier = getViewportHeroTier(window.innerWidth)
+      if (HERO_QUALITY_ORDER.indexOf(viewportTier) < HERO_QUALITY_ORDER.indexOf(tier)) {
+        degradeRequested = true
+        onDegrade?.(viewportTier)
+        return
+      }
       camera.aspect = container.clientWidth / container.clientHeight
       camera.updateProjectionMatrix()
-      const pixelRatio = Math.min(window.devicePixelRatio, profile.dpr)
+      const pixelRatio = Math.min(window.devicePixelRatio, quality.maxDpr)
       renderer.setPixelRatio(pixelRatio)
       uniforms.uPixelRatio.value = pixelRatio
       renderer.setSize(container.clientWidth, container.clientHeight)
@@ -334,13 +469,15 @@ export default function NeuralField({ onFailure, quality = 'desktop' }) {
       updateLoop()
     }, { rootMargin: '120px 0px' })
     const resizeObserver = new ResizeObserver(resize)
-    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches
-
     intersectionObserver.observe(container)
     resizeObserver.observe(container)
     document.addEventListener('visibilitychange', handleVisibility)
     renderer.domElement.addEventListener('webglcontextlost', handleContextLost)
-    if (finePointer) window.addEventListener('pointermove', handlePointerMove, { passive: true })
+    if (quality.pointerEnabled) window.addEventListener('pointermove', handlePointerMove, { passive: true })
+    if (quality.scrollEnabled) {
+      window.addEventListener('scroll', handleScroll, { passive: true })
+      updateScrollTarget()
+    }
 
     updateLoop()
 
@@ -351,13 +488,16 @@ export default function NeuralField({ onFailure, quality = 'desktop' }) {
       document.removeEventListener('visibilitychange', handleVisibility)
       renderer.domElement.removeEventListener('webglcontextlost', handleContextLost)
       window.removeEventListener('pointermove', handlePointerMove)
+      window.removeEventListener('scroll', handleScroll)
+      if (scrollFrame !== null) window.cancelAnimationFrame(scrollFrame)
+      if (triggerProofRef.current === triggerProof) triggerProofRef.current = null
       geometry.dispose()
       material.dispose()
       renderer.dispose()
       renderer.forceContextLoss()
-      renderer.domElement.remove()
+      if (renderer.domElement.isConnected) renderer.domElement.remove()
     }
-  }, [onFailure, quality])
+  }, [onDegrade, onFailure, onReady, quality])
 
   return (
     <div
@@ -365,7 +505,7 @@ export default function NeuralField({ onFailure, quality = 'desktop' }) {
       ref={mountRef}
       aria-hidden="true"
       data-marketing-three="true"
-      data-neural-quality={quality}
+      data-neural-quality={quality?.tier || 'high'}
     />
   )
 }

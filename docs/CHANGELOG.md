@@ -19,6 +19,8 @@ All notable frontend changes are documented here following Keep a Changelog.
 - Browser regression coverage for the responsive viewport matrix and cinematic-bundle isolation.
 - A word-by-word hero heading reveal with a complete reduced-motion presentation.
 - Shared subtle, panel, and strong glass-surface treatments across marketing, console, and status views.
+- A single-play semantic proof wave synchronized with the completed hero heading reveal.
+- Explicit loading, ready, and fallback states for the lazy Three.js renderer.
 
 ### Changed
 
@@ -31,6 +33,14 @@ All notable frontend changes are documented here following Keep a Changelog.
 - Limited GSAP ScrollTrigger to the desktop homepage lifecycle; tablet and mobile use one-time in-view reveals.
 - Restored the original full-hero rolling topography, grayscale shimmer, fog depth, pointer lift, and camera drift using GPU vertex displacement.
 - Replaced the right-biased mobile hero stage with a full-background composition that keeps calls to action in the content flow.
+- Rebalanced the neural terrain around a deliberate focal ridge, restrained desktop scroll depth, and responsive contrast masks.
+- Replaced viewport-only hero quality with performance-first tiers that can degrade only downward during a route visit.
+
+### Performance
+
+- Reduced hero DPR to `1.0` on mobile/tablet and `1.25` on desktop while lowering procedural geometry density.
+- Added frame-cadence monitoring, tier-specific frame ceilings, low-tier antialiasing removal, and automatic sustained-budget downgrades.
+- Preserved one procedural geometry and draw call with no new 3D dependencies, models, textures, or console/status bundle cost.
 
 ### Removed
 
@@ -48,6 +58,8 @@ All notable frontend changes are documented here following Keep a Changelog.
 - Added unit coverage for routing, capabilities, environment validation, response validation, simulation provenance, non-mutation, and text-based status semantics.
 - Added frozen reduced-motion visual baselines and separate animation behavior checks.
 - Added runtime assertions that console and status profiles do not request Three.js or GSAP chunks.
+- Added unit coverage for quality selection, low-power detection, downgrade ordering, and sustained frame-budget hysteresis.
+- Added browser checks for first-frame readiness, one-shot proof-wave behavior, low-DPR mobile rendering, and WebGL fallback.
 
 ### Known release blocks
 

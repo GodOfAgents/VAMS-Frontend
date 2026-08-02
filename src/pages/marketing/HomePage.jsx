@@ -1,5 +1,5 @@
 import { ArrowDown, ArrowRight, Boxes, Braces, Cpu, FileCheck2, Globe2, ShieldCheck } from 'lucide-react'
-import { useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { LifecycleEnhancer } from '../../components/marketing/LifecycleEnhancer.jsx'
 import { MarketingVisual } from '../../components/marketing/MarketingVisual.jsx'
@@ -27,16 +27,22 @@ const architecture = [
 
 export function HomePage() {
   const lifecycleRef = useRef(null)
+  const [proofSignal, setProofSignal] = useState(0)
+  const triggerProofWave = useCallback(() => setProofSignal(1), [])
 
   return (
     <>
       <section className="hero">
-        <MarketingVisual />
+        <MarketingVisual proofSignal={proofSignal} />
         <div className="hero__content">
           <div className="hero__copy">
             <Reveal delay={0.05}><StatusBadge state="DEPLOYMENT_PENDING" prefix="Hardened pre-testnet candidate" /></Reveal>
             <Reveal delay={0.12}><p className="hero__kicker">VERIFIABLE AGENTIC MODULAR STACK</p></Reveal>
-            <SmokeText mode="words" phrases={['Verifiable', 'infrastructure for', 'autonomous agents.']} />
+            <SmokeText
+              mode="words"
+              onRevealComplete={triggerProofWave}
+              phrases={['Verifiable', 'infrastructure for', 'autonomous agents.']}
+            />
             <Reveal delay={0.5}>
               <p className="hero__lede">Discover, compose, execute, verify, and coordinate agent infrastructure across decentralized networks—without hiding the operational evidence.</p>
             </Reveal>

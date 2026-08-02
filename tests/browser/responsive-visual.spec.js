@@ -66,9 +66,12 @@ test('motion and neural topography activate only for the capable marketing profi
 
   await page.goto('/', { waitUntil: 'commit' })
   await page.evaluate(() => document.fonts.ready)
+  await expect(page.locator('[data-hero-renderer="ready"]')).toBeVisible()
   await expect(page.locator('[data-marketing-three] canvas')).toBeVisible()
-  await expect(page.locator('[data-smoke-mode="words"] .smoke-text__word--animated').first()).toHaveCSS('opacity', '1')
-  await expect(page.locator('[data-neural-quality="desktop"]')).toBeVisible()
+  await expect(page.locator('[data-smoke-final="true"]')).toHaveCSS('opacity', '1')
+  await expect(page.locator('[data-neural-quality="high"]')).toBeVisible()
+  await expect(page.locator('[data-marketing-three]')).toHaveAttribute('data-proof-count', '1')
+  await expect(page.locator('[data-marketing-three]')).toHaveAttribute('data-proof-wave', 'complete')
 
   const wordIndexes = await page.locator('[data-smoke-mode="words"] .smoke-text__word--animated')
     .evaluateAll((words) => words.map((word) => Number(word.dataset.smokeIndex)))
@@ -84,9 +87,47 @@ test('motion and neural topography activate only for the capable marketing profi
   await expect.poll(async () => page.locator('.lifecycle-list .is-active').count()).toBeGreaterThan(0)
   await page.locator('.hero').scrollIntoViewIfNeeded()
   await expect(page.locator('[data-smoke-mode="words"] .smoke-text__word--animated').first()).toHaveCSS('opacity', '1')
+  await expect(page.locator('[data-marketing-three]')).toHaveAttribute('data-proof-count', '1')
 
   expect(requestedAssets.some((url) => url.includes('three-marketing'))).toBe(true)
   expect(requestedAssets.some((url) => url.includes('gsap-marketing'))).toBe(true)
+})
+
+test('mobile hero uses the low-DPR performance profile', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/', { waitUntil: 'commit' })
+  await page.evaluate(() => document.fonts.ready)
+
+  const field = page.locator('[data-neural-quality="low"]')
+  await expect(field).toBeVisible()
+  await expect(page.locator('[data-hero-renderer="ready"]')).toBeVisible()
+
+  const renderSize = await field.locator('canvas').evaluate((canvas) => ({
+    cssHeight: canvas.clientHeight,
+    cssWidth: canvas.clientWidth,
+    height: canvas.height,
+    width: canvas.width,
+  }))
+  expect(renderSize.width).toBeLessThanOrEqual(Math.ceil(renderSize.cssWidth))
+  expect(renderSize.height).toBeLessThanOrEqual(Math.ceil(renderSize.cssHeight))
+})
+
+test('WebGL failure retains the complete static hero', async ({ page }) => {
+  await page.addInitScript(() => {
+    const originalGetContext = HTMLCanvasElement.prototype.getContext
+    HTMLCanvasElement.prototype.getContext = function getContext(type, ...args) {
+      if (type === 'webgl' || type === 'webgl2' || type === 'experimental-webgl') return null
+      return originalGetContext.call(this, type, ...args)
+    }
+  })
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('/', { waitUntil: 'commit' })
+  await page.evaluate(() => document.fonts.ready)
+
+  await expect(page.locator('[data-hero-renderer="fallback"]')).toBeVisible()
+  await expect(page.locator('.neural-field--static')).toBeVisible()
+  await expect(page.locator('[data-marketing-three]')).toHaveCount(0)
+  await expect(page.locator('.hero h1')).toHaveAccessibleName('Verifiable infrastructure for autonomous agents.')
 })
 
 test('reduced motion uses the complete static hero without loading cinematic bundles', async ({ page }) => {

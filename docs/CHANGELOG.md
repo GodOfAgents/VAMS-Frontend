@@ -17,6 +17,11 @@ All notable frontend changes are documented here following Keep a Changelog.
 - Responsive motion primitives for route presence, in-view reveals, stagger groups, smoke text, magnetic links, drawers, and data-state transitions.
 - A deterministic shader-driven neural-topography hero with responsive quality profiles and static fallbacks.
 - Browser regression coverage for the responsive viewport matrix and cinematic-bundle isolation.
+- A word-by-word hero heading reveal with a complete reduced-motion presentation.
+- Shared subtle, panel, and strong glass-surface treatments across marketing, console, and status views.
+- A single-play semantic proof wave synchronized with the completed hero heading reveal.
+- Explicit loading, ready, and fallback states for the lazy Three.js renderer.
+- A fixed full-homepage neural scene with lifecycle, architecture, evidence, journey, and CTA chapter art direction.
 
 ### Changed
 
@@ -27,6 +32,19 @@ All notable frontend changes are documented here following Keep a Changelog.
 - Replaced viewport-width container calculations with role-based percentage containers, responsive gutters, and component-aware grids.
 - Rebalanced hero, navigation, editorial, console, status, and evidence spacing from `320px` through ultrawide layouts.
 - Limited GSAP ScrollTrigger to the desktop homepage lifecycle; tablet and mobile use one-time in-view reveals.
+- Restored the original full-hero rolling topography, grayscale shimmer, fog depth, pointer lift, and camera drift using GPU vertex displacement.
+- Replaced the right-biased mobile hero stage with a full-background composition that keeps calls to action in the content flow.
+- Rebalanced the neural terrain around a deliberate focal ridge, restrained desktop scroll depth, and responsive contrast masks.
+- Replaced viewport-only hero quality with performance-first tiers that can degrade only downward during a route visit.
+- Extended the hero terrain behind the complete homepage while preserving theme-aware contrast and a dark cinematic hero in light mode.
+- Tightened the `<360px` hero composition so the first primary action remains visible in the initial `320×568` viewport.
+
+### Performance
+
+- Reduced hero DPR to `1.0` on mobile/tablet and `1.25` on desktop while lowering procedural geometry density.
+- Added frame-cadence monitoring, tier-specific frame ceilings, low-tier antialiasing removal, and automatic sustained-budget downgrades.
+- Preserved one procedural geometry and draw call with no new 3D dependencies, models, textures, or console/status bundle cost.
+- Reused one adaptive scene across homepage chapters with passive scroll sampling, cached section metrics, and shader-only morphing.
 
 ### Removed
 
@@ -38,14 +56,17 @@ All notable frontend changes are documented here following Keep a Changelog.
 - Gateway origins fail closed on non-local HTTP, credentials, paths, queries, or fragments.
 - Explorer requests omit credentials and validate the common provenance envelope.
 - A baseline content security policy is present in `index.html`; production response-header verification remains a deployment gate.
+- Updated React Router and transitive build dependencies to versions with no reported npm audit vulnerabilities.
 
 ### Testing
 
 - Added unit coverage for routing, capabilities, environment validation, response validation, simulation provenance, non-mutation, and text-based status semantics.
 - Added frozen reduced-motion visual baselines and separate animation behavior checks.
 - Added runtime assertions that console and status profiles do not request Three.js or GSAP chunks.
+- Added unit coverage for quality selection, low-power detection, downgrade ordering, and sustained frame-budget hysteresis.
+- Added browser checks for first-frame readiness, one-shot proof-wave behavior, low-DPR mobile rendering, and WebGL fallback.
+- Added unit and browser coverage for chapter interpolation, theme handoff, CTA marker forwarding, full-page scene continuity, compact-mobile fallback, and route disposal.
 
 ### Known release blocks
 
-- `npm audit --omit=dev --audit-level=high` reports `GHSA-qwww-vcr4-c8h2` in React Router 7.18.1. VAMS does not expose React Server Components or action endpoints, but public-testnet exposure remains blocked until an upstream patched release is available or the router is replaced.
 - Gateway explorer implementation, public DTO redaction, signed commit-bound evidence export, CSP response headers, browser security, accessibility, and phishing reviews remain external gates.

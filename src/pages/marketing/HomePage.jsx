@@ -1,5 +1,5 @@
 import { ArrowDown, ArrowRight, Boxes, Braces, Cpu, FileCheck2, Globe2, ShieldCheck } from 'lucide-react'
-import { useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { LifecycleEnhancer } from '../../components/marketing/LifecycleEnhancer.jsx'
 import { MarketingVisual } from '../../components/marketing/MarketingVisual.jsx'
@@ -27,16 +27,23 @@ const architecture = [
 
 export function HomePage() {
   const lifecycleRef = useRef(null)
+  const [proofSignal, setProofSignal] = useState(0)
+  const triggerProofWave = useCallback(() => setProofSignal(1), [])
 
   return (
-    <>
-      <section className="hero">
-        <MarketingVisual />
+    <div className="marketing-home">
+      <MarketingVisual proofSignal={proofSignal} />
+
+      <section className="hero" data-scene-chapter="intro">
         <div className="hero__content">
           <div className="hero__copy">
             <Reveal delay={0.05}><StatusBadge state="DEPLOYMENT_PENDING" prefix="Hardened pre-testnet candidate" /></Reveal>
             <Reveal delay={0.12}><p className="hero__kicker">VERIFIABLE AGENTIC MODULAR STACK</p></Reveal>
-            <SmokeText phrases={['Verifiable', 'infrastructure for', 'autonomous agents.']} />
+            <SmokeText
+              mode="words"
+              onRevealComplete={triggerProofWave}
+              phrases={['Verifiable', 'infrastructure for', 'autonomous agents.']}
+            />
             <Reveal delay={0.5}>
               <p className="hero__lede">Discover, compose, execute, verify, and coordinate agent infrastructure across decentralized networks—without hiding the operational evidence.</p>
             </Reveal>
@@ -56,7 +63,7 @@ export function HomePage() {
         <StaggerItem><span>Interaction profile</span><strong>Read-only</strong></StaggerItem>
       </StaggerGroup>
 
-      <section className="editorial-section lifecycle-section" ref={lifecycleRef}>
+      <section className="editorial-section lifecycle-section" data-scene-chapter="lifecycle" ref={lifecycleRef}>
         <Reveal className="section-heading">
           <p className="eyebrow">The execution lifecycle</p>
           <h2>From resource discovery to verifiable evidence.</h2>
@@ -73,7 +80,7 @@ export function HomePage() {
         <LifecycleEnhancer scopeRef={lifecycleRef} />
       </section>
 
-      <section className="editorial-section editorial-section--bordered">
+      <section className="editorial-section editorial-section--bordered" data-scene-chapter="architecture">
         <Reveal className="section-heading">
           <p className="eyebrow">Architecture boundaries</p>
           <h2>One system. Explicit trust boundaries.</h2>
@@ -85,7 +92,7 @@ export function HomePage() {
         </StaggerGroup>
       </section>
 
-      <section className="evidence-feature">
+      <section className="evidence-feature" data-scene-chapter="evidence">
         <Reveal className="evidence-feature__intro">
           <p className="eyebrow">Trust and evidence</p>
           <h2>Every important claim should carry its proof state.</h2>
@@ -99,7 +106,7 @@ export function HomePage() {
         </StaggerGroup>
       </section>
 
-      <section className="journey-section">
+      <section className="journey-section" data-scene-chapter="journey">
         <Reveal><p className="eyebrow">Choose your entry point</p></Reveal>
         <StaggerGroup className="journey-grid">
           <StaggerItem><Link to="/build"><span>01</span><h3>Agent developer</h3><p>Explore blueprints and simulate composition.</p></Link></StaggerItem>
@@ -109,7 +116,7 @@ export function HomePage() {
         </StaggerGroup>
       </section>
 
-      <Reveal as="section" className="final-cta">
+      <Reveal as="section" className="final-cta" data-scene-chapter="cta">
         <p className="eyebrow">Sovereign by construction</p>
         <h2>Build agents that do not depend on a single cloud, chain, or operator.</h2>
         <div>
@@ -117,6 +124,6 @@ export function HomePage() {
           <Link className="button button--outline-light" to="/research">Inspect research</Link>
         </div>
       </Reveal>
-    </>
+    </div>
   )
 }

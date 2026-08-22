@@ -1,323 +1,426 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
+import {
+  createFrameBudgetController,
+  getNextLowerHeroTier,
+  getViewportHeroTier,
+  HERO_QUALITY_ORDER,
+} from '../../motion/heroQuality.js'
 
 const qualityProfiles = {
-  mobile: {
-    camera: [0.2, 2.1, 8.8],
-    dpr: 1.25,
-    height: 9,
-    opacity: 0.58,
-    pointScale: 2.8,
-    position: [1.3, -2.2, -0.5],
-    rotation: -1.02,
-    segments: [42, 28],
-    width: 14,
+  low: {
+    antialias: false, budgetMs: 30, camera: [0, 4.6, 12.8], density: 0.78,
+    height: 22, opacity: 0.48, pointScale: 2.75, pointerRadius: 4.2,
+    position: [0, -2.8, -1.4], rotation: -1.14, segments: [48, 32], width: 30,
   },
-  tablet: {
-    camera: [0.8, 2.8, 9.5],
-    dpr: 1.25,
-    height: 12,
-    opacity: 0.56,
-    pointScale: 2.6,
-    position: [2.8, -2.2, -0.8],
-    rotation: -1.06,
-    segments: [72, 48],
-    width: 19,
+  medium: {
+    antialias: false, budgetMs: 30, camera: [0, 5, 12.4], density: 0.86,
+    height: 30, opacity: 0.54, pointScale: 2.55, pointerRadius: 5.4,
+    position: [0, -2.2, -1.1], rotation: -1.2, segments: [72, 48], width: 42,
   },
-  desktop: {
-    camera: [1.2, 3.2, 10.2],
-    dpr: 1.5,
-    height: 14,
-    opacity: 0.62,
-    pointScale: 2.45,
-    position: [3.5, -2.1, -1],
-    rotation: -1.08,
-    segments: [96, 64],
-    width: 22,
+  high: {
+    antialias: true, budgetMs: 22, camera: [0, 5.2, 12.4], density: 0.94,
+    height: 38, opacity: 0.62, pointScale: 2.4, pointerRadius: 6.8,
+    position: [0, -1.7, -0.9], rotation: -Math.PI / 2.5, segments: [112, 72], width: 60,
   },
   wide: {
-    camera: [1.6, 3.4, 10.8],
-    dpr: 1.5,
-    height: 15,
-    opacity: 0.66,
-    pointScale: 2.35,
-    position: [4.2, -2, -1],
-    rotation: -1.08,
-    segments: [112, 72],
-    width: 24,
+    antialias: true, budgetMs: 22, camera: [0, 5.6, 13.2], density: 1,
+    height: 44, opacity: 0.65, pointScale: 2.3, pointerRadius: 7.4,
+    position: [0, -1.4, -0.8], rotation: -Math.PI / 2.5, segments: [128, 80], width: 70,
   },
 }
 
 const terrainVertexShader = `
   uniform float uTime;
   uniform float uPixelRatio;
+  uniform float uPointDensity;
   uniform float uPointScale;
+  uniform float uPointerRadius;
   uniform float uPointerStrength;
+  uniform float uProofProgress;
+  uniform float uPageProgress;
+  uniform float uChapterFrom;
+  uniform float uChapterTo;
+  uniform float uChapterMix;
+  uniform float uMotionScale;
   uniform vec2 uPointer;
-  varying float vElevation;
+  attribute float aDensity;
+  attribute float aShade;
   varying float vDepth;
+  varying float vElevation;
+  varying float vProof;
+  varying float vShade;
+  varying float vVisible;
+  varying vec2 vUv;
 
-  float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+  vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+  vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+  vec3 permute(vec3 x) { return mod289(((x * 34.0) + 10.0) * x); }
+
+  float simplexNoise(vec2 value) {
+    const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+    vec2 i = floor(value + dot(value, C.yy));
+    vec2 x0 = value - i + dot(i, C.xx);
+    vec2 i1 = x0.x > x0.y ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+    vec4 x12 = x0.xyxy + C.xxzz;
+    x12.xy -= i1;
+    i = mod289(i);
+    vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));
+    vec3 m = max(0.5 - vec3(dot(x0, x0), dot(x12.xy, x12.xy), dot(x12.zw, x12.zw)), 0.0);
+    m = m * m;
+    m = m * m;
+    vec3 x = 2.0 * fract(p * C.www) - 1.0;
+    vec3 h = abs(x) - 0.5;
+    vec3 ox = floor(x + 0.5);
+    vec3 a0 = x - ox;
+    m *= 1.79284291400159 - 0.85373472095314 * (a0 * a0 + h * h);
+    vec3 gradient;
+    gradient.x = a0.x * x0.x + h.x * x0.y;
+    gradient.yz = a0.yz * x12.xz + h.yz * x12.yw;
+    return 130.0 * dot(m, gradient);
   }
 
-  float noise(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-    vec2 u = f * f * (3.0 - 2.0 * f);
-    return mix(
-      mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
-      mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
-      u.y
-    );
+  float peak(vec2 uv, vec2 origin, vec2 scale) {
+    vec2 delta = (uv - origin) * scale;
+    return exp(-dot(delta, delta));
   }
 
-  vec3 displacedPosition(vec3 source) {
-    float broadNoise = noise(source.xy * 0.34 + vec2(uTime * 0.025, -uTime * 0.018));
-    float detailNoise = noise(source.xy * 0.82 + vec2(-uTime * 0.02, uTime * 0.016));
-    float ridge = sin(source.x * 0.52 + uTime * 0.12) * 0.22;
-    ridge += cos(source.y * 0.66 - uTime * 0.09) * 0.18;
-    float pointerDistance = distance(source.xy, uPointer);
-    float proofWave = exp(-pointerDistance * 0.5)
-      * sin(pointerDistance * 2.3 - uTime * 1.35)
-      * uPointerStrength
-      * 0.82;
+  float chapterElevation(float chapter, vec3 source, vec2 uv, float time) {
+    float ambient = simplexNoise(source.xy * 0.105 + vec2(time * 0.042, -time * 0.026)) * 1.12;
+    float detail = simplexNoise(source.xy * 0.29 - vec2(time * 0.055, -time * 0.034)) * 0.28;
+    float intro = ambient + detail + peak(uv, vec2(0.72, 0.54), vec2(3.2, 2.2)) * 1.18;
+    float lifecycle = ambient * 0.72 + detail + sin((uv.x * 0.72 + uv.y) * 19.0 - time * 0.42) * 0.18
+      + peak(uv, vec2(0.58, 0.48), vec2(2.1, 4.8)) * 0.72;
+    float architecture = ambient * 0.58 + detail * 0.72
+      + (peak(uv, vec2(0.28, 0.38), vec2(5.0, 4.4))
+      + peak(uv, vec2(0.54, 0.62), vec2(5.4, 4.8))
+      + peak(uv, vec2(0.78, 0.34), vec2(5.0, 4.2))) * 0.82;
+    float ringDistance = abs(distance(uv, vec2(0.64, 0.52)) - 0.2);
+    float evidence = ambient * 0.5 + detail * 0.64 + exp(-pow(ringDistance * 17.0, 2.0)) * 0.92;
+    float journey = ambient * 0.66 + detail * 0.72
+      + (peak(uv, vec2(0.2, 0.58), vec2(7.0, 5.0))
+      + peak(uv, vec2(0.42, 0.42), vec2(7.0, 5.0))
+      + peak(uv, vec2(0.64, 0.6), vec2(7.0, 5.0))
+      + peak(uv, vec2(0.84, 0.4), vec2(7.0, 5.0))) * 0.72;
+    float cta = ambient * 0.48 + detail * 0.55
+      + peak(uv, vec2(0.5, 0.5), vec2(2.4, 7.0)) * 1.08;
 
-    vec3 transformed = source;
-    transformed.z = (broadNoise - 0.42) * 1.55
-      + (detailNoise - 0.5) * 0.55
-      + ridge
-      + proofWave;
-    return transformed;
+    if (chapter < 0.5) return intro;
+    if (chapter < 1.5) return lifecycle;
+    if (chapter < 2.5) return architecture;
+    if (chapter < 3.5) return evidence;
+    if (chapter < 4.5) return journey;
+    return cta;
   }
 
   void main() {
-    vec3 transformed = displacedPosition(position);
+    float time = uTime * uMotionScale;
+    float elevationFrom = chapterElevation(uChapterFrom, position, uv, time);
+    float elevationTo = chapterElevation(uChapterTo, position, uv, time);
+    float elevation = mix(elevationFrom, elevationTo, smoothstep(0.0, 1.0, uChapterMix));
+    float pointerDistance = distance(position.xy, uPointer);
+    float pointerLift = smoothstep(uPointerRadius, 0.0, pointerDistance) * uPointerStrength * 1.9;
+    float pointerRipple = sin(pointerDistance * 1.45 - uTime * 1.15)
+      * smoothstep(uPointerRadius * 1.35, 0.0, pointerDistance) * uPointerStrength * 0.14;
+    float proofPath = uv.x * 0.76 + (1.0 - uv.y) * 0.24;
+    float proofDistance = proofPath - uProofProgress;
+    float proofWave = exp(-pow(proofDistance * 18.0, 2.0))
+      * smoothstep(0.0, 0.12, uProofProgress)
+      * (1.0 - smoothstep(0.92, 1.12, uProofProgress));
+
+    vec3 transformed = position;
+    transformed.z = elevation + pointerLift + pointerRipple + proofWave * (0.7 + sin(uv.y * 20.0) * 0.12);
     vec4 modelPosition = modelMatrix * vec4(transformed, 1.0);
     vec4 viewPosition = viewMatrix * modelPosition;
+    vDepth = clamp((-viewPosition.z - 4.0) / 30.0, 0.0, 1.0);
     vElevation = transformed.z;
-    vDepth = clamp((-viewPosition.z - 3.0) / 15.0, 0.0, 1.0);
+    vProof = proofWave;
+    vShade = aShade;
+    vVisible = step(aDensity, uPointDensity);
+    vUv = uv;
     gl_Position = projectionMatrix * viewPosition;
-    gl_PointSize = max(1.15, uPointScale * uPixelRatio * (10.0 / max(2.0, -viewPosition.z)));
+    gl_PointSize = max(1.0, uPointScale * uPixelRatio * (14.0 / max(3.5, -viewPosition.z)) * vVisible);
   }
 `
 
 const pointFragmentShader = `
   uniform float uOpacity;
-  varying float vElevation;
+  uniform float uThemeMix;
   varying float vDepth;
+  varying float vElevation;
+  varying float vProof;
+  varying float vShade;
+  varying float vVisible;
+  varying vec2 vUv;
 
   void main() {
+    if (vVisible < 0.5) discard;
     float distanceToCenter = distance(gl_PointCoord, vec2(0.5));
     if (distanceToCenter > 0.5) discard;
-    float edge = 1.0 - smoothstep(0.18, 0.5, distanceToCenter);
-    float elevationGlow = clamp(0.62 + vElevation * 0.18, 0.38, 1.0);
-    float fog = 1.0 - smoothstep(0.35, 1.0, vDepth);
-    gl_FragColor = vec4(vec3(0.86), edge * elevationGlow * fog * uOpacity);
+    float pointEdge = 1.0 - smoothstep(0.12, 0.5, distanceToCenter);
+    float horizonFog = exp(-pow(vDepth * 1.62, 2.0));
+    float edgeFadeX = smoothstep(0.0, 0.08, vUv.x) * smoothstep(0.0, 0.08, 1.0 - vUv.x);
+    float edgeFadeY = smoothstep(0.0, 0.11, vUv.y) * smoothstep(0.0, 0.11, 1.0 - vUv.y);
+    float elevationLight = clamp(0.72 + vElevation * 0.12, 0.42, 1.0);
+    float shade = clamp(vShade * elevationLight + vProof * 0.34, 0.18, 1.0);
+    vec3 lightPoint = vec3(0.88) * shade;
+    vec3 darkPoint = vec3(0.08 + (1.0 - shade) * 0.18);
+    vec3 pointColor = mix(darkPoint, lightPoint, uThemeMix);
+    float alpha = pointEdge * horizonFog * edgeFadeX * edgeFadeY * uOpacity * (1.0 + vProof * 0.42);
+    gl_FragColor = vec4(pointColor, alpha);
   }
 `
 
-const lineFragmentShader = `
-  uniform float uLineOpacity;
-  varying float vDepth;
-
-  void main() {
-    float fog = 1.0 - smoothstep(0.2, 1.0, vDepth);
-    gl_FragColor = vec4(vec3(0.72), uLineOpacity * fog);
-  }
-`
-
-function deterministicJitter(index) {
-  const value = Math.sin(index * 91.719 + 17.13) * 43758.5453
+function deterministicValue(index, salt = 0) {
+  const value = Math.sin(index * 91.719 + salt * 17.13) * 43758.5453
   return value - Math.floor(value)
 }
 
-function createTopologyGeometry(profile) {
+function createTerrainGeometry(profile) {
   const [segmentsX, segmentsY] = profile.segments
-  const points = new THREE.PlaneGeometry(profile.width, profile.height, segmentsX, segmentsY)
-  const positions = points.attributes.position
-
+  const geometry = new THREE.PlaneGeometry(profile.width, profile.height, segmentsX, segmentsY)
+  const positions = geometry.attributes.position
+  const densities = new Float32Array(positions.count)
+  const shades = new Float32Array(positions.count)
   for (let index = 0; index < positions.count; index += 1) {
-    const jitterX = (deterministicJitter(index) - 0.5) * 0.12
-    const jitterY = (deterministicJitter(index + 411) - 0.5) * 0.12
-    positions.setX(index, positions.getX(index) + jitterX)
-    positions.setY(index, positions.getY(index) + jitterY)
+    positions.setX(index, positions.getX(index) + (deterministicValue(index) - 0.5) * 0.08)
+    positions.setY(index, positions.getY(index) + (deterministicValue(index, 23) - 0.5) * 0.08)
+    densities[index] = deterministicValue(index, 71)
+    shades[index] = 0.32 + deterministicValue(index, 47) * 0.58
   }
   positions.needsUpdate = true
-
-  const linePositions = []
-  const rowSize = segmentsX + 1
-  const step = profile.segments[0] > 80 ? 4 : 3
-  const appendConnection = (from, to) => {
-    linePositions.push(
-      positions.getX(from), positions.getY(from), positions.getZ(from),
-      positions.getX(to), positions.getY(to), positions.getZ(to),
-    )
-  }
-
-  for (let y = 0; y <= segmentsY; y += step) {
-    for (let x = 0; x <= segmentsX; x += step) {
-      const index = y * rowSize + x
-      if (x + step <= segmentsX) appendConnection(index, index + step)
-      if (y + step <= segmentsY) appendConnection(index, index + step * rowSize)
-    }
-  }
-
-  const lines = new THREE.BufferGeometry()
-  lines.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3))
-  return { lines, points }
+  geometry.setAttribute('aDensity', new THREE.BufferAttribute(densities, 1))
+  geometry.setAttribute('aShade', new THREE.BufferAttribute(shades, 1))
+  return geometry
 }
 
-export default function NeuralField({ onFailure, quality = 'desktop' }) {
+export default function NeuralField({
+  onDegrade,
+  onFailure,
+  onReady,
+  proofSignal = 0,
+  quality,
+  sceneStateRef,
+}) {
   const mountRef = useRef(null)
+  const proofSignalRef = useRef(proofSignal)
+  const triggerProofRef = useRef(null)
+
+  useEffect(() => {
+    proofSignalRef.current = proofSignal
+    if (proofSignal > 0) triggerProofRef.current?.()
+  }, [proofSignal])
 
   useEffect(() => {
     const container = mountRef.current
-    const profile = qualityProfiles[quality] || qualityProfiles.desktop
+    const tier = quality?.tier || 'high'
+    const profile = qualityProfiles[tier] || qualityProfiles.high
     if (!container) return undefined
 
     let renderer
     try {
-      renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'high-performance' })
+      renderer = new THREE.WebGLRenderer({
+        alpha: true,
+        antialias: profile.antialias,
+        powerPreference: 'high-performance',
+      })
     } catch {
       onFailure?.()
       return undefined
     }
 
     const scene = new THREE.Scene()
-    const camera = new THREE.PerspectiveCamera(52, container.clientWidth / container.clientHeight, 0.1, 100)
+    const camera = new THREE.PerspectiveCamera(60, container.clientWidth / Math.max(container.clientHeight, 1), 0.1, 100)
     camera.position.set(...profile.camera)
-    camera.lookAt(1.8, -0.8, 0)
-
+    camera.lookAt(0, -0.8, 0)
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.setClearAlpha(0)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, profile.dpr))
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality.maxDpr))
     renderer.setSize(container.clientWidth, container.clientHeight)
     container.appendChild(renderer.domElement)
 
-    const { lines: lineGeometry, points: pointGeometry } = createTopologyGeometry(profile)
+    const geometry = createTerrainGeometry(profile)
     const uniforms = {
-      uLineOpacity: { value: profile.opacity * 0.12 },
+      uChapterFrom: { value: 0 },
+      uChapterMix: { value: 0 },
+      uChapterTo: { value: 0 },
+      uMotionScale: { value: tier === 'low' ? 0.58 : tier === 'medium' ? 0.76 : 1 },
       uOpacity: { value: profile.opacity },
-      uPixelRatio: { value: Math.min(window.devicePixelRatio, profile.dpr) },
+      uPageProgress: { value: 0 },
+      uPixelRatio: { value: Math.min(window.devicePixelRatio, quality.maxDpr) },
+      uPointDensity: { value: profile.density },
       uPointer: { value: new THREE.Vector2(0, 0) },
+      uPointerRadius: { value: profile.pointerRadius },
       uPointerStrength: { value: 0 },
       uPointScale: { value: profile.pointScale },
+      uProofProgress: { value: -1 },
+      uThemeMix: { value: sceneStateRef.current.themeMix },
       uTime: { value: 0 },
     }
-
-    const pointMaterial = new THREE.ShaderMaterial({
+    const material = new THREE.ShaderMaterial({
+      blending: THREE.NormalBlending,
       depthWrite: false,
       fragmentShader: pointFragmentShader,
       transparent: true,
       uniforms,
       vertexShader: terrainVertexShader,
     })
-    const lineMaterial = new THREE.ShaderMaterial({
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      fragmentShader: lineFragmentShader,
-      transparent: true,
-      uniforms,
-      vertexShader: terrainVertexShader,
-    })
-
-    const group = new THREE.Group()
-    const points = new THREE.Points(pointGeometry, pointMaterial)
-    const lines = new THREE.LineSegments(lineGeometry, lineMaterial)
-    group.add(lines, points)
-    group.position.set(...profile.position)
-    group.rotation.x = profile.rotation
-    scene.add(group)
+    const terrain = new THREE.Points(geometry, material)
+    terrain.position.set(...profile.position)
+    terrain.rotation.x = profile.rotation
+    scene.add(terrain)
 
     const clock = new THREE.Clock()
+    const frameBudget = createFrameBudgetController({ thresholdMs: profile.budgetMs })
     const pointerTarget = new THREE.Vector2(0, 0)
-    let targetStrength = 0
-    let visible = true
+    const minimumFrameInterval = quality.targetFps ? 1000 / quality.targetFps : 0
+    let degradeRequested = false
+    let lastAnimationAt = null
+    let lastRenderAt = Number.NEGATIVE_INFINITY
     let pageVisible = document.visibilityState === 'visible'
+    let proofPlayed = false
+    let proofStartsAt = null
+    let readyReported = false
+    let targetStrength = 0
 
-    const render = () => {
-      if (!visible || !pageVisible) return
+    const triggerProof = () => {
+      if (proofPlayed) return
+      proofPlayed = true
+      proofStartsAt = performance.now() + 250
+      container.dataset.proofCount = '1'
+      container.dataset.proofWave = 'scheduled'
+    }
+    triggerProofRef.current = triggerProof
+    container.dataset.proofCount = '0'
+    if (proofSignalRef.current > 0) triggerProof()
+
+    const render = (animationTime = performance.now()) => {
+      if (!pageVisible) return
+      if (lastAnimationAt !== null && !degradeRequested) {
+        const frameInterval = animationTime - lastAnimationAt
+        if (frameBudget.record(frameInterval, animationTime)) {
+          degradeRequested = true
+          onDegrade?.(getNextLowerHeroTier(tier))
+        }
+      }
+      lastAnimationAt = animationTime
+      if (animationTime - lastRenderAt < minimumFrameInterval - 0.5) return
+      lastRenderAt = animationTime
+
       const time = clock.getElapsedTime()
+      const sceneState = sceneStateRef.current
       uniforms.uTime.value = time
-      uniforms.uPointer.value.lerp(pointerTarget, 0.075)
-      uniforms.uPointerStrength.value += (targetStrength - uniforms.uPointerStrength.value) * 0.06
+      uniforms.uChapterFrom.value = sceneState.chapterFrom
+      uniforms.uChapterTo.value = sceneState.chapterTo
+      uniforms.uChapterMix.value += (sceneState.chapterMix - uniforms.uChapterMix.value) * 0.08
+      uniforms.uPageProgress.value += (sceneState.pageProgress - uniforms.uPageProgress.value) * 0.065
+      uniforms.uThemeMix.value += (sceneState.themeMix - uniforms.uThemeMix.value) * 0.08
+      uniforms.uPointer.value.lerp(pointerTarget, 0.065)
+      uniforms.uPointerStrength.value += (targetStrength - uniforms.uPointerStrength.value) * 0.055
 
-      if (quality === 'desktop' || quality === 'wide') {
-        camera.position.x = profile.camera[0] + Math.sin(time * 0.085) * 0.22
-        camera.position.y = profile.camera[1] + Math.cos(time * 0.07) * 0.08
-        camera.lookAt(1.8, -0.8, 0)
+      if (proofStartsAt !== null && animationTime >= proofStartsAt) {
+        const proofProgress = (animationTime - proofStartsAt) / 1400
+        if (proofProgress <= 1.12) {
+          uniforms.uProofProgress.value = proofProgress
+          container.dataset.proofWave = 'active'
+        } else {
+          uniforms.uProofProgress.value = -1
+          container.dataset.proofWave = 'complete'
+          proofStartsAt = null
+        }
       }
 
+      const scrollDrift = quality.scrollEnabled ? uniforms.uPageProgress.value : 0
+      camera.position.x = profile.camera[0] + Math.sin(time * 0.08) * (tier === 'low' ? 0.2 : 0.66)
+      camera.position.y = profile.camera[1] + Math.cos(time * 0.065) * 0.12 + scrollDrift * 0.12
+      camera.position.z = profile.camera[2] + Math.sin(time * 0.045) * 0.1 - scrollDrift * profile.camera[2] * 0.03
+      camera.lookAt(0, -0.8, 0)
+      const footerFade = 1 - THREE.MathUtils.smoothstep(sceneState.pageProgress, 0.94, 1)
+      uniforms.uOpacity.value = profile.opacity * (0.82 + (1 - sceneState.chapterMix) * 0.18) * footerFade
       renderer.render(scene, camera)
+
+      if (!readyReported) {
+        readyReported = true
+        onReady?.()
+      }
     }
 
     const updateLoop = () => {
-      renderer.setAnimationLoop(visible && pageVisible ? render : null)
-      if (visible && pageVisible) render()
+      renderer.setAnimationLoop(pageVisible ? render : null)
+      if (pageVisible) render()
     }
 
     const handlePointerMove = (event) => {
-      const bounds = container.getBoundingClientRect()
-      const normalizedX = (event.clientX - bounds.left) / bounds.width
-      const normalizedY = (event.clientY - bounds.top) / bounds.height
-      pointerTarget.set((normalizedX - 0.5) * profile.width, (0.5 - normalizedY) * profile.height)
+      const hero = container.closest('.marketing-home')?.querySelector('.hero')
+      const bounds = hero?.getBoundingClientRect()
+      const isIntro = sceneStateRef.current.activeChapter === 'intro'
+      const withinHero = bounds && event.clientX >= bounds.left && event.clientX <= bounds.right
+        && event.clientY >= bounds.top && event.clientY <= bounds.bottom
+      if (!isIntro || !withinHero) {
+        targetStrength = 0
+        return
+      }
+      pointerTarget.set(
+        ((event.clientX - bounds.left) / bounds.width - 0.5) * profile.width * 0.72,
+        (0.48 - (event.clientY - bounds.top) / bounds.height) * profile.height * 0.68,
+      )
       targetStrength = 1
-    }
-
-    const handlePointerLeave = () => {
-      pointerTarget.set(profile.width * 0.16, -profile.height * 0.08)
-      targetStrength = 0.22
     }
 
     const handleVisibility = () => {
       pageVisible = document.visibilityState === 'visible'
       updateLoop()
     }
-
+    const handleContextLost = (event) => {
+      event.preventDefault()
+      renderer.setAnimationLoop(null)
+      onFailure?.()
+    }
     const resize = () => {
       if (!container.clientWidth || !container.clientHeight) return
+      const viewportTier = getViewportHeroTier(window.innerWidth)
+      if (HERO_QUALITY_ORDER.indexOf(viewportTier) < HERO_QUALITY_ORDER.indexOf(tier)) {
+        degradeRequested = true
+        onDegrade?.(viewportTier)
+        return
+      }
       camera.aspect = container.clientWidth / container.clientHeight
       camera.updateProjectionMatrix()
-      const pixelRatio = Math.min(window.devicePixelRatio, profile.dpr)
+      const pixelRatio = Math.min(window.devicePixelRatio, quality.maxDpr)
       renderer.setPixelRatio(pixelRatio)
       uniforms.uPixelRatio.value = pixelRatio
       renderer.setSize(container.clientWidth, container.clientHeight)
     }
 
-    const intersectionObserver = new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting
-      updateLoop()
-    }, { rootMargin: '120px 0px' })
     const resizeObserver = new ResizeObserver(resize)
-    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches
-
-    intersectionObserver.observe(container)
     resizeObserver.observe(container)
     document.addEventListener('visibilitychange', handleVisibility)
-    if (finePointer) {
-      container.addEventListener('pointermove', handlePointerMove, { passive: true })
-      container.addEventListener('pointerleave', handlePointerLeave)
-    }
-
-    handlePointerLeave()
+    renderer.domElement.addEventListener('webglcontextlost', handleContextLost)
+    if (quality.pointerEnabled) window.addEventListener('pointermove', handlePointerMove, { passive: true })
     updateLoop()
 
     return () => {
       renderer.setAnimationLoop(null)
-      intersectionObserver.disconnect()
       resizeObserver.disconnect()
       document.removeEventListener('visibilitychange', handleVisibility)
-      container.removeEventListener('pointermove', handlePointerMove)
-      container.removeEventListener('pointerleave', handlePointerLeave)
-      lineGeometry.dispose()
-      pointGeometry.dispose()
-      lineMaterial.dispose()
-      pointMaterial.dispose()
+      renderer.domElement.removeEventListener('webglcontextlost', handleContextLost)
+      window.removeEventListener('pointermove', handlePointerMove)
+      if (triggerProofRef.current === triggerProof) triggerProofRef.current = null
+      geometry.dispose()
+      material.dispose()
       renderer.dispose()
-      renderer.domElement.remove()
+      renderer.forceContextLoss()
+      if (renderer.domElement.isConnected) renderer.domElement.remove()
     }
-  }, [onFailure, quality])
+  }, [onDegrade, onFailure, onReady, quality, sceneStateRef])
 
-  return <div className="neural-field neural-field--canvas" ref={mountRef} aria-hidden="true" data-marketing-three="true" />
+  return (
+    <div
+      className="neural-field neural-field--canvas"
+      ref={mountRef}
+      aria-hidden="true"
+      data-marketing-three="true"
+      data-neural-quality={quality?.tier || 'high'}
+    />
+  )
 }

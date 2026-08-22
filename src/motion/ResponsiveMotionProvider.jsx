@@ -1,10 +1,11 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { LazyMotion, MotionConfig, domAnimation } from 'motion/react'
+import { describeHeroQuality } from './heroQuality.js'
 
 const ResponsiveMotionContext = createContext({
   coarsePointer: true,
   distance: 0,
-  heroQuality: 'static',
+  heroQuality: describeHeroQuality({ coarsePointer: true, reducedMotion: true, viewportWidth: 320 }),
   isDesktop: false,
   isMobile: true,
   reducedMotion: true,
@@ -37,17 +38,10 @@ function describeMotionEnvironment(environment) {
   const { coarsePointer, reducedMotion, viewportWidth } = environment
   const isMobile = viewportWidth < 768
   const isDesktop = viewportWidth >= 1200
-  let heroQuality = 'desktop'
-
-  if (viewportWidth < 360) heroQuality = 'static'
-  else if (viewportWidth < 768) heroQuality = 'mobile'
-  else if (viewportWidth < 1200) heroQuality = 'tablet'
-  else if (viewportWidth >= 1600) heroQuality = 'wide'
-
   return {
     coarsePointer,
     distance: reducedMotion ? 0 : isDesktop ? 24 : isMobile ? 8 : 12,
-    heroQuality: reducedMotion ? 'static' : heroQuality,
+    heroQuality: describeHeroQuality(environment),
     isDesktop,
     isMobile,
     reducedMotion,

@@ -21,6 +21,7 @@ All notable frontend changes are documented here following Keep a Changelog.
 - Shared subtle, panel, and strong glass-surface treatments across marketing, console, and status views.
 - A single-play semantic proof wave synchronized with the completed hero heading reveal.
 - Explicit loading, ready, and fallback states for the lazy Three.js renderer.
+- A fixed full-homepage neural scene with lifecycle, architecture, evidence, journey, and CTA chapter art direction.
 
 ### Changed
 
@@ -35,12 +36,15 @@ All notable frontend changes are documented here following Keep a Changelog.
 - Replaced the right-biased mobile hero stage with a full-background composition that keeps calls to action in the content flow.
 - Rebalanced the neural terrain around a deliberate focal ridge, restrained desktop scroll depth, and responsive contrast masks.
 - Replaced viewport-only hero quality with performance-first tiers that can degrade only downward during a route visit.
+- Extended the hero terrain behind the complete homepage while preserving theme-aware contrast and a dark cinematic hero in light mode.
+- Tightened the `<360px` hero composition so the first primary action remains visible in the initial `320×568` viewport.
 
 ### Performance
 
 - Reduced hero DPR to `1.0` on mobile/tablet and `1.25` on desktop while lowering procedural geometry density.
 - Added frame-cadence monitoring, tier-specific frame ceilings, low-tier antialiasing removal, and automatic sustained-budget downgrades.
 - Preserved one procedural geometry and draw call with no new 3D dependencies, models, textures, or console/status bundle cost.
+- Reused one adaptive scene across homepage chapters with passive scroll sampling, cached section metrics, and shader-only morphing.
 
 ### Removed
 
@@ -60,6 +64,7 @@ All notable frontend changes are documented here following Keep a Changelog.
 - Added runtime assertions that console and status profiles do not request Three.js or GSAP chunks.
 - Added unit coverage for quality selection, low-power detection, downgrade ordering, and sustained frame-budget hysteresis.
 - Added browser checks for first-frame readiness, one-shot proof-wave behavior, low-DPR mobile rendering, and WebGL fallback.
+- Added unit and browser coverage for chapter interpolation, theme handoff, CTA marker forwarding, full-page scene continuity, compact-mobile fallback, and route disposal.
 
 ### Known release blocks
 

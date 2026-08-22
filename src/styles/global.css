@@ -3141,16 +3141,24 @@ body {
 
 @media (max-width: 359px) {
   .hero__content {
-    padding-top: 34px;
+    padding-top: 26px;
     padding-bottom: 64px;
   }
 
   .hero__kicker {
-    margin: 20px 0 12px;
+    margin: 14px 0 8px;
+  }
+
+  .hero h1,
+  .hero .smoke-text {
+    font-size: 2.48rem;
+    line-height: 0.88;
   }
 
   .hero__lede {
-    margin: 24px 0 22px;
+    margin: 16px 0;
+    font-size: 0.92rem;
+    line-height: 1.48;
   }
 }
 

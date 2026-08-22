@@ -1,6 +1,17 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
-import { SmokeText } from './primitives.jsx'
+import { Reveal, SmokeText } from './primitives.jsx'
+
+describe('Reveal', () => {
+  it('forwards semantic scene markers to its rendered element', () => {
+    const markup = renderToStaticMarkup(
+      <Reveal as="section" data-scene-chapter="cta">Final CTA</Reveal>,
+    )
+
+    expect(markup).toContain('data-scene-chapter="cta"')
+    expect(markup).toContain('<section')
+  })
+})
 
 describe('SmokeText', () => {
   it('keeps the hero word sequence and one accessible heading label', () => {

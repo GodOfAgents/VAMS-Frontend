@@ -22,7 +22,7 @@ function MotionElement({ as = 'div', ...props }) {
   return <Component {...props} />
 }
 
-export function Reveal({ as = 'div', children, className = '', delay = 0, distance, once = true }) {
+export function Reveal({ as = 'div', children, className = '', delay = 0, distance, once = true, ...props }) {
   const motion = useResponsiveMotion()
   const offset = distance ?? motion.distance
 
@@ -34,6 +34,7 @@ export function Reveal({ as = 'div', children, className = '', delay = 0, distan
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ amount: motion.isMobile ? 0.12 : 0.2, margin: '0px 0px -8% 0px', once }}
       transition={{ delay, duration: motion.isMobile ? 0.42 : 0.62, ease: [0.16, 1, 0.3, 1] }}
+      {...props}
     >
       {children}
     </MotionElement>

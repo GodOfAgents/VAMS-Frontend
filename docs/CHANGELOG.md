@@ -56,6 +56,7 @@ All notable frontend changes are documented here following Keep a Changelog.
 - Gateway origins fail closed on non-local HTTP, credentials, paths, queries, or fragments.
 - Explorer requests omit credentials and validate the common provenance envelope.
 - A baseline content security policy is present in `index.html`; production response-header verification remains a deployment gate.
+- Updated React Router and transitive build dependencies to versions with no reported npm audit vulnerabilities.
 
 ### Testing
 
@@ -68,5 +69,4 @@ All notable frontend changes are documented here following Keep a Changelog.
 
 ### Known release blocks
 
-- `npm audit --omit=dev --audit-level=high` reports `GHSA-qwww-vcr4-c8h2` in React Router 7.18.1. VAMS does not expose React Server Components or action endpoints, but public-testnet exposure remains blocked until an upstream patched release is available or the router is replaced.
 - Gateway explorer implementation, public DTO redaction, signed commit-bound evidence export, CSP response headers, browser security, accessibility, and phishing reviews remain external gates.

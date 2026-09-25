@@ -64,7 +64,7 @@ export function MarketingLayout() {
         <Reveal className="site-footer__grid">
           <div>
             <Brand />
-            <p>Verifiable infrastructure for autonomous agents.</p>
+            <p>Sovereign infrastructure for durable, verifiable digital services.</p>
           </div>
           <div>
             <p className="eyebrow">Lifecycle</p>

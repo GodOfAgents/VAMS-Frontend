@@ -67,3 +67,16 @@ test('leaving home disposes the neural scene and topic routes exclude Three.js',
   await expect(page.locator('[data-marketing-scene]')).toHaveCount(0)
   await expect(page.locator('[data-marketing-three] canvas')).toHaveCount(0)
 })
+
+test('public surfaces share fluid hover treatment without mounting a protocol scene', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('/protocol', { waitUntil: 'commit' })
+  const principle = page.locator('.topic-principles article').first()
+  await expect(principle).toBeVisible()
+  await expect(principle).toHaveCSS('transition-property', /transform/)
+  await expect(page.locator('[data-marketing-scene]')).toHaveCount(0)
+
+  await page.goto('/build', { waitUntil: 'commit' })
+  const migrationStep = page.locator('.migration-path li').first()
+  await expect(migrationStep).toHaveCSS('transition-property', /padding-left/)
+})

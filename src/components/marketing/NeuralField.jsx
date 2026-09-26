@@ -51,6 +51,7 @@ const terrainVertexShader = `
   varying float vProof;
   varying float vShade;
   varying float vVisible;
+  varying float vPointer;
   varying vec2 vUv;
 
   vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -122,6 +123,9 @@ const terrainVertexShader = `
     float pointerLift = smoothstep(uPointerRadius, 0.0, pointerDistance) * uPointerStrength * 1.9;
     float pointerRipple = sin(pointerDistance * 1.45 - uTime * 1.15)
       * smoothstep(uPointerRadius * 1.35, 0.0, pointerDistance) * uPointerStrength * 0.14;
+    float pointerEcho = sin(pointerDistance * 2.8 - uTime * 0.72)
+      * smoothstep(uPointerRadius * 1.7, 0.0, pointerDistance) * uPointerStrength * 0.07;
+    float pointerField = smoothstep(uPointerRadius * 1.15, 0.0, pointerDistance) * uPointerStrength;
     float proofPath = uv.x * 0.76 + (1.0 - uv.y) * 0.24;
     float proofDistance = proofPath - uProofProgress;
     float proofWave = exp(-pow(proofDistance * 18.0, 2.0))
@@ -129,7 +133,7 @@ const terrainVertexShader = `
       * (1.0 - smoothstep(0.92, 1.12, uProofProgress));
 
     vec3 transformed = position;
-    transformed.z = elevation + pointerLift + pointerRipple + proofWave * (0.7 + sin(uv.y * 20.0) * 0.12);
+    transformed.z = elevation + pointerLift + pointerRipple + pointerEcho + proofWave * (0.7 + sin(uv.y * 20.0) * 0.12);
     vec4 modelPosition = modelMatrix * vec4(transformed, 1.0);
     vec4 viewPosition = viewMatrix * modelPosition;
     vDepth = clamp((-viewPosition.z - 4.0) / 30.0, 0.0, 1.0);
@@ -137,6 +141,7 @@ const terrainVertexShader = `
     vProof = proofWave;
     vShade = aShade;
     vVisible = step(aDensity, uPointDensity);
+    vPointer = pointerField;
     vUv = uv;
     gl_Position = projectionMatrix * viewPosition;
     gl_PointSize = max(1.0, uPointScale * uPixelRatio * (14.0 / max(3.5, -viewPosition.z)) * vVisible);
@@ -151,6 +156,7 @@ const pointFragmentShader = `
   varying float vProof;
   varying float vShade;
   varying float vVisible;
+  varying float vPointer;
   varying vec2 vUv;
 
   void main() {
@@ -162,11 +168,11 @@ const pointFragmentShader = `
     float edgeFadeX = smoothstep(0.0, 0.08, vUv.x) * smoothstep(0.0, 0.08, 1.0 - vUv.x);
     float edgeFadeY = smoothstep(0.0, 0.11, vUv.y) * smoothstep(0.0, 0.11, 1.0 - vUv.y);
     float elevationLight = clamp(0.72 + vElevation * 0.12, 0.42, 1.0);
-    float shade = clamp(vShade * elevationLight + vProof * 0.34, 0.18, 1.0);
+    float shade = clamp(vShade * elevationLight + vProof * 0.34 + vPointer * 0.3, 0.18, 1.0);
     vec3 lightPoint = vec3(0.88) * shade;
     vec3 darkPoint = vec3(0.08 + (1.0 - shade) * 0.18);
     vec3 pointColor = mix(darkPoint, lightPoint, uThemeMix);
-    float alpha = pointEdge * horizonFog * edgeFadeX * edgeFadeY * uOpacity * (1.0 + vProof * 0.42);
+    float alpha = pointEdge * horizonFog * edgeFadeX * edgeFadeY * uOpacity * (1.0 + vProof * 0.42 + vPointer * 0.28);
     gl_FragColor = vec4(pointColor, alpha);
   }
 `

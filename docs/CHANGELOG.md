@@ -30,6 +30,7 @@ All notable frontend changes are documented here following Keep a Changelog.
 
 - Reframed the homepage around one fluid neural-topography experience with scroll chapters, pointer lift, and evidence-aware explanatory content.
 - Added a restrained pointer light and copy-depth parallax layer that follows the same neural field while respecting reduced-motion preferences.
+- Added localized neural-point luminance and echo ripples around the pointer signal without adding geometry or draw calls.
 - Extended the same fluid interaction language to public-page principle, migration, and operator-requirement surfaces.
 
 - Replaced the 68 KB monolithic landing page with one shared route-ready frontend system.

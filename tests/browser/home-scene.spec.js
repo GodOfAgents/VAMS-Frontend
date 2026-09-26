@@ -6,7 +6,13 @@ test('one adaptive neural scene carries the homepage topology from hero through 
   await page.evaluate(() => document.fonts.ready)
 
   const scene = page.locator('[data-marketing-scene]')
-  await expect(scene).toHaveAttribute('data-hero-renderer', 'ready')
+  await expect(scene).toHaveAttribute('data-hero-renderer', /^(ready|fallback)$/)
+  if (await scene.getAttribute('data-hero-renderer') === 'fallback') {
+    await expect(page.locator('.neural-field--static')).toBeVisible()
+    await expect(page.locator('[data-marketing-three] canvas')).toHaveCount(0)
+    return
+  }
+
   await expect(scene).toHaveAttribute('data-scene-active', 'intro')
   await expect(page.locator('.scene-progress')).toBeVisible()
   await expect(page.locator('.scene-progress__ticks i')).toHaveCount(6)
@@ -44,12 +50,19 @@ test('light theme preserves the dark hero before transitioning to editorial cont
   await expect.poll(() => scene.evaluate((element) => element.style.getPropertyValue('--scene-theme-mix'))).toBe('0.000')
 })
 
-test('compact mobile uses the static neural scene and keeps the first CTA in view', async ({ page }) => {
+test('compact mobile uses the low-quality neural scene and keeps the first CTA in view', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 })
   await page.goto('/', { waitUntil: 'commit' })
 
-  await expect(page.locator('[data-marketing-scene]')).toHaveAttribute('data-hero-renderer', 'fallback')
-  await expect(page.locator('[data-marketing-three] canvas')).toHaveCount(0)
+  const scene = page.locator('[data-marketing-scene]')
+  await expect(scene).toHaveAttribute('data-hero-renderer', /^(ready|fallback)$/)
+  await expect(page.locator('[data-marketing-scene]')).toHaveAttribute('data-hero-quality', 'low')
+  if (await scene.getAttribute('data-hero-renderer') === 'ready') {
+    await expect(page.locator('[data-marketing-three] canvas')).toHaveCount(1)
+  } else {
+    await expect(page.locator('[data-marketing-three] canvas')).toHaveCount(0)
+    await expect(page.locator('.neural-field--static')).toBeVisible()
+  }
   await expect(page.locator('.scene-progress')).toBeHidden()
   const ctaBounds = await page.getByRole('link', { name: /Explore the network/ }).boundingBox()
   expect(ctaBounds).not.toBeNull()

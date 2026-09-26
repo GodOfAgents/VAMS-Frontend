@@ -41,6 +41,7 @@ export function HomePage() {
             <Reveal delay={0.12}><p className="hero__kicker">VERIFIABLE AGENTIC MODULAR STACK</p></Reveal>
             <SmokeText
               mode="words"
+              triggerOnView
               onRevealComplete={triggerProofWave}
               phrases={['Sovereign', 'infrastructure for', 'enduring services.']}
             />
@@ -66,7 +67,7 @@ export function HomePage() {
       <section className="editorial-section lifecycle-section" data-scene-chapter="lifecycle" ref={lifecycleRef}>
         <Reveal className="section-heading">
           <p className="eyebrow">The execution lifecycle</p>
-          <h2>From human intent to accountable continuity.</h2>
+          <SmokeText as="h2" className="smoke-text--heading" mode="words" triggerOnView phrases={['From human intent to accountable continuity.']} />
           <p>VAMS links authority, execution, evidence, economics, and recovery into one inspectable service lifecycle.</p>
         </Reveal>
         <div className="lifecycle-list-wrap">
@@ -83,7 +84,7 @@ export function HomePage() {
       <section className="editorial-section editorial-section--bordered" data-scene-chapter="architecture">
         <Reveal className="section-heading">
           <p className="eyebrow">Architecture boundaries</p>
-          <h2>One service lifecycle. Explicit authority boundaries.</h2>
+          <SmokeText as="h2" className="smoke-text--heading" mode="words" triggerOnView phrases={['One service lifecycle. Explicit authority boundaries.']} />
         </Reveal>
         <StaggerGroup className="architecture-grid">
           {architecture.map(([Icon, title, detail]) => (
@@ -95,7 +96,7 @@ export function HomePage() {
       <section className="evidence-feature" data-scene-chapter="evidence">
         <Reveal className="evidence-feature__intro">
           <p className="eyebrow">Trust and evidence</p>
-          <h2>Every important claim should carry its proof state.</h2>
+          <SmokeText as="h2" className="smoke-text--heading" mode="words" triggerOnView phrases={['Every important claim should carry its proof state.']} />
           <p>Implementation, local verification, CI verification, deployment verification, independent review, and live observation remain distinct.</p>
           <Link className="text-link" to="/status">Inspect verification status <ArrowRight aria-hidden="true" size={15} /></Link>
         </Reveal>
@@ -118,7 +119,7 @@ export function HomePage() {
 
       <Reveal as="section" className="final-cta" data-scene-chapter="cta">
         <p className="eyebrow">The destination</p>
-        <h2>A web where our work can endure, our intelligence can evolve, and our sovereignty remains our own.</h2>
+        <SmokeText as="h2" className="smoke-text--heading" mode="words" triggerOnView phrases={['A web where our work can endure, our intelligence can evolve, and our sovereignty remains our own.']} />
         <div>
           <MagneticLink className="button button--inverse" to="/overview">Open console</MagneticLink>
           <Link className="button button--outline-light" to="/research">Inspect research</Link>

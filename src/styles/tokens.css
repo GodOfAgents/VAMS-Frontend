@@ -22,9 +22,24 @@
   --glass-blur-subtle: 2px;
   --glass-blur-panel: 8px;
   --glass-blur-strong: 18px;
-  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-serif: "Playfair Display", Georgia, "Times New Roman", serif;
-  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  /* Research-lab type system: one display face, one reading face, one instrument face. */
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-body: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-ui: var(--font-body);
+  --font-label: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  --font-sans: var(--font-body);
+  --font-serif: var(--font-display);
+  --font-mono: var(--font-label);
+  /* Shared type roles: use these roles even when page-specific sizing varies. */
+  --type-display: clamp(2.75rem, 6.4vw, 6rem);
+  --type-page: clamp(2.5rem, 5.2vw, 4.75rem);
+  --type-section: clamp(2rem, 4vw, 3.75rem);
+  --type-card: clamp(1.25rem, 2vw, 1.75rem);
+  --type-console-page: clamp(2.1rem, 4vw, 4rem);
+  --leading-display: 1;
+  --leading-section: 1.12;
+  --leading-card: 1.2;
+  --leading-body: 1.6;
   --radius-sm: 2px;
   --radius-md: 8px;
   --space-1: 0.25rem;
@@ -71,47 +86,48 @@
 @media (max-width: 359px) {
   :root {
     --page-gutter: 16px;
-    --section-space: 64px;
-    --heading-gap: 32px;
+    --section-space: 56px;
+    --heading-gap: 28px;
+    --type-display: 2.48rem;
   }
 }
 
 @media (min-width: 360px) and (max-width: 479px) {
   :root {
     --page-gutter: 20px;
-    --section-space: 72px;
-    --heading-gap: 36px;
+    --section-space: 64px;
+    --heading-gap: 32px;
   }
 }
 
 @media (min-width: 480px) and (max-width: 767px) {
   :root {
     --page-gutter: 24px;
-    --section-space: 80px;
-    --heading-gap: 40px;
+    --section-space: 64px;
+    --heading-gap: 32px;
   }
 }
 
 @media (min-width: 768px) and (max-width: 1199px) {
   :root {
     --page-gutter: 32px;
-    --section-space: 96px;
-    --heading-gap: 48px;
+    --section-space: 88px;
+    --heading-gap: 44px;
   }
 }
 
 @media (min-width: 1200px) and (max-width: 1599px) {
   :root {
     --page-gutter: 48px;
-    --section-space: 120px;
-    --heading-gap: 56px;
+    --section-space: 104px;
+    --heading-gap: 48px;
   }
 }
 
 @media (min-width: 1600px) {
   :root {
     --page-gutter: 64px;
-    --section-space: 128px;
-    --heading-gap: 64px;
+    --section-space: 104px;
+    --heading-gap: 48px;
   }
 }

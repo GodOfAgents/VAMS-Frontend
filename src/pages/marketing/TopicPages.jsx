@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { PageHeader } from '../../components/ui/PageHeader.jsx'
 import { appEnvironment } from '../../config/environment.js'
 import { Reveal } from '../../motion/primitives.jsx'
+export { ResearchPage } from './ResearchPage.jsx'
 
 const content = {
   protocol: {
@@ -127,4 +128,3 @@ export const ProtocolPage = () => <TopicPage topic="protocol" />
 export const NetworkPage = () => <TopicPage topic="network" />
 export const BuildPage = () => <TopicPage topic="build" />
 export const OperatePage = () => <TopicPage topic="operate" />
-export const ResearchPage = () => <TopicPage topic="research" />

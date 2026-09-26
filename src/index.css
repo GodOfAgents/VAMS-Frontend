@@ -2,31 +2,6 @@
 @import "./styles/tokens.css";
 @import "./styles/global.css";
 
-/* Font fallback strategy - fonts loaded async via index.html */
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 300 600;
-  font-display: swap;
-  src: local('Inter');
-}
-
-@font-face {
-  font-family: 'Playfair Display';
-  font-style: normal;
-  font-weight: 400 600;
-  font-display: swap;
-  src: local('Playfair Display');
-}
-
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 400 500;
-  font-display: swap;
-  src: local('JetBrains Mono');
-}
-
 ::selection {
   background: var(--ink);
   color: var(--canvas);

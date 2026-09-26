@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react'
-import { AnimatePresence, useMotionValue, useSpring } from 'motion/react'
+import { AnimatePresence, useInView, useMotionValue, useSpring } from 'motion/react'
 import * as m from 'motion/react-m'
 import { Link, useLocation } from 'react-router-dom'
 import { useResponsiveMotion } from './ResponsiveMotionProvider.jsx'
@@ -89,7 +89,7 @@ export function StaggerItem({ as = 'div', children, className = '', ...props }) 
   )
 }
 
-function SmokeLine({ mode, motion, onFinalWordReveal, phrase, phraseIndex, phrases, totalWords, wordOffset }) {
+function SmokeLine({ isActive, mode, motion, onFinalWordReveal, phrase, phraseIndex, phrases, totalWords, wordOffset, triggerOnView }) {
   return (
     <span className="smoke-text__line" aria-hidden="true">
       {phrase.split(' ').map((word, wordIndex) => {
@@ -103,14 +103,16 @@ function SmokeLine({ mode, motion, onFinalWordReveal, phrase, phraseIndex, phras
               data-smoke-final={globalWordIndex === totalWords - 1 ? 'true' : undefined}
               initial={{
                 opacity: 0,
-                filter: `blur(${motion.isMobile ? 6 : 12}px)`,
-                y: motion.isMobile ? 8 : 20,
-                scale: motion.isMobile ? 1.03 : 1.08,
+                filter: `blur(${motion.isMobile ? 9 : 18}px)`,
+                y: motion.isMobile ? 12 : 30,
+                scale: motion.isMobile ? 1.04 : 1.1,
               }}
-              animate={{ opacity: 1, filter: 'blur(0px)', y: 0, scale: 1 }}
+              animate={triggerOnView && !isActive
+                ? { opacity: 0, filter: `blur(${motion.isMobile ? 9 : 18}px)`, y: motion.isMobile ? 12 : 30, scale: motion.isMobile ? 1.04 : 1.1 }
+                : { opacity: 1, filter: 'blur(0px)', y: 0, scale: 1 }}
               transition={{
                 delay: globalWordIndex * (motion.isMobile ? 0.08 : 0.11),
-                duration: 0.9,
+                duration: motion.isMobile ? 0.85 : 1.12,
                 ease: [0.2, 0.65, 0.3, 0.9],
               }}
               onAnimationComplete={globalWordIndex === totalWords - 1 ? onFinalWordReveal : undefined}
@@ -137,8 +139,10 @@ function SmokeLine({ mode, motion, onFinalWordReveal, phrase, phraseIndex, phras
               return (
                 <m.span
                   className="smoke-text__letter"
-                  initial={{ opacity: 0, filter: `blur(${motion.isMobile ? 6 : 12}px)`, y: motion.distance, scale: motion.isMobile ? 1.03 : 1.08 }}
-                  animate={{ opacity: 1, filter: 'blur(0px)', y: 0, scale: 1 }}
+                  initial={{ opacity: 0, filter: `blur(${motion.isMobile ? 9 : 18}px)`, y: motion.distance * 1.35, scale: motion.isMobile ? 1.04 : 1.1 }}
+                  animate={triggerOnView && !isActive
+                    ? { opacity: 0, filter: `blur(${motion.isMobile ? 9 : 18}px)`, y: motion.distance * 1.35, scale: motion.isMobile ? 1.04 : 1.1 }
+                    : { opacity: 1, filter: 'blur(0px)', y: 0, scale: 1 }}
                   transition={{ delay, duration: motion.isMobile ? 0.68 : 0.92, ease: [0.2, 0.65, 0.3, 0.9] }}
                   key={`${word}-${index}`}
                 >
@@ -153,9 +157,15 @@ function SmokeLine({ mode, motion, onFinalWordReveal, phrase, phraseIndex, phras
   )
 }
 
-export function SmokeText({ as = 'h1', className = '', mode = 'letters', onRevealComplete, phrases }) {
+export function SmokeText({ as = 'h1', className = '', mode = 'letters', onRevealComplete, phrases, triggerOnView = false }) {
   const motion = useResponsiveMotion()
   const revealCompletedRef = useRef(false)
+  const containerRef = useRef(null)
+  const isInView = useInView(containerRef, {
+    amount: motion.isMobile ? 0.12 : 0.2,
+    margin: '0px 0px -8% 0px',
+    once: true,
+  })
   const Tag = as
   const totalWords = phrases.reduce((total, phrase) => total + phrase.split(' ').length, 0)
   const handleFinalWordReveal = useCallback(() => {
@@ -181,7 +191,7 @@ export function SmokeText({ as = 'h1', className = '', mode = 'letters', onRevea
 
   if (motion.reducedMotion) {
     return (
-      <Tag className={`smoke-text ${className}`} aria-label={phrases.join(' ')} data-smoke-mode={mode}>
+      <Tag ref={containerRef} className={`smoke-text ${className}`} aria-label={phrases.join(' ')} data-smoke-mode={mode}>
         {lines.map(({ phrase, wordOffset: lineWordOffset }) => (
           <span className="smoke-text__line" aria-hidden="true" key={phrase}>
             {phrase.split(' ').map((word, wordIndex) => (
@@ -194,16 +204,18 @@ export function SmokeText({ as = 'h1', className = '', mode = 'letters', onRevea
   }
 
   return (
-    <Tag className={`smoke-text ${className}`} aria-label={phrases.join(' ')} data-smoke-mode={mode}>
+    <Tag ref={containerRef} className={`smoke-text ${className}`} aria-label={phrases.join(' ')} data-smoke-mode={mode}>
       {lines.map(({ phrase, phraseIndex, wordOffset: lineWordOffset }) => (
         <SmokeLine
           mode={mode}
           motion={motion}
+          isActive={!triggerOnView || isInView}
           onFinalWordReveal={handleFinalWordReveal}
           phrase={phrase}
           phraseIndex={phraseIndex}
           phrases={phrases}
           totalWords={totalWords}
+          triggerOnView={triggerOnView}
           wordOffset={lineWordOffset}
           key={phrase}
         />

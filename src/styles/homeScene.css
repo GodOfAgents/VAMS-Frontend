@@ -161,8 +161,11 @@
 
 .marketing-home .hero__content,
 .marketing-home .hero__scroll {
-  position: relative;
   z-index: 1;
+}
+
+.marketing-home .hero__scroll {
+  position: absolute;
 }
 
 :root[data-motion="full"] .marketing-home .hero__copy {
@@ -200,7 +203,7 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce), (max-width: 359px) {
+@media (prefers-reduced-motion: reduce) {
   .marketing-scene .neural-field--static {
     opacity: 0.58;
   }

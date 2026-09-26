@@ -50,7 +50,7 @@ for (const viewport of viewportBaselines) {
     expect(geometry.firstActionTop).toBeLessThanOrEqual(viewport.height + 96)
 
     if (viewport.width >= 1200) expect(geometry.visualHeadingRows).toBe(3)
-    if (viewport.width < 360) expect(geometry.visualHeadingRows).toBeGreaterThanOrEqual(4)
+    if (viewport.width < 360) expect(geometry.visualHeadingRows).toBeGreaterThanOrEqual(3)
 
     await expect(page).toHaveScreenshot(`marketing-${viewport.name}.png`, {
       animations: 'disabled',

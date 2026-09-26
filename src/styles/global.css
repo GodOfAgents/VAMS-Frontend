@@ -110,13 +110,14 @@ pre {
 }
 
 .brand img {
-  width: 28px;
+  width: auto;
   height: 28px;
+  display: block;
   object-fit: contain;
 }
 
-.brand--compact span {
-  font-size: 1.15rem;
+.brand--compact img {
+  height: 24px;
 }
 
 .button {
@@ -2821,7 +2822,6 @@ body {
   }
 
   .brand img {
-    width: 23px;
     height: 23px;
   }
 

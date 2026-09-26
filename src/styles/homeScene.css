@@ -29,7 +29,7 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: radial-gradient(circle 260px at var(--scene-pointer-x, 72%) var(--scene-pointer-y, 44%), rgba(111, 205, 255, .12), transparent 72%);
+  background: transparent;
   content: "";
   opacity: var(--scene-pointer-opacity);
   mix-blend-mode: screen;

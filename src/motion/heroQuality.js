@@ -10,14 +10,14 @@ export const HERO_QUALITY_PROFILES = {
   },
   low: {
     maxDpr: 1,
-    pointerEnabled: false,
+    pointerEnabled: true,
     scrollEnabled: false,
     targetFps: 30,
     tier: 'low',
   },
   medium: {
     maxDpr: 1,
-    pointerEnabled: false,
+    pointerEnabled: true,
     scrollEnabled: false,
     targetFps: 40,
     tier: 'medium',
@@ -52,13 +52,13 @@ export function getNextLowerHeroTier(tier) {
   return HERO_QUALITY_ORDER[index - 1]
 }
 
-export function describeHeroQuality({ coarsePointer, reducedMotion, viewportWidth }) {
+export function describeHeroQuality({ reducedMotion, viewportWidth }) {
   const tier = reducedMotion ? 'static' : getViewportHeroTier(viewportWidth)
   const profile = HERO_QUALITY_PROFILES[tier]
 
   return {
     ...profile,
-    pointerEnabled: profile.pointerEnabled && !coarsePointer && !reducedMotion,
+    pointerEnabled: profile.pointerEnabled && !reducedMotion,
     reducedMotion,
     scrollEnabled: profile.scrollEnabled && !reducedMotion,
   }

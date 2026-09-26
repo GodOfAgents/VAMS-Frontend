@@ -34,12 +34,12 @@ describe('hero quality selection', () => {
     }))
   })
 
-  it('disables pointer response on coarse pointers without lowering visual tier', () => {
+  it('keeps pointer response available on coarse pointers without lowering visual tier', () => {
     expect(describeHeroQuality({
       coarsePointer: true,
       reducedMotion: false,
       viewportWidth: 1440,
-    })).toEqual(expect.objectContaining({ pointerEnabled: false, tier: 'high' }))
+    })).toEqual(expect.objectContaining({ pointerEnabled: true, tier: 'high' }))
   })
 
   it('identifies constrained memory or CPU without treating missing hints as constrained', () => {

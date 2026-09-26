@@ -84,4 +84,5 @@ All notable frontend changes are documented here following Keep a Changelog.
 - Added a clean pointer-exit reset so the neural glow settles immediately when the viewport is left.
 - Made public-page hover and focus treatments respect reduced-motion preferences across topic, migration, and operator surfaces.
 - Added six quiet chapter ticks to the scroll rail so the long-form neural narrative has a clear visual rhythm.
+- Clarified the architecture boundary: the Three.js layer is only the interactive neural backdrop, never a protocol map.
 - Added a continuous scroll-progress horizon veil to the neural scene, preserving one fluid spatial field between chapter transitions.

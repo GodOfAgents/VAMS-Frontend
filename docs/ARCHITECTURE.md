@@ -4,7 +4,7 @@
 
 VAMS uses one React/Vite source tree with three logically separate surfaces:
 
-- `MarketingLayout`: editorial protocol routes and selected lazy Three.js visuals
+- `MarketingLayout`: editorial protocol routes and one lazy neural topography visual
 - `ConsoleLayout`: read-only protocol entity inspection
 - `StatusLayout`: operational observations and release-readiness evidence
 
@@ -70,9 +70,11 @@ AND Gateway support
 
 The explorer is always read-only.
 
-## Three.js boundary
+## Neural renderer boundary
 
 `three` is imported only by `components/marketing/NeuralField.jsx`. The component is dynamically imported, rendered only on the marketing home page, skipped when reduced motion is requested, and emitted as `three-marketing` in production builds.
+
+This renderer is a decorative, interactive neural background. It is not a protocol map, entity graph, or representation of protocol topology.
 
 Console and evidence routes do not import or execute Three.js at runtime.
 

@@ -85,4 +85,5 @@ All notable frontend changes are documented here following Keep a Changelog.
 - Made public-page hover and focus treatments respect reduced-motion preferences across topic, migration, and operator surfaces.
 - Added six quiet chapter ticks to the scroll rail so the long-form neural narrative has a clear visual rhythm.
 - Clarified the architecture boundary: the Three.js layer is only the interactive neural backdrop, never a protocol map.
+- Highlighted the active chapter tick so scroll position reads as a living narrative state.
 - Added a continuous scroll-progress horizon veil to the neural scene, preserving one fluid spatial field between chapter transitions.

@@ -29,6 +29,7 @@ All notable frontend changes are documented here following Keep a Changelog.
 ### Changed
 
 - Reframed the homepage around one fluid neural-topography experience with scroll chapters, pointer lift, and evidence-aware explanatory content.
+- Added a restrained pointer light and copy-depth parallax layer that follows the same neural field while respecting reduced-motion preferences.
 
 - Replaced the 68 KB monolithic landing page with one shared route-ready frontend system.
 - Reorganized public content around Protocol, Network, Build, Operate, Research, and Status.

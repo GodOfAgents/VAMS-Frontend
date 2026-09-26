@@ -203,7 +203,7 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce), (max-width: 359px) {
+@media (prefers-reduced-motion: reduce) {
   .marketing-scene .neural-field--static {
     opacity: 0.58;
   }

@@ -39,7 +39,9 @@ export const HERO_QUALITY_PROFILES = {
 }
 
 export function getViewportHeroTier(viewportWidth) {
-  if (viewportWidth < 360) return 'static'
+  // Keep the neural field available on narrow phones so touch can still
+  // provide the primary way to explore the background. Reduced-motion users
+  // still resolve to the static profile in describeHeroQuality.
   if (viewportWidth < 768) return 'low'
   if (viewportWidth < 1200) return 'medium'
   if (viewportWidth < 1600) return 'high'

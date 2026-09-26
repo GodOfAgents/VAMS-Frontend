@@ -9,7 +9,7 @@ import {
 
 describe('hero quality selection', () => {
   it.each([
-    [320, 'static'],
+    [320, 'low'],
     [360, 'low'],
     [767, 'low'],
     [768, 'medium'],

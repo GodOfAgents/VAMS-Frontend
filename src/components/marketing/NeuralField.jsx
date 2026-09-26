@@ -10,7 +10,7 @@ import {
 const qualityProfiles = {
   low: {
     antialias: false, budgetMs: 30, camera: [0, 4.6, 12.8], density: 0.78,
-    height: 22, opacity: 0.62, pointScale: 2.85, pointerRadius: 7.4,
+    height: 22, opacity: 0.68, pointScale: 3.05, pointerRadius: 9.6,
     position: [0, -2.8, -1.4], rotation: -1.14, segments: [48, 32], width: 30,
   },
   medium: {
@@ -359,6 +359,7 @@ export default function NeuralField({
     let proofStartsAt = null
     let readyReported = false
     let targetStrength = 0
+    let touchResetTimer = null
 
     const triggerProof = () => {
       if (proofPlayed) return
@@ -429,6 +430,9 @@ export default function NeuralField({
 
     const clearPointer = () => {
       targetStrength = 0
+      if (touchResetTimer !== null) window.clearTimeout(touchResetTimer)
+      touchResetTimer = null
+      uniforms.uPointerRadius.value = profile.pointerRadius
       const sceneElement = container.closest('.marketing-scene')
       sceneElement?.style.setProperty('--scene-pointer-opacity', '0')
       sceneElement?.style.setProperty('--scene-pointer-nx', '0')
@@ -445,7 +449,7 @@ export default function NeuralField({
         return
       }
       uniforms.uPointerRadius.value = event.pointerType === 'touch'
-        ? profile.pointerRadius * 1.55
+        ? profile.pointerRadius * 1.9
         : profile.pointerRadius
       const normalizedX = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2
       const normalizedY = ((event.clientY - bounds.top) / bounds.height - 0.5) * 2
@@ -458,15 +462,18 @@ export default function NeuralField({
         ((event.clientX - bounds.left) / bounds.width - 0.5) * profile.width * 0.72,
         (0.48 - (event.clientY - bounds.top) / bounds.height) * profile.height * 0.68,
       )
-      targetStrength = 1
+      // A finger covers more of the field than a cursor. Increase the lift so
+      // the response remains legible on a small, high-density display.
+      targetStrength = event.pointerType === 'touch' ? 1.28 : 1
     }
 
     const handlePointerDown = (event) => {
       handlePointerMove(event)
-      targetStrength = 1
+      targetStrength = event.pointerType === 'touch' ? 1.28 : 1
     }
 
-    const handlePointerEnd = () => {
+    const handlePointerEnd = (event) => {
+      if (event?.pointerType === 'touch') return
       targetStrength = 0
     }
 
@@ -482,7 +489,15 @@ export default function NeuralField({
       handlePointerMove({ clientX: point.clientX, clientY: point.clientY, pointerType: 'touch' })
     }
 
-    const handleTouchEnd = () => handlePointerEnd()
+    const handleTouchEnd = () => {
+      if (touchResetTimer !== null) window.clearTimeout(touchResetTimer)
+      // Let a tap remain visible briefly after the finger leaves the glass.
+      touchResetTimer = window.setTimeout(() => {
+        targetStrength = 0
+        uniforms.uPointerRadius.value = profile.pointerRadius
+        touchResetTimer = null
+      }, 720)
+    }
 
     const handlePointerOut = (event) => {
       if (!event.relatedTarget) clearPointer()
@@ -541,6 +556,7 @@ export default function NeuralField({
       window.removeEventListener('touchmove', handleTouchMove)
       window.removeEventListener('touchend', handleTouchEnd)
       if (triggerProofRef.current === triggerProof) triggerProofRef.current = null
+      if (touchResetTimer !== null) window.clearTimeout(touchResetTimer)
       lineGeometry.dispose()
       pointGeometry.dispose()
       lineMaterial.dispose()

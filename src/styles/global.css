@@ -23,7 +23,7 @@ body,
 button,
 input,
 select {
-  font-family: var(--font-sans);
+  font-family: var(--font-ui);
 }
 
 button,
@@ -50,10 +50,20 @@ p {
 h1,
 h2,
 h3 {
-  font-family: var(--font-serif);
+  font-family: var(--font-display);
   font-weight: 400;
   line-height: 1.08;
   letter-spacing: -0.025em;
+}
+
+h4,
+h5,
+h6 {
+  margin-top: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 1.16;
+  letter-spacing: -0.02em;
 }
 
 code,
@@ -2052,6 +2062,11 @@ body {
   will-change: transform, filter, opacity;
 }
 
+.smoke-text--heading .smoke-text__line:last-child {
+  color: inherit;
+  font-style: normal;
+}
+
 .hero h1,
 .hero .smoke-text {
   max-width: 1120px;
@@ -2285,11 +2300,11 @@ body {
 }
 
 .final-cta {
-  padding: clamp(80px, 8vw, 120px) max(var(--page-gutter), calc((100% - var(--container-editorial)) / 2));
+  padding: clamp(64px, 7vw, 104px) max(var(--page-gutter), calc((100% - var(--container-editorial)) / 2));
 }
 
 .page-header {
-  padding: clamp(72px, 8vw, 104px) 0 clamp(36px, 4vw, 48px);
+  padding: clamp(56px, 6vw, 84px) 0 clamp(28px, 3vw, 40px);
 }
 
 .page-header h1,

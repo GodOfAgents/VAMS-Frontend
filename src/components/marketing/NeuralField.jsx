@@ -186,6 +186,26 @@ const pointFragmentShader = `
   }
 `
 
+const lineFragmentShader = `
+  uniform float uLineOpacity;
+  uniform float uThemeMix;
+  varying float vDepth;
+  varying float vElevation;
+  varying float vProof;
+  varying float vShade;
+
+  void main() {
+    float topography = smoothstep(-0.12, 0.82, vElevation);
+    float fog = 1.0 - smoothstep(0.2, 1.0, vDepth);
+    float signal = clamp(topography * 0.62 + vProof * 0.72, 0.0, 1.0);
+    vec3 quietLine = mix(vec3(0.08, 0.12, 0.16), vec3(0.42), uThemeMix);
+    vec3 activeLine = vec3(0.06, 0.5, 0.72);
+    vec3 lineColor = mix(quietLine, activeLine, signal * 0.78 + vShade * 0.08);
+    float alpha = uLineOpacity * fog * (0.52 + signal * 0.92);
+    gl_FragColor = vec4(lineColor, alpha);
+  }
+`
+
 function deterministicValue(index, salt = 0) {
   const value = Math.sin(index * 91.719 + salt * 17.13) * 43758.5453
   return value - Math.floor(value)
@@ -206,7 +226,36 @@ function createTerrainGeometry(profile) {
   positions.needsUpdate = true
   geometry.setAttribute('aDensity', new THREE.BufferAttribute(densities, 1))
   geometry.setAttribute('aShade', new THREE.BufferAttribute(shades, 1))
-  return geometry
+
+  const linePositions = []
+  const lineDensities = []
+  const lineShades = []
+  const lineUvs = []
+  const rowSize = segmentsX + 1
+  const step = segmentsX > 100 ? 4 : 3
+  const appendConnection = (from, to) => {
+    for (const index of [from, to]) {
+      linePositions.push(positions.getX(index), positions.getY(index), positions.getZ(index))
+      lineDensities.push(densities[index])
+      lineShades.push(shades[index])
+      lineUvs.push(geometry.attributes.uv.getX(index), geometry.attributes.uv.getY(index))
+    }
+  }
+
+  for (let y = 0; y <= segmentsY; y += step) {
+    for (let x = 0; x <= segmentsX; x += step) {
+      const index = y * rowSize + x
+      if (x + step <= segmentsX) appendConnection(index, index + step)
+      if (y + step <= segmentsY) appendConnection(index, index + step * rowSize)
+    }
+  }
+
+  const lines = new THREE.BufferGeometry()
+  lines.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3))
+  lines.setAttribute('aDensity', new THREE.Float32BufferAttribute(lineDensities, 1))
+  lines.setAttribute('aShade', new THREE.Float32BufferAttribute(lineShades, 1))
+  lines.setAttribute('uv', new THREE.Float32BufferAttribute(lineUvs, 2))
+  return { lines, points: geometry }
 }
 
 export default function NeuralField({
@@ -254,11 +303,12 @@ export default function NeuralField({
     renderer.setSize(container.clientWidth, container.clientHeight)
     container.appendChild(renderer.domElement)
 
-    const geometry = createTerrainGeometry(profile)
+    const { lines: lineGeometry, points: pointGeometry } = createTerrainGeometry(profile)
     const uniforms = {
       uChapterFrom: { value: 0 },
       uChapterMix: { value: 0 },
       uChapterTo: { value: 0 },
+      uLineOpacity: { value: profile.opacity * 0.16 },
       uMotionScale: { value: tier === 'low' ? 0.58 : tier === 'medium' ? 0.76 : 1 },
       uOpacity: { value: profile.opacity },
       uPageProgress: { value: 0 },
@@ -280,10 +330,22 @@ export default function NeuralField({
       uniforms,
       vertexShader: terrainVertexShader,
     })
-    const terrain = new THREE.Points(geometry, material)
+    const lineMaterial = new THREE.ShaderMaterial({
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      fragmentShader: lineFragmentShader,
+      transparent: true,
+      uniforms,
+      vertexShader: terrainVertexShader,
+    })
+    const terrain = new THREE.Points(pointGeometry, material)
+    const network = new THREE.LineSegments(lineGeometry, lineMaterial)
     terrain.position.set(...profile.position)
     terrain.rotation.x = profile.rotation
+    network.position.copy(terrain.position)
+    network.rotation.copy(terrain.rotation)
     scene.add(terrain)
+    scene.add(network)
 
     const clock = new THREE.Clock()
     const frameBudget = createFrameBudgetController({ thresholdMs: profile.budgetMs })
@@ -479,7 +541,9 @@ export default function NeuralField({
       window.removeEventListener('touchmove', handleTouchMove)
       window.removeEventListener('touchend', handleTouchEnd)
       if (triggerProofRef.current === triggerProof) triggerProofRef.current = null
-      geometry.dispose()
+      lineGeometry.dispose()
+      pointGeometry.dispose()
+      lineMaterial.dispose()
       material.dispose()
       renderer.dispose()
       renderer.forceContextLoss()

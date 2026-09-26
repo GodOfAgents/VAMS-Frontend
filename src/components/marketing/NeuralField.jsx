@@ -358,8 +358,13 @@ export default function NeuralField({
         && event.clientY >= bounds.top && event.clientY <= bounds.bottom
       if (!isIntro || !withinHero) {
         targetStrength = 0
+        container.closest('.marketing-scene')?.style.setProperty('--scene-pointer-opacity', '0')
         return
       }
+      const sceneElement = container.closest('.marketing-scene')
+      sceneElement?.style.setProperty('--scene-pointer-x', `${event.clientX}px`)
+      sceneElement?.style.setProperty('--scene-pointer-y', `${event.clientY}px`)
+      sceneElement?.style.setProperty('--scene-pointer-opacity', '1')
       pointerTarget.set(
         ((event.clientX - bounds.left) / bounds.width - 0.5) * profile.width * 0.72,
         (0.48 - (event.clientY - bounds.top) / bounds.height) * profile.height * 0.68,

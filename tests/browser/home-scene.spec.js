@@ -8,6 +8,8 @@ test('one adaptive neural scene carries the homepage topology from hero through 
   const scene = page.locator('[data-marketing-scene]')
   await expect(scene).toHaveAttribute('data-hero-renderer', 'ready')
   await expect(scene).toHaveAttribute('data-scene-active', 'intro')
+  await expect(page.locator('.scene-progress')).toBeVisible()
+  await expect(page.locator('.scene-progress__ticks i')).toHaveCount(6)
   await expect(page.locator('[data-marketing-three] canvas')).toHaveCount(1)
   await page.locator('.hero').hover({ position: { x: 960, y: 280 } })
   await expect(scene).toHaveCSS('--scene-pointer-opacity', '1')
@@ -48,6 +50,7 @@ test('compact mobile uses the static neural scene and keeps the first CTA in vie
 
   await expect(page.locator('[data-marketing-scene]')).toHaveAttribute('data-hero-renderer', 'fallback')
   await expect(page.locator('[data-marketing-three] canvas')).toHaveCount(0)
+  await expect(page.locator('.scene-progress')).toBeHidden()
   const ctaBounds = await page.getByRole('link', { name: /Explore the network/ }).boundingBox()
   expect(ctaBounds).not.toBeNull()
   expect(ctaBounds.y + ctaBounds.height).toBeLessThanOrEqual(568)

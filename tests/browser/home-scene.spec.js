@@ -11,6 +11,7 @@ test('one adaptive neural scene carries the homepage topology from hero through 
   await expect(page.locator('[data-marketing-three] canvas')).toHaveCount(1)
   await page.locator('.hero').hover({ position: { x: 960, y: 280 } })
   await expect(scene).toHaveCSS('--scene-pointer-opacity', '1')
+  await expect(scene).not.toHaveCSS('--scene-pointer-nx', '0')
 
   for (const chapter of ['lifecycle', 'architecture', 'evidence', 'journey', 'cta']) {
     await page.locator(`[data-scene-chapter="${chapter}"]`).evaluate((element) => {

@@ -10,12 +10,12 @@ import {
 const qualityProfiles = {
   low: {
     antialias: false, budgetMs: 30, camera: [0, 4.6, 12.8], density: 0.78,
-    height: 22, opacity: 0.48, pointScale: 2.75, pointerRadius: 4.2,
+    height: 22, opacity: 0.62, pointScale: 2.85, pointerRadius: 7.4,
     position: [0, -2.8, -1.4], rotation: -1.14, segments: [48, 32], width: 30,
   },
   medium: {
     antialias: false, budgetMs: 30, camera: [0, 5, 12.4], density: 0.86,
-    height: 30, opacity: 0.54, pointScale: 2.55, pointerRadius: 5.4,
+    height: 30, opacity: 0.6, pointScale: 2.65, pointerRadius: 7.2,
     position: [0, -2.2, -1.1], rotation: -1.2, segments: [72, 48], width: 42,
   },
   high: {
@@ -382,6 +382,9 @@ export default function NeuralField({
         clearPointer()
         return
       }
+      uniforms.uPointerRadius.value = event.pointerType === 'touch'
+        ? profile.pointerRadius * 1.55
+        : profile.pointerRadius
       const normalizedX = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2
       const normalizedY = ((event.clientY - bounds.top) / bounds.height - 0.5) * 2
       sceneElement?.style.setProperty('--scene-pointer-x', `${event.clientX}px`)
@@ -404,6 +407,20 @@ export default function NeuralField({
     const handlePointerEnd = () => {
       targetStrength = 0
     }
+
+    const handleTouchStart = (event) => {
+      const point = event.touches?.[0]
+      if (!point) return
+      handlePointerDown({ clientX: point.clientX, clientY: point.clientY, pointerType: 'touch' })
+    }
+
+    const handleTouchMove = (event) => {
+      const point = event.touches?.[0]
+      if (!point) return
+      handlePointerMove({ clientX: point.clientX, clientY: point.clientY, pointerType: 'touch' })
+    }
+
+    const handleTouchEnd = () => handlePointerEnd()
 
     const handlePointerOut = (event) => {
       if (!event.relatedTarget) clearPointer()
@@ -443,6 +460,9 @@ export default function NeuralField({
     if (quality.pointerEnabled) window.addEventListener('pointerup', handlePointerEnd, { passive: true })
     if (quality.pointerEnabled) window.addEventListener('pointercancel', handlePointerEnd, { passive: true })
     if (quality.pointerEnabled) window.addEventListener('pointerout', handlePointerOut, { passive: true })
+    if (quality.pointerEnabled) window.addEventListener('touchstart', handleTouchStart, { passive: true })
+    if (quality.pointerEnabled) window.addEventListener('touchmove', handleTouchMove, { passive: true })
+    if (quality.pointerEnabled) window.addEventListener('touchend', handleTouchEnd, { passive: true })
     updateLoop()
 
     return () => {
@@ -455,6 +475,9 @@ export default function NeuralField({
       window.removeEventListener('pointerup', handlePointerEnd)
       window.removeEventListener('pointercancel', handlePointerEnd)
       window.removeEventListener('pointerout', handlePointerOut)
+      window.removeEventListener('touchstart', handleTouchStart)
+      window.removeEventListener('touchmove', handleTouchMove)
+      window.removeEventListener('touchend', handleTouchEnd)
       if (triggerProofRef.current === triggerProof) triggerProofRef.current = null
       geometry.dispose()
       material.dispose()

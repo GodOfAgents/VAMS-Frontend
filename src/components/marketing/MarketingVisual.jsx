@@ -35,7 +35,10 @@ export function MarketingVisual({ proofSignal = 0 }) {
     ...initialSceneState,
     documentThemeMix: theme === 'dark' ? 1 : 0,
   })
-  const [tier, setTier] = useState(() => (lowPower ? 'static' : requestedQuality.tier))
+  const [tier, setTier] = useState(() => {
+    if (requestedQuality.tier === 'static') return 'static'
+    return lowPower ? 'low' : requestedQuality.tier
+  })
   const [degraded, setDegraded] = useState(false)
   const [failed, setFailed] = useState(false)
   const [ready, setReady] = useState(false)

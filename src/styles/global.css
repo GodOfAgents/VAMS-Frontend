@@ -111,13 +111,13 @@ pre {
 
 .brand img {
   width: auto;
-  height: 28px;
+  height: 36px;
   display: block;
   object-fit: contain;
 }
 
 .brand--compact img {
-  height: 24px;
+  height: 31px;
 }
 
 .button {
@@ -2822,7 +2822,7 @@ body {
   }
 
   .brand img {
-    height: 23px;
+    height: 30px;
   }
 
   .hero__content {

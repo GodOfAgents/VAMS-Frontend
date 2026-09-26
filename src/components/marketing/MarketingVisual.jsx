@@ -111,6 +111,7 @@ export function MarketingVisual({ proofSignal = 0 }) {
       sceneElement.dataset.sceneMix = state.chapterMix.toFixed(3)
       sceneElement.dataset.scenePage = state.pageProgress.toFixed(3)
       sceneElement.style.setProperty('--scene-theme-mix', themeMix.toFixed(3))
+      sceneElement.style.setProperty('--scene-page-progress', state.pageProgress.toFixed(3))
     }
 
     const requestUpdate = () => {
@@ -154,6 +155,10 @@ export function MarketingVisual({ proofSignal = 0 }) {
       style={{ '--scene-theme-mix': 1 }}
     >
       <div className="neural-field neural-field--static" />
+      <div className="scene-progress" aria-hidden="true">
+        <span className="scene-progress__fill" />
+        <span className="scene-progress__ticks"><i /><i /><i /><i /><i /><i /></span>
+      </div>
       {!failed && effectiveTier !== 'static' && (
         <Suspense fallback={null}>
           <NeuralField

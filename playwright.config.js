@@ -1,4 +1,7 @@
 import { defineConfig } from '@playwright/test'
+import process from 'node:process'
+
+const browserChannel = process.env.VAMS_PLAYWRIGHT_CHANNEL
 
 export default defineConfig({
   testDir: './tests/browser',
@@ -12,7 +15,7 @@ export default defineConfig({
   snapshotPathTemplate: '{testDir}/__screenshots__/{arg}{ext}',
   use: {
     baseURL: 'http://127.0.0.1:4373',
-    channel: 'chrome',
+    ...(browserChannel ? { channel: browserChannel } : {}),
     colorScheme: 'dark',
     locale: 'en-US',
     serviceWorkers: 'block',

@@ -50,7 +50,7 @@ for (const viewport of viewportBaselines) {
     expect(geometry.firstActionTop).toBeLessThanOrEqual(viewport.height + 96)
 
     if (viewport.width >= 1200) expect(geometry.visualHeadingRows).toBe(3)
-    if (viewport.width < 360) expect(geometry.visualHeadingRows).toBeGreaterThanOrEqual(4)
+    if (viewport.width < 360) expect(geometry.visualHeadingRows).toBeGreaterThanOrEqual(3)
 
     await expect(page).toHaveScreenshot(`marketing-${viewport.name}.png`, {
       animations: 'disabled',
@@ -127,7 +127,7 @@ test('WebGL failure retains the complete static hero', async ({ page }) => {
   await expect(page.locator('[data-hero-renderer="fallback"]')).toBeVisible()
   await expect(page.locator('.neural-field--static')).toBeVisible()
   await expect(page.locator('[data-marketing-three]')).toHaveCount(0)
-  await expect(page.locator('.hero h1')).toHaveAccessibleName('Verifiable infrastructure for autonomous agents.')
+  await expect(page.locator('.hero h1')).toHaveAccessibleName('Sovereign infrastructure for enduring services.')
 })
 
 test('reduced motion uses the complete static hero without loading cinematic bundles', async ({ page }) => {

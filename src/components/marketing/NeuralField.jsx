@@ -51,6 +51,7 @@ const terrainVertexShader = `
   varying float vProof;
   varying float vShade;
   varying float vVisible;
+  varying float vPointer;
   varying vec2 vUv;
 
   vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
@@ -119,9 +120,12 @@ const terrainVertexShader = `
     float elevationTo = chapterElevation(uChapterTo, position, uv, time);
     float elevation = mix(elevationFrom, elevationTo, smoothstep(0.0, 1.0, uChapterMix));
     float pointerDistance = distance(position.xy, uPointer);
-    float pointerLift = smoothstep(uPointerRadius, 0.0, pointerDistance) * uPointerStrength * 1.9;
+    float pointerLift = smoothstep(uPointerRadius, 0.0, pointerDistance) * uPointerStrength * 2.35;
     float pointerRipple = sin(pointerDistance * 1.45 - uTime * 1.15)
       * smoothstep(uPointerRadius * 1.35, 0.0, pointerDistance) * uPointerStrength * 0.14;
+    float pointerEcho = sin(pointerDistance * 2.8 - uTime * 0.72)
+      * smoothstep(uPointerRadius * 1.7, 0.0, pointerDistance) * uPointerStrength * 0.07;
+    float pointerField = smoothstep(uPointerRadius * 1.15, 0.0, pointerDistance) * uPointerStrength;
     float proofPath = uv.x * 0.76 + (1.0 - uv.y) * 0.24;
     float proofDistance = proofPath - uProofProgress;
     float proofWave = exp(-pow(proofDistance * 18.0, 2.0))
@@ -129,14 +133,16 @@ const terrainVertexShader = `
       * (1.0 - smoothstep(0.92, 1.12, uProofProgress));
 
     vec3 transformed = position;
-    transformed.z = elevation + pointerLift + pointerRipple + proofWave * (0.7 + sin(uv.y * 20.0) * 0.12);
+    transformed.z = elevation + pointerLift + pointerRipple + pointerEcho + proofWave * (0.7 + sin(uv.y * 20.0) * 0.12);
     vec4 modelPosition = modelMatrix * vec4(transformed, 1.0);
     vec4 viewPosition = viewMatrix * modelPosition;
     vDepth = clamp((-viewPosition.z - 4.0) / 30.0, 0.0, 1.0);
-    vElevation = transformed.z;
+    // Keep emission tied to the underlying neural topography, not the cursor's temporary lift.
+    vElevation = elevation;
     vProof = proofWave;
     vShade = aShade;
     vVisible = step(aDensity, uPointDensity);
+    vPointer = pointerField;
     vUv = uv;
     gl_Position = projectionMatrix * viewPosition;
     gl_PointSize = max(1.0, uPointScale * uPixelRatio * (14.0 / max(3.5, -viewPosition.z)) * vVisible);
@@ -146,11 +152,13 @@ const terrainVertexShader = `
 const pointFragmentShader = `
   uniform float uOpacity;
   uniform float uThemeMix;
+  uniform float uTime;
   varying float vDepth;
   varying float vElevation;
   varying float vProof;
   varying float vShade;
   varying float vVisible;
+  varying float vPointer;
   varying vec2 vUv;
 
   void main() {
@@ -162,11 +170,18 @@ const pointFragmentShader = `
     float edgeFadeX = smoothstep(0.0, 0.08, vUv.x) * smoothstep(0.0, 0.08, 1.0 - vUv.x);
     float edgeFadeY = smoothstep(0.0, 0.11, vUv.y) * smoothstep(0.0, 0.11, 1.0 - vUv.y);
     float elevationLight = clamp(0.72 + vElevation * 0.12, 0.42, 1.0);
-    float shade = clamp(vShade * elevationLight + vProof * 0.34, 0.18, 1.0);
+    float elevatedNode = smoothstep(-0.12, 0.82, vElevation);
+    float shimmer = 0.72 + 0.28 * sin(uTime * 5.2 + vUv.x * 14.0 + vUv.y * 9.0);
+    float bioluminescence = clamp(elevatedNode * shimmer + vProof * 0.72, 0.0, 1.0);
+    float shade = clamp(vShade * elevationLight + vProof * 0.34 + bioluminescence * 0.32, 0.18, 1.0);
     vec3 lightPoint = vec3(0.88) * shade;
     vec3 darkPoint = vec3(0.08 + (1.0 - shade) * 0.18);
     vec3 pointColor = mix(darkPoint, lightPoint, uThemeMix);
-    float alpha = pointEdge * horizonFog * edgeFadeX * edgeFadeY * uOpacity * (1.0 + vProof * 0.42);
+    vec3 cyanGlow = vec3(0.04, 0.82, 1.0) * (0.82 + uThemeMix * 0.18);
+    pointColor = mix(pointColor, cyanGlow, min(1.0, bioluminescence * 1.12));
+    pointColor += cyanGlow * bioluminescence * 0.62;
+    float alpha = pointEdge * horizonFog * edgeFadeX * edgeFadeY * uOpacity
+      * (1.0 + vProof * 0.42 + bioluminescence * 2.1);
     gl_FragColor = vec4(pointColor, alpha);
   }
 `
@@ -350,21 +365,48 @@ export default function NeuralField({
       if (pageVisible) render()
     }
 
+    const clearPointer = () => {
+      targetStrength = 0
+      const sceneElement = container.closest('.marketing-scene')
+      sceneElement?.style.setProperty('--scene-pointer-opacity', '0')
+      sceneElement?.style.setProperty('--scene-pointer-nx', '0')
+      sceneElement?.style.setProperty('--scene-pointer-ny', '0')
+    }
+
     const handlePointerMove = (event) => {
-      const hero = container.closest('.marketing-home')?.querySelector('.hero')
-      const bounds = hero?.getBoundingClientRect()
-      const isIntro = sceneStateRef.current.activeChapter === 'intro'
-      const withinHero = bounds && event.clientX >= bounds.left && event.clientX <= bounds.right
+      const sceneElement = container.closest('.marketing-scene')
+      const bounds = sceneElement?.getBoundingClientRect()
+      const withinScene = bounds && event.clientX >= bounds.left && event.clientX <= bounds.right
         && event.clientY >= bounds.top && event.clientY <= bounds.bottom
-      if (!isIntro || !withinHero) {
-        targetStrength = 0
+      if (!sceneElement || !withinScene) {
+        clearPointer()
         return
       }
+      const normalizedX = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2
+      const normalizedY = ((event.clientY - bounds.top) / bounds.height - 0.5) * 2
+      sceneElement?.style.setProperty('--scene-pointer-x', `${event.clientX}px`)
+      sceneElement?.style.setProperty('--scene-pointer-y', `${event.clientY}px`)
+      sceneElement?.style.setProperty('--scene-pointer-nx', normalizedX.toFixed(3))
+      sceneElement?.style.setProperty('--scene-pointer-ny', normalizedY.toFixed(3))
+      sceneElement?.style.setProperty('--scene-pointer-opacity', '1')
       pointerTarget.set(
         ((event.clientX - bounds.left) / bounds.width - 0.5) * profile.width * 0.72,
         (0.48 - (event.clientY - bounds.top) / bounds.height) * profile.height * 0.68,
       )
       targetStrength = 1
+    }
+
+    const handlePointerDown = (event) => {
+      handlePointerMove(event)
+      targetStrength = 1
+    }
+
+    const handlePointerEnd = () => {
+      targetStrength = 0
+    }
+
+    const handlePointerOut = (event) => {
+      if (!event.relatedTarget) clearPointer()
     }
 
     const handleVisibility = () => {
@@ -397,6 +439,10 @@ export default function NeuralField({
     document.addEventListener('visibilitychange', handleVisibility)
     renderer.domElement.addEventListener('webglcontextlost', handleContextLost)
     if (quality.pointerEnabled) window.addEventListener('pointermove', handlePointerMove, { passive: true })
+    if (quality.pointerEnabled) window.addEventListener('pointerdown', handlePointerDown, { passive: true })
+    if (quality.pointerEnabled) window.addEventListener('pointerup', handlePointerEnd, { passive: true })
+    if (quality.pointerEnabled) window.addEventListener('pointercancel', handlePointerEnd, { passive: true })
+    if (quality.pointerEnabled) window.addEventListener('pointerout', handlePointerOut, { passive: true })
     updateLoop()
 
     return () => {
@@ -405,6 +451,10 @@ export default function NeuralField({
       document.removeEventListener('visibilitychange', handleVisibility)
       renderer.domElement.removeEventListener('webglcontextlost', handleContextLost)
       window.removeEventListener('pointermove', handlePointerMove)
+      window.removeEventListener('pointerdown', handlePointerDown)
+      window.removeEventListener('pointerup', handlePointerEnd)
+      window.removeEventListener('pointercancel', handlePointerEnd)
+      window.removeEventListener('pointerout', handlePointerOut)
       if (triggerProofRef.current === triggerProof) triggerProofRef.current = null
       geometry.dispose()
       material.dispose()

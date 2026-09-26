@@ -1,28 +1,27 @@
 import { ArrowRight, CheckCircle2, CircleDashed, ExternalLink } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { PageHeader } from '../../components/ui/PageHeader.jsx'
-import { StatusBadge } from '../../components/ui/StatusBadge.jsx'
 import { appEnvironment } from '../../config/environment.js'
-import { Reveal, StaggerGroup, StaggerItem } from '../../motion/primitives.jsx'
+import { Reveal } from '../../motion/primitives.jsx'
 
 const content = {
   protocol: {
     eyebrow: 'Protocol',
-    title: 'Infrastructure whose claims can be inspected.',
-    description: 'VAMS separates agent execution, identity, verification, data availability, composition, and settlement into explicit architectural boundaries.',
+    title: 'Infrastructure whose authority and claims can be inspected.',
+    description: 'VAMS connects portable identity, durable state, governed execution, independent evidence, and economic responsibility without hiding their boundaries.',
     pillars: [
-      ['Agent execution', 'Neuron runtimes expose capabilities and public health through allowlisted explorer records.'],
-      ['Resource composition', 'The Composer scores compute, SLA, latency, region, skills, and CHC cognitive fit.'],
-      ['Verification', 'Proof state is cumulative only when source-linked evidence exists.'],
-      ['Dual-host architecture', 'Polygon Amoy targets execution; Cardano Pre-Prod targets governance, identity, and insurance. Both remain deployment pending.'],
+      ['Immortal Execution', 'Supported services aim to recover authenticated state and authority beyond the life of one host.'],
+      ['Heart and Brain', 'Reasoning proposes and composes; consent, policy, and revocation remain independent authority boundaries.'],
+      ['Evidence and accountability', 'Claims, receipts, challenges, and settlement stay linked to explicit responsibilities.'],
+      ['Dual-host architecture', 'Polygon Amoy targets execution while Cardano Pre-Prod targets governance, identity, and insurance. Both remain deployment pending.'],
     ],
   },
   network: {
     eyebrow: 'Network',
-    title: 'Inspect resources before trusting them.',
-    description: 'The public explorer exposes sanitized node, blueprint, service, DA, and evidence records—never private telemetry or sensitive infrastructure fields.',
+    title: 'Replace providers without surrendering the service.',
+    description: 'VAMS treats compute, storage, networking, models, and verification as replaceable resources whose claims must remain inspectable.',
     pillars: [
-      ['Nodes', 'Availability, region, resources, skills, CHC profile, trust tier, and freshness.'],
+      ['Nodes', 'Availability, region, resources, skills, trust posture, and freshness.'],
       ['Service Blocks', 'Composable capabilities with integration and mock/live boundaries.'],
       ['Data availability', 'Provider implementation and operational readiness remain distinct.'],
       ['Network state', 'No response is silently replaced with synthetic activity.'],
@@ -30,10 +29,10 @@ const content = {
   },
   build: {
     eyebrow: 'Build',
-    title: 'Compose with explanations, not opaque recommendations.',
-    description: 'Developer simulation compares candidate nodes, exclusions, shortfalls, allocations, and estimated cost without provisioning or settlement.',
+    title: 'Move from Web2 toward portable services.',
+    description: 'Package existing capabilities, declare requirements, preserve state, and add independent providers incrementally without pretending migration is only a file transfer.',
     pillars: [
-      ['Blueprints', 'Describe compute, cognition, trust, geography, and service requirements.'],
+      ['Blueprints', 'Describe compute, data, trust, geography, cognition, and service requirements.'],
       ['Dry-run composition', 'A non-mutating simulation reuses scoring concepts while remaining visibly synthetic or Gateway-sourced.'],
       ['SDK-ready output', 'Export paths are designed for later phases; submission is intentionally absent.'],
       ['Gateway contract', 'Versioned, schema-validated explorer APIs carry provenance in every response.'],
@@ -41,8 +40,8 @@ const content = {
   },
   operate: {
     eyebrow: 'Operate',
-    title: 'Operational participation begins with verification.',
-    description: 'The current frontend explains requirements and blockers. It does not register operators, authorize identities, or create economic expectations.',
+    title: 'Operational participation begins with evidence.',
+    description: 'The current public surface explains requirements and blockers. It does not register operators, authorize identities, or create economic expectations.',
     pillars: [
       ['Neuron requirements', 'Compute, telemetry, identity, heartbeat, trust, and service capabilities.'],
       ['Security posture', 'mTLS, DID authorization, strict request schemas, and fail-closed dependencies are release requirements.'],
@@ -52,33 +51,58 @@ const content = {
   },
   research: {
     eyebrow: 'Research',
-    title: 'Neuro-symbolic infrastructure, open to inspection.',
-    description: 'VAMS joins cognitive matching, sovereign memory, lexical retrieval, verifiable execution, and decentralized coordination without presenting papers as deployed proof.',
+    title: 'Open questions, explicit evidence.',
+    description: 'VAMS researches continuity, adversarial intelligence, private accountability, durable decentralization, and cryptographic migration without presenting ambition as deployed proof.',
     pillars: [
-      ['CHC matching', 'Ten cognitive dimensions inform an explainable cognitive shortfall contribution.'],
-      ['S-MMU and HORMA', 'Tiered semantic memory with integrity-checked hierarchical state.'],
-      ['SIRA', 'Expected-response expansion and dual BM25 retrieval.'],
-      ['Evidence discipline', 'Research, implementation, verification, and deployment are labeled independently.'],
+      ['Continuity', 'Preserve authority, state, completed effects, and settlement obligations across independent trust domains.'],
+      ['Adversarial intelligence', 'Constrain specified prohibited effects even when a model or credentialed handler is malicious.'],
+      ['Private accountability', 'Verify material claims without making private lives or commercial activity publicly traceable.'],
+      ['Evidence discipline', 'Research, implementation, verification, deployment, and live observation are labeled independently.'],
     ],
   },
+}
+
+const migrationSteps = [
+  ['Map the service', 'Identify application state, owners, permissions, dependencies, and irreversible external effects.', 'Start with what must survive a provider change.'],
+  ['Declare requirements', 'Describe compute, data, trust, geography, cognition, and service requirements in a blueprint.', 'Make capability and authority boundaries inspectable.'],
+  ['Inspect a composition', 'Explore candidate capabilities and use explicit dry-run simulation when enabled.', 'Simulation is not a deployment or a guarantee of availability.'],
+  ['Establish recovery evidence', 'Validate state availability, current authority, and recovery assumptions before live migration.', 'Deployment and economic actions remain gated.'],
+]
+
+function TopicComposition({ topic, page }) {
+  if (topic === 'protocol' || topic === 'network') return (
+    <div className="topic-principles">
+      {page.pillars.map(([title, detail], index) => <Reveal as="article" key={title}><span className="topic-number">0{index + 1}</span><h2>{title}</h2><p>{detail}</p></Reveal>)}
+    </div>
+  )
+  if (topic === 'build') return (
+    <section className="migration-path" aria-label="Migration stages">
+      <div className="topic-section-intro"><p className="eyebrow">An incremental path</p><h2>Keep the service.<br />Expand its independence.</h2><p>Migration includes identity, permissions, application state, and recovery. Begin with one bounded capability.</p><Link to="/blueprints" className="text-link">Inspect blueprints <ArrowRight size={16} aria-hidden="true" /></Link></div>
+      <ol>{migrationSteps.map(([title, detail, boundary], index) => <li key={title}><span className="topic-number">0{index + 1}</span><div><h3>{title}</h3><p>{detail}</p><small>{boundary}</small></div></li>)}</ol>
+    </section>
+  )
+  if (topic === 'operate') return (
+    <section className="operator-readiness" aria-label="Operator requirements and release gates">
+      <div className="operator-requirements"><p className="eyebrow">Prepare to participate</p><h2>Capabilities come with responsibilities.</h2>{page.pillars.slice(0, 2).map(([title, detail]) => <article key={title}><h3>{title}</h3><p>{detail}</p></article>)}<Link className="text-link" to="/nodes">Inspect node requirements <ArrowRight size={16} aria-hidden="true" /></Link></div>
+      <div className="release-gates"><p className="eyebrow">Before live participation</p><h2>Release gates</h2><ul>{[['Identity and transport', 'Authorization, telemetry, and fail-closed dependencies require verified deployment evidence.'], ['Independent providers', 'Mock adapters are not staging or production evidence.'], ['Economic actions', 'Registration, staking, rewards, and settlement remain unavailable on this surface.']].map(([title, detail]) => <li key={title}><CircleDashed aria-hidden="true" size={20} /><div><h3>{title}</h3><p>{detail}</p></div></li>)}</ul><Link to="/status" className="text-link">Review verification status <ArrowRight size={16} aria-hidden="true" /></Link></div>
+    </section>
+  )
+  return (
+    <section className="research-agenda" aria-label="Research agenda">
+      <div className="topic-section-intro"><p className="eyebrow">Questions worth making precise</p><h2>Ambition needs an evidence trail.</h2><p>Research defines the questions. Implementation, verification, deployment, and live observation establish different kinds of evidence.</p><Link className="text-link" to="/evidence">Explore evidence <ArrowRight size={16} aria-hidden="true" /></Link></div>
+      <div className="research-questions">{page.pillars.map(([title, detail], index) => <details key={title} open={index === 0}><summary><span className="topic-number">0{index + 1}</span><span>{title}</span><span aria-hidden="true" className="research-expand">+</span></summary><p>{detail}</p><small>Research direction · not a deployed guarantee</small></details>)}</div>
+    </section>
+  )
 }
 
 function TopicPage({ topic }) {
   const page = content[topic]
   return (
-    <div className="topic-page">
+    <div className={`topic-page topic-page--${topic}`}>
       <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description} smoke>
-        <StatusBadge state="SOURCE_IMPLEMENTED" />
+        <span className="topic-lifecycle">Pre-testnet · {topic === 'research' ? 'Research agenda' : 'Architecture & requirements'}</span>
       </PageHeader>
-      <StaggerGroup className="topic-grid">
-        {page.pillars.map(([title, detail], index) => (
-          <StaggerItem as="article" key={title}>
-            <span>0{index + 1}</span>
-            <h2>{title}</h2>
-            <p>{detail}</p>
-          </StaggerItem>
-        ))}
-      </StaggerGroup>
+      <TopicComposition topic={topic} page={page} />
       <Reveal as="section" className="topic-callout">
         <div>
           <p className="eyebrow">Current lifecycle boundary</p>

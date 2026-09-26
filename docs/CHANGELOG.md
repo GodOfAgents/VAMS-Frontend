@@ -6,6 +6,9 @@ All notable frontend changes are documented here following Keep a Changelog.
 
 ### Added
 
+- Distinct Protocol, Network, Build, Operate, and Research public-page compositions with clearer builder and operator pathways.
+- A persistent animation preference and improved public navigation focus, dismissal, and route-title behavior.
+
 - Shared marketing, console, and status layouts with route-specific navigation.
 - Read-only node, blueprint, Service Block, DA, evidence, and system explorer routes.
 - Schema-validated `/v1/explorer` clients and fail-closed capability intersection.
@@ -25,6 +28,11 @@ All notable frontend changes are documented here following Keep a Changelog.
 
 ### Changed
 
+- Reframed the homepage around one fluid neural-topography experience with scroll chapters, pointer lift, and evidence-aware explanatory content.
+- Added a restrained pointer light and copy-depth parallax layer that follows the same neural field while respecting reduced-motion preferences.
+- Added localized neural-point luminance and echo ripples around the pointer signal without adding geometry or draw calls.
+- Extended the same fluid interaction language to public-page principle, migration, and operator-requirement surfaces.
+
 - Replaced the 68 KB monolithic landing page with one shared route-ready frontend system.
 - Reorganized public content around Protocol, Network, Build, Operate, Research, and Status.
 - Replaced Avalanche, active rewards/yield, and fixed-roadmap claims with Polygon Amoy/Cardano Pre-Prod deployment-pending architecture.
@@ -43,8 +51,8 @@ All notable frontend changes are documented here following Keep a Changelog.
 
 - Reduced hero DPR to `1.0` on mobile/tablet and `1.25` on desktop while lowering procedural geometry density.
 - Added frame-cadence monitoring, tier-specific frame ceilings, low-tier antialiasing removal, and automatic sustained-budget downgrades.
-- Preserved one procedural geometry and draw call with no new 3D dependencies, models, textures, or console/status bundle cost.
-- Reused one adaptive scene across homepage chapters with passive scroll sampling, cached section metrics, and shader-only morphing.
+- Preserved one procedural neural geometry and draw call with no additional models, textures, or console/status bundle cost.
+- Reused one adaptive neural scene across homepage chapters with passive scroll sampling, cached section metrics, and shader-only morphing.
 
 ### Removed
 
@@ -65,8 +73,17 @@ All notable frontend changes are documented here following Keep a Changelog.
 - Added runtime assertions that console and status profiles do not request Three.js or GSAP chunks.
 - Added unit coverage for quality selection, low-power detection, downgrade ordering, and sustained frame-budget hysteresis.
 - Added browser checks for first-frame readiness, one-shot proof-wave behavior, low-DPR mobile rendering, and WebGL fallback.
-- Added unit and browser coverage for chapter interpolation, theme handoff, CTA marker forwarding, full-page scene continuity, compact-mobile fallback, and route disposal.
+- Added browser coverage for neural chapter interpolation, theme handoff, CTA marker forwarding, full-page scene continuity, compact-mobile fallback, and route disposal.
 
 ### Known release blocks
 
 - Gateway explorer implementation, public DTO redaction, signed commit-bound evidence export, CSP response headers, browser security, accessibility, and phishing reviews remain external gates.
+### 2026-09-26
+- Added a restrained scroll-progress rail to keep the long neural narrative spatially legible, with reduced-motion-safe transitions.
+- Kept the neural pointer field responsive across every scroll chapter instead of muting it after the hero.
+- Added a clean pointer-exit reset so the neural glow settles immediately when the viewport is left.
+- Made public-page hover and focus treatments respect reduced-motion preferences across topic, migration, and operator surfaces.
+- Added six quiet chapter ticks to the scroll rail so the long-form neural narrative has a clear visual rhythm.
+- Clarified the architecture boundary: the Three.js layer is only the interactive neural backdrop, never a protocol map.
+- Highlighted the active chapter tick so scroll position reads as a living narrative state.
+- Added a continuous scroll-progress horizon veil to the neural scene, preserving one fluid spatial field between chapter transitions.

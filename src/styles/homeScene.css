@@ -176,3 +176,9 @@
     opacity: 0.58;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-progress span {
+    transition: none;
+  }
+}

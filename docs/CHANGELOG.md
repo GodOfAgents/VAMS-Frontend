@@ -6,6 +6,9 @@ All notable frontend changes are documented here following Keep a Changelog.
 
 ### Added
 
+- Distinct Protocol, Network, Build, Operate, and Research public-page compositions with clearer builder and operator pathways.
+- A persistent animation preference and improved public navigation focus, dismissal, and route-title behavior.
+
 - Shared marketing, console, and status layouts with route-specific navigation.
 - Read-only node, blueprint, Service Block, DA, evidence, and system explorer routes.
 - Schema-validated `/v1/explorer` clients and fail-closed capability intersection.
@@ -25,6 +28,8 @@ All notable frontend changes are documented here following Keep a Changelog.
 
 ### Changed
 
+- Reframed the homepage around one fluid neural-topography experience with scroll chapters, pointer lift, and evidence-aware explanatory content.
+
 - Replaced the 68 KB monolithic landing page with one shared route-ready frontend system.
 - Reorganized public content around Protocol, Network, Build, Operate, Research, and Status.
 - Replaced Avalanche, active rewards/yield, and fixed-roadmap claims with Polygon Amoy/Cardano Pre-Prod deployment-pending architecture.
@@ -43,8 +48,8 @@ All notable frontend changes are documented here following Keep a Changelog.
 
 - Reduced hero DPR to `1.0` on mobile/tablet and `1.25` on desktop while lowering procedural geometry density.
 - Added frame-cadence monitoring, tier-specific frame ceilings, low-tier antialiasing removal, and automatic sustained-budget downgrades.
-- Preserved one procedural geometry and draw call with no new 3D dependencies, models, textures, or console/status bundle cost.
-- Reused one adaptive scene across homepage chapters with passive scroll sampling, cached section metrics, and shader-only morphing.
+- Preserved one procedural neural geometry and draw call with no additional models, textures, or console/status bundle cost.
+- Reused one adaptive neural scene across homepage chapters with passive scroll sampling, cached section metrics, and shader-only morphing.
 
 ### Removed
 
@@ -65,7 +70,7 @@ All notable frontend changes are documented here following Keep a Changelog.
 - Added runtime assertions that console and status profiles do not request Three.js or GSAP chunks.
 - Added unit coverage for quality selection, low-power detection, downgrade ordering, and sustained frame-budget hysteresis.
 - Added browser checks for first-frame readiness, one-shot proof-wave behavior, low-DPR mobile rendering, and WebGL fallback.
-- Added unit and browser coverage for chapter interpolation, theme handoff, CTA marker forwarding, full-page scene continuity, compact-mobile fallback, and route disposal.
+- Added browser coverage for neural chapter interpolation, theme handoff, CTA marker forwarding, full-page scene continuity, compact-mobile fallback, and route disposal.
 
 ### Known release blocks
 

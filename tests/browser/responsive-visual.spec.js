@@ -127,7 +127,7 @@ test('WebGL failure retains the complete static hero', async ({ page }) => {
   await expect(page.locator('[data-hero-renderer="fallback"]')).toBeVisible()
   await expect(page.locator('.neural-field--static')).toBeVisible()
   await expect(page.locator('[data-marketing-three]')).toHaveCount(0)
-  await expect(page.locator('.hero h1')).toHaveAccessibleName('Verifiable infrastructure for autonomous agents.')
+  await expect(page.locator('.hero h1')).toHaveAccessibleName('Sovereign infrastructure for enduring services.')
 })
 
 test('reduced motion uses the complete static hero without loading cinematic bundles', async ({ page }) => {

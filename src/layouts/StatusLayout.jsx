@@ -4,6 +4,7 @@ import { Brand } from '../components/navigation/Brand.jsx'
 import { SimulationBanner } from '../components/disclosures/SimulationBanner.jsx'
 import { ThemeToggle } from '../components/ui/ThemeToggle.jsx'
 import { RouteMotion } from '../motion/primitives.jsx'
+import '../styles/publicPages.css'
 
 export function StatusLayout() {
   return (
@@ -14,6 +15,7 @@ export function StatusLayout() {
         <Brand to="/status" />
         <span className="status-nav__title">VERIFICATION STATUS</span>
         <div>
+          <Link to="/">Protocol home</Link>
           <a href="https://github.com/GodOfAgents/VAMS">Source <ExternalLink aria-hidden="true" size={13} /></a>
           <Link to="/overview">Console</Link>
           <ThemeToggle />

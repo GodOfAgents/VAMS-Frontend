@@ -42,10 +42,24 @@ function RouteEffects() {
   }, [navigate])
 
   useEffect(() => {
-    window.scrollTo(0, 0)
-    const leaf = location.pathname.split('/').filter(Boolean).pop() || 'protocol'
-    document.title = `${leaf.replaceAll('-', ' ')} | VAMS`
-  }, [location.pathname])
+    const titles = {
+      '/': 'VAMS — Sovereign infrastructure for Web4',
+      '/protocol': 'Protocol architecture | VAMS',
+      '/network': 'Independent providers | VAMS',
+      '/build': 'Build portable services | VAMS',
+      '/operate': 'Operator requirements | VAMS',
+      '/research': 'Research and evidence | VAMS',
+      '/status': 'Verification status | VAMS',
+    }
+    const leaf = location.pathname.split('/').filter(Boolean).pop() || 'Home'
+    document.title = titles[location.pathname] || `${leaf.replaceAll('-', ' ')} | VAMS`
+    const frame = requestAnimationFrame(() => {
+      const anchor = location.hash ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null
+      if (anchor) anchor.scrollIntoView({ behavior: 'instant', block: 'start' })
+      else if (!location.hash) window.scrollTo({ top: 0, behavior: 'instant' })
+    })
+    return () => cancelAnimationFrame(frame)
+  }, [location.pathname, location.hash])
 
   return <Outlet />
 }

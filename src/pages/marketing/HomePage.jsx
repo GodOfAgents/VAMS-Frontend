@@ -34,7 +34,6 @@ export function HomePage() {
   return (
     <div className="marketing-home">
       <MarketingVisual proofSignal={proofSignal} />
-
       <section className="hero" data-scene-chapter="intro">
         <div className="hero__content">
           <div className="hero__copy">
@@ -74,7 +73,7 @@ export function HomePage() {
           <div className="lifecycle-track" aria-hidden="true"><span className="lifecycle-progress__bar" /></div>
           <StaggerGroup as="ol" className="lifecycle-list">
             {lifecycle.map(([number, title, detail]) => (
-              <StaggerItem as="li" key={number}><span>{number}</span><h3>{title}</h3><p>{detail}</p></StaggerItem>
+              <StaggerItem as="li" key={number} data-lifecycle-step={number}><span>{number}</span><h3>{title}</h3><p>{detail}</p></StaggerItem>
             ))}
           </StaggerGroup>
         </div>

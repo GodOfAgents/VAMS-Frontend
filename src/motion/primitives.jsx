@@ -67,13 +67,14 @@ export function StaggerGroup({ as = 'div', children, className = '', delay = 0, 
   )
 }
 
-export function StaggerItem({ as = 'div', children, className = '' }) {
+export function StaggerItem({ as = 'div', children, className = '', ...props }) {
   const motion = useResponsiveMotion()
 
   return (
     <MotionElement
       as={as}
       className={className}
+      {...props}
       variants={{
         hidden: { opacity: 0, y: motion.distance },
         visible: {

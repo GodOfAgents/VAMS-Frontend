@@ -1,9 +1,8 @@
 import { ArrowRight, CheckCircle2, CircleDashed, ExternalLink } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { PageHeader } from '../../components/ui/PageHeader.jsx'
-import { StatusBadge } from '../../components/ui/StatusBadge.jsx'
 import { appEnvironment } from '../../config/environment.js'
-import { Reveal, StaggerGroup, StaggerItem } from '../../motion/primitives.jsx'
+import { Reveal } from '../../motion/primitives.jsx'
 
 const content = {
   protocol: {
@@ -63,22 +62,47 @@ const content = {
   },
 }
 
+const migrationSteps = [
+  ['Map the service', 'Identify application state, owners, permissions, dependencies, and irreversible external effects.', 'Start with what must survive a provider change.'],
+  ['Declare requirements', 'Describe compute, data, trust, geography, cognition, and service requirements in a blueprint.', 'Make capability and authority boundaries inspectable.'],
+  ['Inspect a composition', 'Explore candidate capabilities and use explicit dry-run simulation when enabled.', 'Simulation is not a deployment or a guarantee of availability.'],
+  ['Establish recovery evidence', 'Validate state availability, current authority, and recovery assumptions before live migration.', 'Deployment and economic actions remain gated.'],
+]
+
+function TopicComposition({ topic, page }) {
+  if (topic === 'protocol' || topic === 'network') return (
+    <div className="topic-principles">
+      {page.pillars.map(([title, detail], index) => <Reveal as="article" key={title}><span className="topic-number">0{index + 1}</span><h2>{title}</h2><p>{detail}</p></Reveal>)}
+    </div>
+  )
+  if (topic === 'build') return (
+    <section className="migration-path" aria-label="Migration stages">
+      <div className="topic-section-intro"><p className="eyebrow">An incremental path</p><h2>Keep the service.<br />Expand its independence.</h2><p>Migration includes identity, permissions, application state, and recovery. Begin with one bounded capability.</p><Link to="/blueprints" className="text-link">Inspect blueprints <ArrowRight size={16} aria-hidden="true" /></Link></div>
+      <ol>{migrationSteps.map(([title, detail, boundary], index) => <li key={title}><span className="topic-number">0{index + 1}</span><div><h3>{title}</h3><p>{detail}</p><small>{boundary}</small></div></li>)}</ol>
+    </section>
+  )
+  if (topic === 'operate') return (
+    <section className="operator-readiness" aria-label="Operator requirements and release gates">
+      <div className="operator-requirements"><p className="eyebrow">Prepare to participate</p><h2>Capabilities come with responsibilities.</h2>{page.pillars.slice(0, 2).map(([title, detail]) => <article key={title}><h3>{title}</h3><p>{detail}</p></article>)}<Link className="text-link" to="/nodes">Inspect node requirements <ArrowRight size={16} aria-hidden="true" /></Link></div>
+      <div className="release-gates"><p className="eyebrow">Before live participation</p><h2>Release gates</h2><ul>{[['Identity and transport', 'Authorization, telemetry, and fail-closed dependencies require verified deployment evidence.'], ['Independent providers', 'Mock adapters are not staging or production evidence.'], ['Economic actions', 'Registration, staking, rewards, and settlement remain unavailable on this surface.']].map(([title, detail]) => <li key={title}><CircleDashed aria-hidden="true" size={20} /><div><h3>{title}</h3><p>{detail}</p></div></li>)}</ul><Link to="/status" className="text-link">Review verification status <ArrowRight size={16} aria-hidden="true" /></Link></div>
+    </section>
+  )
+  return (
+    <section className="research-agenda" aria-label="Research agenda">
+      <div className="topic-section-intro"><p className="eyebrow">Questions worth making precise</p><h2>Ambition needs an evidence trail.</h2><p>Research defines the questions. Implementation, verification, deployment, and live observation establish different kinds of evidence.</p><Link className="text-link" to="/evidence">Explore evidence <ArrowRight size={16} aria-hidden="true" /></Link></div>
+      <div className="research-questions">{page.pillars.map(([title, detail], index) => <details key={title} open={index === 0}><summary><span className="topic-number">0{index + 1}</span><span>{title}</span><span aria-hidden="true" className="research-expand">+</span></summary><p>{detail}</p><small>Research direction · not a deployed guarantee</small></details>)}</div>
+    </section>
+  )
+}
+
 function TopicPage({ topic }) {
   const page = content[topic]
   return (
-    <div className="topic-page">
+    <div className={`topic-page topic-page--${topic}`}>
       <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description} smoke>
-        <StatusBadge state="SOURCE_IMPLEMENTED" />
+        <span className="topic-lifecycle">Pre-testnet · {topic === 'research' ? 'Research agenda' : 'Architecture & requirements'}</span>
       </PageHeader>
-      <StaggerGroup className="topic-grid">
-        {page.pillars.map(([title, detail], index) => (
-          <StaggerItem as="article" key={title}>
-            <span>0{index + 1}</span>
-            <h2>{title}</h2>
-            <p>{detail}</p>
-          </StaggerItem>
-        ))}
-      </StaggerGroup>
+      <TopicComposition topic={topic} page={page} />
       <Reveal as="section" className="topic-callout">
         <div>
           <p className="eyebrow">Current lifecycle boundary</p>

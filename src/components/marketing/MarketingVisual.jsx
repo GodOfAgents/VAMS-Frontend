@@ -111,6 +111,7 @@ export function MarketingVisual({ proofSignal = 0 }) {
       sceneElement.dataset.sceneMix = state.chapterMix.toFixed(3)
       sceneElement.dataset.scenePage = state.pageProgress.toFixed(3)
       sceneElement.style.setProperty('--scene-theme-mix', themeMix.toFixed(3))
+      sceneElement.style.setProperty('--scene-page-progress', state.pageProgress.toFixed(3))
       if (state.activeChapter !== 'intro') {
         sceneElement.style.setProperty('--scene-pointer-opacity', '0')
         sceneElement.style.setProperty('--scene-pointer-nx', '0')

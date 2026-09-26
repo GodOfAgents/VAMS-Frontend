@@ -13,6 +13,7 @@
   --scene-pointer-opacity: 0;
   --scene-pointer-nx: 0;
   --scene-pointer-ny: 0;
+  --scene-page-progress: 0;
   position: fixed;
   z-index: 0;
   inset: 0;
@@ -34,6 +35,20 @@
   mix-blend-mode: screen;
   pointer-events: none;
   transition: opacity 420ms cubic-bezier(.16, 1, .3, 1);
+}
+
+.marketing-scene::before {
+  position: absolute;
+  inset: -12%;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse at 50% calc(112% - (var(--scene-page-progress) * 52%)), rgba(111, 205, 255, .08), transparent 42%),
+    linear-gradient(180deg, rgba(4, 10, 18, 0) 24%, rgba(4, 10, 18, calc(.05 + (var(--scene-page-progress) * .08))) 100%);
+  content: "";
+  opacity: .9;
+  transform: translate3d(0, calc(var(--scene-page-progress) * -1.2%), 0);
+  transition: background-position 700ms cubic-bezier(.16, 1, .3, 1), opacity 500ms ease, transform 900ms cubic-bezier(.16, 1, .3, 1);
+  pointer-events: none;
 }
 
 .marketing-scene .neural-field {

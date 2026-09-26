@@ -78,3 +78,5 @@ All notable frontend changes are documented here following Keep a Changelog.
 ### Known release blocks
 
 - Gateway explorer implementation, public DTO redaction, signed commit-bound evidence export, CSP response headers, browser security, accessibility, and phishing reviews remain external gates.
+### 2026-09-26
+- Added a continuous scroll-progress horizon veil to the neural scene, preserving one fluid spatial field between chapter transitions.

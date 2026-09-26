@@ -357,20 +357,17 @@ export default function NeuralField({
     }
 
     const handlePointerMove = (event) => {
-      const hero = container.closest('.marketing-home')?.querySelector('.hero')
-      const bounds = hero?.getBoundingClientRect()
-      const isIntro = sceneStateRef.current.activeChapter === 'intro'
-      const withinHero = bounds && event.clientX >= bounds.left && event.clientX <= bounds.right
+      const sceneElement = container.closest('.marketing-scene')
+      const bounds = sceneElement?.getBoundingClientRect()
+      const withinScene = bounds && event.clientX >= bounds.left && event.clientX <= bounds.right
         && event.clientY >= bounds.top && event.clientY <= bounds.bottom
-      if (!isIntro || !withinHero) {
+      if (!sceneElement || !withinScene) {
         targetStrength = 0
-        const sceneElement = container.closest('.marketing-scene')
         sceneElement?.style.setProperty('--scene-pointer-opacity', '0')
         sceneElement?.style.setProperty('--scene-pointer-nx', '0')
         sceneElement?.style.setProperty('--scene-pointer-ny', '0')
         return
       }
-      const sceneElement = container.closest('.marketing-scene')
       const normalizedX = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2
       const normalizedY = ((event.clientY - bounds.top) / bounds.height - 0.5) * 2
       sceneElement?.style.setProperty('--scene-pointer-x', `${event.clientX}px`)

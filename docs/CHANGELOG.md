@@ -80,4 +80,5 @@ All notable frontend changes are documented here following Keep a Changelog.
 - Gateway explorer implementation, public DTO redaction, signed commit-bound evidence export, CSP response headers, browser security, accessibility, and phishing reviews remain external gates.
 ### 2026-09-26
 - Added a restrained scroll-progress rail to keep the long neural narrative spatially legible, with reduced-motion-safe transitions.
+- Kept the neural pointer field responsive across every scroll chapter instead of muting it after the hero.
 - Added a continuous scroll-progress horizon veil to the neural scene, preserving one fluid spatial field between chapter transitions.

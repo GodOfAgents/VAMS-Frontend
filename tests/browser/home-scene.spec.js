@@ -18,6 +18,8 @@ test('one adaptive neural scene carries the homepage topology from hero through 
       window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY, behavior: 'instant' })
     })
     await expect(scene).toHaveAttribute('data-scene-active', chapter)
+    await page.mouse.move(1060, 420)
+    await expect(scene).toHaveCSS('--scene-pointer-opacity', '1')
     expect(await page.locator('[data-marketing-three] canvas').count()).toBeLessThanOrEqual(1)
     await expect.poll(() => scene.evaluate((element) => element.getBoundingClientRect().top)).toBe(0)
   }

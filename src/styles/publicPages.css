@@ -65,4 +65,18 @@
   .site-shell .marketing-nav__inner { padding-inline: 12px; }
   .migration-path li { gap: 10px; grid-template-columns: 28px 1fr; }
 }
-@media (prefers-reduced-motion: reduce) { .research-expand { transition: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .research-expand,
+  .topic-principles article,
+  .topic-principles article::after,
+  .migration-path li,
+  .operator-requirements article { transition: none; }
+
+  .topic-principles article:hover,
+  .topic-principles article:focus-within { transform: none; }
+
+  .migration-path li:hover,
+  .migration-path li:focus-within,
+  .operator-requirements article:hover,
+  .operator-requirements article:focus-within { padding-left: 0; }
+}

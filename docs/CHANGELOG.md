@@ -81,4 +81,5 @@ All notable frontend changes are documented here following Keep a Changelog.
 ### 2026-09-26
 - Added a restrained scroll-progress rail to keep the long neural narrative spatially legible, with reduced-motion-safe transitions.
 - Kept the neural pointer field responsive across every scroll chapter instead of muting it after the hero.
+- Added a clean pointer-exit reset so the neural glow settles immediately when the viewport is left.
 - Added a continuous scroll-progress horizon veil to the neural scene, preserving one fluid spatial field between chapter transitions.

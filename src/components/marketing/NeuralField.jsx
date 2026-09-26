@@ -356,16 +356,21 @@ export default function NeuralField({
       if (pageVisible) render()
     }
 
+    const clearPointer = () => {
+      targetStrength = 0
+      const sceneElement = container.closest('.marketing-scene')
+      sceneElement?.style.setProperty('--scene-pointer-opacity', '0')
+      sceneElement?.style.setProperty('--scene-pointer-nx', '0')
+      sceneElement?.style.setProperty('--scene-pointer-ny', '0')
+    }
+
     const handlePointerMove = (event) => {
       const sceneElement = container.closest('.marketing-scene')
       const bounds = sceneElement?.getBoundingClientRect()
       const withinScene = bounds && event.clientX >= bounds.left && event.clientX <= bounds.right
         && event.clientY >= bounds.top && event.clientY <= bounds.bottom
       if (!sceneElement || !withinScene) {
-        targetStrength = 0
-        sceneElement?.style.setProperty('--scene-pointer-opacity', '0')
-        sceneElement?.style.setProperty('--scene-pointer-nx', '0')
-        sceneElement?.style.setProperty('--scene-pointer-ny', '0')
+        clearPointer()
         return
       }
       const normalizedX = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2
@@ -380,6 +385,10 @@ export default function NeuralField({
         (0.48 - (event.clientY - bounds.top) / bounds.height) * profile.height * 0.68,
       )
       targetStrength = 1
+    }
+
+    const handlePointerOut = (event) => {
+      if (!event.relatedTarget) clearPointer()
     }
 
     const handleVisibility = () => {
@@ -412,6 +421,7 @@ export default function NeuralField({
     document.addEventListener('visibilitychange', handleVisibility)
     renderer.domElement.addEventListener('webglcontextlost', handleContextLost)
     if (quality.pointerEnabled) window.addEventListener('pointermove', handlePointerMove, { passive: true })
+    if (quality.pointerEnabled) window.addEventListener('pointerout', handlePointerOut, { passive: true })
     updateLoop()
 
     return () => {
@@ -420,6 +430,7 @@ export default function NeuralField({
       document.removeEventListener('visibilitychange', handleVisibility)
       renderer.domElement.removeEventListener('webglcontextlost', handleContextLost)
       window.removeEventListener('pointermove', handlePointerMove)
+      window.removeEventListener('pointerout', handlePointerOut)
       if (triggerProofRef.current === triggerProof) triggerProofRef.current = null
       geometry.dispose()
       material.dispose()

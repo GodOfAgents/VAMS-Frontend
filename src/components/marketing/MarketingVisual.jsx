@@ -160,6 +160,7 @@ export function MarketingVisual({ proofSignal = 0 }) {
       style={{ '--scene-theme-mix': 1 }}
     >
       <div className="neural-field neural-field--static" />
+      <div className="scene-progress" aria-hidden="true"><span /></div>
       {!failed && effectiveTier !== 'static' && (
         <Suspense fallback={null}>
           <NeuralField

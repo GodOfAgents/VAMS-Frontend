@@ -1,0 +1,227 @@
+/* Status surface: verification register. Open columns and ruled rows. */
+
+.status-shell {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.status-shell > main {
+  flex: 1 0 auto;
+}
+
+.status-nav {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+}
+
+.status-nav__title {
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+}
+
+.status-nav__links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+}
+
+.status-nav__links a {
+  display: inline-flex;
+  height: 34px;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+  border-radius: var(--radius-sm);
+  color: var(--text-2);
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease-standard), background-color var(--dur-fast) var(--ease-standard);
+}
+
+.status-nav__links a:hover {
+  background: color-mix(in srgb, var(--text) 5%, transparent);
+  color: var(--text);
+}
+
+.status-page {
+  position: relative;
+  padding-bottom: clamp(48px, 6vw, 80px);
+  isolation: isolate;
+}
+
+.status-page::before {
+  position: absolute;
+  z-index: -1;
+  top: calc(-1 * (var(--nav-height) + 12px));
+  left: 50%;
+  width: min(1400px, 140%);
+  height: 520px;
+  background: radial-gradient(40% 55% at 70% 18%, var(--accent-soft), transparent 70%);
+  content: "";
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+.status-page > .page-header {
+  padding-top: clamp(48px, 7vw, 104px);
+}
+
+.status-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid var(--line-strong);
+  border-bottom: 1px solid var(--line);
+}
+
+.status-column {
+  min-width: 0;
+  padding: clamp(28px, 3.4vw, 44px) clamp(24px, 3.4vw, 48px) clamp(28px, 3.4vw, 44px) 0;
+}
+
+.status-column + .status-column {
+  padding-right: 0;
+  padding-left: clamp(24px, 3.4vw, 48px);
+  border-left: 1px solid var(--line);
+}
+
+.status-column__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.status-column__head > svg {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: var(--accent);
+}
+
+.status-column__head h2 {
+  margin-top: 4px;
+  font-size: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+}
+
+.operational-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line-soft);
+  color: var(--text);
+  font-size: var(--fs-sm);
+}
+
+.readiness-summary {
+  display: grid;
+  justify-items: start;
+  gap: 14px;
+  max-width: 46ch;
+}
+
+.readiness-summary p {
+  color: var(--text-2);
+  font-size: var(--fs-lede);
+  line-height: 1.55;
+}
+
+.status-column--readiness .text-link {
+  margin-top: 10px;
+}
+
+.status-records {
+  padding-top: clamp(56px, 7vw, 96px);
+}
+
+.status-records__heading {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.status-records__heading h2 {
+  max-width: 22ch;
+  font-size: var(--fs-h2);
+}
+
+.claim-grid {
+  border-top: 1px solid var(--line-strong);
+}
+
+.status-page__footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: clamp(48px, 6vw, 80px);
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+
+.status-page__footer svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  color: var(--accent);
+}
+
+@media (max-width: 959px) {
+  .status-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .status-column,
+  .status-column + .status-column {
+    padding: 28px 0;
+    border-left: 0;
+  }
+
+  .status-column + .status-column {
+    border-top: 1px solid var(--line);
+  }
+}
+
+@media (max-width: 767px) {
+  .status-nav {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .status-nav__title {
+    display: none;
+  }
+
+  .status-nav__links a {
+    padding: 0 7px;
+    font-size: 0.8125rem;
+  }
+}
+
+@media (max-width: 419px) {
+  .status-nav .brand img {
+    height: 20px;
+  }
+
+  .status-nav__links {
+    gap: 0;
+  }
+
+  .status-nav__links a {
+    padding: 0 5px;
+    font-size: 0.75rem;
+  }
+
+  .status-nav__links a svg {
+    display: none;
+  }
+}

@@ -2,7 +2,7 @@ import { ArrowRight, CheckCircle2, CircleDashed, ExternalLink } from 'lucide-rea
 import { Link } from 'react-router-dom'
 import { PageHeader } from '../../components/ui/PageHeader.jsx'
 import { appEnvironment } from '../../config/environment.js'
-import { Reveal } from '../../motion/primitives.jsx'
+import { Reveal, StaggerGroup, StaggerItem } from '../../motion/primitives.jsx'
 export { ResearchPage } from './ResearchPage.jsx'
 
 const content = {
@@ -70,22 +70,66 @@ const migrationSteps = [
   ['Establish recovery evidence', 'Validate state availability, current authority, and recovery assumptions before live migration.', 'Deployment and economic actions remain gated.'],
 ]
 
+const releaseGates = [
+  ['Identity and transport', 'Authorization, telemetry, and fail-closed dependencies require verified deployment evidence.'],
+  ['Independent providers', 'Mock adapters are not staging or production evidence.'],
+  ['Economic actions', 'Registration, staking, rewards, and settlement remain unavailable on this surface.'],
+]
+
 function TopicComposition({ topic, page }) {
   if (topic === 'protocol' || topic === 'network') return (
-    <div className="topic-principles">
-      {page.pillars.map(([title, detail], index) => <Reveal as="article" key={title}><span className="topic-number">0{index + 1}</span><h2>{title}</h2><p>{detail}</p></Reveal>)}
-    </div>
+    <StaggerGroup className="topic-principles">
+      {page.pillars.map(([title, detail], index) => (
+        <StaggerItem as="article" className="principle-row" key={title}>
+          <span className="topic-number">0{index + 1}</span>
+          <h2>{title}</h2>
+          <p>{detail}</p>
+        </StaggerItem>
+      ))}
+    </StaggerGroup>
   )
   if (topic === 'build') return (
     <section className="migration-path" aria-label="Migration stages">
-      <div className="topic-section-intro"><p className="eyebrow">An incremental path</p><h2>Keep the service.<br />Expand its independence.</h2><p>Migration includes identity, permissions, application state, and recovery. Begin with one bounded capability.</p><Link to="/blueprints" className="text-link">Inspect blueprints <ArrowRight size={16} aria-hidden="true" /></Link></div>
-      <ol>{migrationSteps.map(([title, detail, boundary], index) => <li key={title}><span className="topic-number">0{index + 1}</span><div><h3>{title}</h3><p>{detail}</p><small>{boundary}</small></div></li>)}</ol>
+      <Reveal className="topic-section-intro">
+        <p className="eyebrow eyebrow--signal">An incremental path</p>
+        <h2>Keep the service.<br /><span className="topic-muted">Expand its independence.</span></h2>
+        <p>Migration includes identity, permissions, application state, and recovery. Begin with one bounded capability.</p>
+        <Link to="/blueprints" className="text-link">Inspect blueprints <ArrowRight size={16} aria-hidden="true" /></Link>
+      </Reveal>
+      <StaggerGroup as="ol" className="migration-steps">
+        {migrationSteps.map(([title, detail, boundary], index) => (
+          <StaggerItem as="li" className="migration-step" key={title}>
+            <span className="topic-number">0{index + 1}</span>
+            <div className="migration-step__body">
+              <h3>{title}</h3>
+              <p>{detail}</p>
+              <small>{boundary}</small>
+            </div>
+          </StaggerItem>
+        ))}
+      </StaggerGroup>
     </section>
   )
   if (topic === 'operate') return (
     <section className="operator-readiness" aria-label="Operator requirements and release gates">
-      <div className="operator-requirements"><p className="eyebrow">Prepare to participate</p><h2>Capabilities come with responsibilities.</h2>{page.pillars.slice(0, 2).map(([title, detail]) => <article key={title}><h3>{title}</h3><p>{detail}</p></article>)}<Link className="text-link" to="/nodes">Inspect node requirements <ArrowRight size={16} aria-hidden="true" /></Link></div>
-      <div className="release-gates"><p className="eyebrow">Before live participation</p><h2>Release gates</h2><ul>{[['Identity and transport', 'Authorization, telemetry, and fail-closed dependencies require verified deployment evidence.'], ['Independent providers', 'Mock adapters are not staging or production evidence.'], ['Economic actions', 'Registration, staking, rewards, and settlement remain unavailable on this surface.']].map(([title, detail]) => <li key={title}><CircleDashed aria-hidden="true" size={20} /><div><h3>{title}</h3><p>{detail}</p></div></li>)}</ul><Link to="/status" className="text-link">Review verification status <ArrowRight size={16} aria-hidden="true" /></Link></div>
+      <Reveal className="operator-requirements">
+        <p className="eyebrow eyebrow--signal">Prepare to participate</p>
+        <h2>Capabilities come with responsibilities.</h2>
+        <div className="requirement-list">
+          {page.pillars.slice(0, 2).map(([title, detail]) => <article className="requirement-row" key={title}><h3>{title}</h3><p>{detail}</p></article>)}
+        </div>
+        <Link className="text-link" to="/nodes">Inspect node requirements <ArrowRight size={16} aria-hidden="true" /></Link>
+      </Reveal>
+      <Reveal className="release-gates" delay={0.1}>
+        <p className="eyebrow eyebrow--signal">Before live participation</p>
+        <h2>Release gates</h2>
+        <ul>
+          {releaseGates.map(([title, detail]) => (
+            <li key={title}><CircleDashed aria-hidden="true" size={20} /><div><h3>{title}</h3><p>{detail}</p></div></li>
+          ))}
+        </ul>
+        <Link to="/status" className="text-link">Review verification status <ArrowRight size={16} aria-hidden="true" /></Link>
+      </Reveal>
     </section>
   )
   return (
@@ -100,26 +144,28 @@ function TopicPage({ topic }) {
   const page = content[topic]
   return (
     <div className={`topic-page topic-page--${topic}`}>
-      <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description} smoke>
-        <span className="topic-lifecycle">Pre-testnet · {topic === 'research' ? 'Research agenda' : 'Architecture & requirements'}</span>
-      </PageHeader>
-      <TopicComposition topic={topic} page={page} />
-      <Reveal as="section" className="topic-callout">
-        <div>
-          <p className="eyebrow">Current lifecycle boundary</p>
-          <h2>Inspection and explicit simulation only.</h2>
-        </div>
-        <ul>
-          <li><CheckCircle2 aria-hidden="true" /> Read public protocol state</li>
-          <li><CheckCircle2 aria-hidden="true" /> Simulate composition when explicitly enabled</li>
-          <li><CircleDashed aria-hidden="true" /> Deployment evidence pending</li>
-          <li><CircleDashed aria-hidden="true" /> Economic actions unavailable</li>
-        </ul>
-      </Reveal>
-      <Reveal className="topic-actions">
-        <Link className="button" to="/overview">Open read-only console <ArrowRight aria-hidden="true" size={16} /></Link>
-        <a className="button button--ghost" href={appEnvironment.docsUrl}>Read repository docs <ExternalLink aria-hidden="true" size={15} /></a>
-      </Reveal>
+      <div className="wrap">
+        <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description} smoke>
+          <span className="chip topic-lifecycle">Pre-testnet · {topic === 'research' ? 'Research agenda' : 'Architecture & requirements'}</span>
+        </PageHeader>
+        <TopicComposition topic={topic} page={page} />
+        <Reveal as="section" className="topic-callout">
+          <div>
+            <p className="eyebrow eyebrow--signal">Current lifecycle boundary</p>
+            <h2>Inspection and explicit simulation only.</h2>
+          </div>
+          <ul>
+            <li className="is-available"><CheckCircle2 aria-hidden="true" /> Read public protocol state</li>
+            <li className="is-available"><CheckCircle2 aria-hidden="true" /> Simulate composition when explicitly enabled</li>
+            <li className="is-pending"><CircleDashed aria-hidden="true" /> Deployment evidence pending</li>
+            <li className="is-pending"><CircleDashed aria-hidden="true" /> Economic actions unavailable</li>
+          </ul>
+        </Reveal>
+        <Reveal className="topic-actions">
+          <Link className="button" to="/overview">Open read-only console <ArrowRight aria-hidden="true" size={16} /></Link>
+          <a className="button button--ghost" href={appEnvironment.docsUrl}>Read repository docs <ExternalLink aria-hidden="true" size={15} /></a>
+        </Reveal>
+      </div>
     </div>
   )
 }

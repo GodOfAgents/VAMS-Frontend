@@ -6,6 +6,7 @@ import { PageHeader } from '../../components/ui/PageHeader.jsx'
 import { StatusBadge } from '../../components/ui/StatusBadge.jsx'
 import { useProtocol } from '../../features/protocol/ProtocolProvider.jsx'
 import { useResource } from '../../features/protocol/useResource.js'
+import { Reveal } from '../../motion/primitives.jsx'
 
 export function StatusPage() {
   const meta = useResource('meta')
@@ -13,10 +14,10 @@ export function StatusPage() {
   const { load } = useProtocol()
 
   return (
-    <div className="status-page">
+    <div className="status-page wrap">
       <PageHeader eyebrow="Verification register" title="Operational status is not release readiness." description="A service can run locally while remaining unverified, undeployed, or blocked for public testnet." />
       <div className="status-columns">
-        <section className="status-column">
+        <Reveal as="section" className="status-column">
           <div className="status-column__head"><Activity aria-hidden="true" /><div><p className="eyebrow">Runtime observation</p><h2>Operational status</h2></div></div>
           <DataBoundary resource={meta} onRetry={() => load('meta')}>
             {(data, envelope) => (
@@ -28,15 +29,15 @@ export function StatusPage() {
               </>
             )}
           </DataBoundary>
-        </section>
-        <section className="status-column status-column--readiness">
+        </Reveal>
+        <Reveal as="section" className="status-column status-column--readiness" delay={0.08}>
           <div className="status-column__head"><ShieldAlert aria-hidden="true" /><div><p className="eyebrow">Release qualification</p><h2>Readiness status</h2></div></div>
           <div className="readiness-summary"><StatusBadge state="BLOCKED" /><p>Public-testnet exposure requires browser security, accessibility, phishing, CSP, Gateway, and commit-bound evidence gates.</p></div>
           <Link className="text-link" to="/evidence">Open detailed evidence register →</Link>
-        </section>
+        </Reveal>
       </div>
       <section className="status-records">
-        <div className="section-heading"><p className="eyebrow">Claim register</p><h2>Evidence supplied by the configured source</h2></div>
+        <Reveal className="status-records__heading"><p className="eyebrow eyebrow--signal">Claim register</p><h2>Evidence supplied by the configured source</h2></Reveal>
         <DataBoundary resource={evidence} onRetry={() => load('evidence')}>
           {(records, envelope) => (
             <>

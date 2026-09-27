@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { Fragment, useCallback, useEffect, useRef } from 'react'
 import { AnimatePresence, useInView, useMotionValue, useSpring } from 'motion/react'
 import * as m from 'motion/react-m'
 import { Link, useLocation } from 'react-router-dom'
 import { useResponsiveMotion } from './ResponsiveMotionProvider.jsx'
+
+export const EASE_OUT = [0.16, 1, 0.3, 1]
 
 const motionElements = {
   article: m.article,
@@ -12,6 +14,7 @@ const motionElements = {
   li: m.li,
   nav: m.nav,
   ol: m.ol,
+  p: m.p,
   section: m.section,
   span: m.span,
   ul: m.ul,
@@ -20,6 +23,10 @@ const motionElements = {
 function MotionElement({ as = 'div', ...props }) {
   const Component = motionElements[as] || m.div
   return <Component {...props} />
+}
+
+function revealDuration(motion) {
+  return motion.isMobile ? 0.5 : 0.72
 }
 
 export function Reveal({ as = 'div', children, className = '', delay = 0, distance, once = true, ...props }) {
@@ -32,8 +39,8 @@ export function Reveal({ as = 'div', children, className = '', delay = 0, distan
       className={className}
       initial={motion.reducedMotion ? false : { opacity: 0, y: offset }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ amount: motion.isMobile ? 0.12 : 0.2, margin: '0px 0px -8% 0px', once }}
-      transition={{ delay, duration: motion.isMobile ? 0.42 : 0.62, ease: [0.16, 1, 0.3, 1] }}
+      viewport={{ amount: motion.isMobile ? 0.1 : 0.18, margin: '0px 0px -6% 0px', once }}
+      transition={{ delay, duration: revealDuration(motion), ease: EASE_OUT }}
       {...props}
     >
       {children}
@@ -41,7 +48,7 @@ export function Reveal({ as = 'div', children, className = '', delay = 0, distan
   )
 }
 
-export function StaggerGroup({ as = 'div', children, className = '', delay = 0, itemSelector }) {
+export function StaggerGroup({ as = 'div', children, className = '', delay = 0, itemSelector, ...props }) {
   const motion = useResponsiveMotion()
 
   return (
@@ -50,17 +57,18 @@ export function StaggerGroup({ as = 'div', children, className = '', delay = 0, 
       className={className}
       initial={motion.reducedMotion ? false : 'hidden'}
       whileInView="visible"
-      viewport={{ amount: motion.isMobile ? 0.08 : 0.16, once: true }}
+      viewport={{ amount: motion.isMobile ? 0.06 : 0.14, margin: '0px 0px -6% 0px', once: true }}
       variants={{
         hidden: {},
         visible: {
           transition: {
             delayChildren: delay,
-            staggerChildren: motion.isMobile ? 0.045 : 0.07,
+            staggerChildren: motion.isMobile ? 0.045 : 0.065,
           },
         },
       }}
       data-motion-items={itemSelector}
+      {...props}
     >
       {children}
     </MotionElement>
@@ -80,7 +88,7 @@ export function StaggerItem({ as = 'div', children, className = '', ...props }) 
         visible: {
           opacity: 1,
           y: 0,
-          transition: { duration: motion.isMobile ? 0.4 : 0.58, ease: [0.16, 1, 0.3, 1] },
+          transition: { duration: revealDuration(motion), ease: EASE_OUT },
         },
       }}
     >
@@ -89,81 +97,79 @@ export function StaggerItem({ as = 'div', children, className = '', ...props }) 
   )
 }
 
-function SmokeLine({ isActive, mode, motion, onFinalWordReveal, phrase, phraseIndex, phrases, totalWords, wordOffset, triggerOnView }) {
+function wordDelay(motion, index) {
+  return index * (motion.isMobile ? 0.045 : 0.06)
+}
+
+function SmokeLine({ isActive, mode, motion, onFinalWordReveal, phrase, totalWords, wordOffset, delay }) {
+  const hidden = { opacity: 0, y: '0.42em' }
+  const shown = { opacity: 1, y: '0em' }
+
   return (
     <span className="smoke-text__line" aria-hidden="true">
       {phrase.split(' ').map((word, wordIndex) => {
         const globalWordIndex = wordOffset + wordIndex
+        const isFinal = globalWordIndex === totalWords - 1
 
         if (mode === 'words') {
           return (
-            <m.span
-              className="smoke-text__word smoke-text__word--animated"
-              data-smoke-index={globalWordIndex}
-              data-smoke-final={globalWordIndex === totalWords - 1 ? 'true' : undefined}
-              initial={{
-                opacity: 0,
-                filter: `blur(${motion.isMobile ? 9 : 18}px)`,
-                y: motion.isMobile ? 12 : 30,
-                scale: motion.isMobile ? 1.04 : 1.1,
-              }}
-              animate={triggerOnView && !isActive
-                ? { opacity: 0, filter: `blur(${motion.isMobile ? 9 : 18}px)`, y: motion.isMobile ? 12 : 30, scale: motion.isMobile ? 1.04 : 1.1 }
-                : { opacity: 1, filter: 'blur(0px)', y: 0, scale: 1 }}
-              transition={{
-                delay: globalWordIndex * (motion.isMobile ? 0.08 : 0.11),
-                duration: motion.isMobile ? 0.85 : 1.12,
-                ease: [0.2, 0.65, 0.3, 0.9],
-              }}
-              onAnimationComplete={globalWordIndex === totalWords - 1 ? onFinalWordReveal : undefined}
-              key={`${phrase}-${word}-${wordIndex}`}
-            >
-              {word}
-            </m.span>
+            <Fragment key={`${phrase}-${word}-${wordIndex}`}>
+              {wordIndex > 0 && ' '}
+              <span className="smoke-text__word">
+                <m.span
+                  className="smoke-text__word--animated"
+                  data-smoke-index={globalWordIndex}
+                  data-smoke-final={isFinal ? 'true' : undefined}
+                  initial={hidden}
+                  animate={isActive ? shown : hidden}
+                  transition={{
+                    delay: delay + wordDelay(motion, globalWordIndex),
+                    duration: motion.isMobile ? 0.7 : 0.9,
+                    ease: EASE_OUT,
+                  }}
+                  onAnimationComplete={isFinal ? onFinalWordReveal : undefined}
+                >
+                  {word}
+                </m.span>
+              </span>
+            </Fragment>
           )
         }
 
         return (
-          <span className="smoke-text__word" key={`${phrase}-${word}-${wordIndex}`}>
-            {word.split('').map((letter, index) => {
-              const previousPhraseLetters = phrases
-                .slice(0, phraseIndex)
-                .reduce((total, item) => total + item.replaceAll(' ', '').length, 0)
-              const previousWordLetters = phrase
-                .split(' ')
-                .slice(0, wordIndex)
-                .reduce((total, item) => total + item.length, 0)
-              const letterIndex = previousPhraseLetters + previousWordLetters + index
-              const delay = Math.min(letterIndex * (motion.isMobile ? 0.018 : 0.028), 0.65)
-
-              return (
+          <Fragment key={`${phrase}-${word}-${wordIndex}`}>
+            {wordIndex > 0 && ' '}
+            <span className="smoke-text__word">
+              {word.split('').map((letter, index) => (
                 <m.span
                   className="smoke-text__letter"
-                  initial={{ opacity: 0, filter: `blur(${motion.isMobile ? 9 : 18}px)`, y: motion.distance * 1.35, scale: motion.isMobile ? 1.04 : 1.1 }}
-                  animate={triggerOnView && !isActive
-                    ? { opacity: 0, filter: `blur(${motion.isMobile ? 9 : 18}px)`, y: motion.distance * 1.35, scale: motion.isMobile ? 1.04 : 1.1 }
-                    : { opacity: 1, filter: 'blur(0px)', y: 0, scale: 1 }}
-                  transition={{ delay, duration: motion.isMobile ? 0.68 : 0.92, ease: [0.2, 0.65, 0.3, 0.9] }}
+                  initial={hidden}
+                  animate={isActive ? shown : hidden}
+                  transition={{ delay: delay + Math.min((globalWordIndex * 6 + index) * 0.018, 0.6), duration: 0.7, ease: EASE_OUT }}
                   key={`${word}-${index}`}
                 >
                   {letter}
                 </m.span>
-              )
-            })}
-          </span>
+              ))}
+            </span>
+          </Fragment>
         )
       })}
     </span>
   )
 }
 
-export function SmokeText({ as = 'h1', className = '', mode = 'letters', onRevealComplete, phrases, triggerOnView = false }) {
+/**
+ * Accessible heading reveal. The heading keeps one accessible label while each
+ * word rises into place. Reduced motion renders the complete static heading.
+ */
+export function SmokeText({ as = 'h1', className = '', delay = 0, mode = 'letters', onRevealComplete, phrases, triggerOnView = false, ...props }) {
   const motion = useResponsiveMotion()
   const revealCompletedRef = useRef(false)
   const containerRef = useRef(null)
   const isInView = useInView(containerRef, {
-    amount: motion.isMobile ? 0.12 : 0.2,
-    margin: '0px 0px -8% 0px',
+    amount: motion.isMobile ? 0.1 : 0.2,
+    margin: '0px 0px -6% 0px',
     once: true,
   })
   const Tag = as
@@ -183,19 +189,21 @@ export function SmokeText({ as = 'h1', className = '', mode = 'letters', onRevea
 
   useEffect(() => {
     if (mode !== 'words' || motion.reducedMotion || !onRevealComplete) return undefined
-    const staggerSeconds = motion.isMobile ? 0.08 : 0.11
-    const revealDurationMs = ((totalWords - 1) * staggerSeconds + 0.9) * 1000
+    const revealDurationMs = (delay + wordDelay(motion, totalWords - 1) + 0.9) * 1000
     const completionTimer = window.setTimeout(handleFinalWordReveal, revealDurationMs)
     return () => window.clearTimeout(completionTimer)
-  }, [handleFinalWordReveal, mode, motion.isMobile, motion.reducedMotion, onRevealComplete, totalWords])
+  }, [delay, handleFinalWordReveal, mode, motion, onRevealComplete, totalWords])
 
   if (motion.reducedMotion) {
     return (
-      <Tag ref={containerRef} className={`smoke-text ${className}`} aria-label={phrases.join(' ')} data-smoke-mode={mode}>
+      <Tag ref={containerRef} className={`smoke-text ${className}`} aria-label={phrases.join(' ')} data-smoke-mode={mode} {...props}>
         {lines.map(({ phrase, wordOffset: lineWordOffset }) => (
           <span className="smoke-text__line" aria-hidden="true" key={phrase}>
             {phrase.split(' ').map((word, wordIndex) => (
-              <span className="smoke-text__word" data-smoke-index={lineWordOffset + wordIndex} key={`${phrase}-${word}-${wordIndex}`}>{word}</span>
+              <Fragment key={`${phrase}-${word}-${wordIndex}`}>
+                {wordIndex > 0 && ' '}
+                <span className="smoke-text__word" data-smoke-index={lineWordOffset + wordIndex}>{word}</span>
+              </Fragment>
             ))}
           </span>
         ))}
@@ -204,20 +212,18 @@ export function SmokeText({ as = 'h1', className = '', mode = 'letters', onRevea
   }
 
   return (
-    <Tag ref={containerRef} className={`smoke-text ${className}`} aria-label={phrases.join(' ')} data-smoke-mode={mode}>
-      {lines.map(({ phrase, phraseIndex, wordOffset: lineWordOffset }) => (
+    <Tag ref={containerRef} className={`smoke-text ${className}`} aria-label={phrases.join(' ')} data-smoke-mode={mode} {...props}>
+      {lines.map(({ phrase, wordOffset: lineWordOffset }) => (
         <SmokeLine
+          delay={delay}
+          isActive={!triggerOnView || isInView}
+          key={phrase}
           mode={mode}
           motion={motion}
-          isActive={!triggerOnView || isInView}
           onFinalWordReveal={handleFinalWordReveal}
           phrase={phrase}
-          phraseIndex={phraseIndex}
-          phrases={phrases}
           totalWords={totalWords}
-          triggerOnView={triggerOnView}
           wordOffset={lineWordOffset}
-          key={phrase}
         />
       ))}
     </Tag>
@@ -229,15 +235,15 @@ export function MagneticLink({ children, className = '', to, href, ...props }) {
   const motion = useResponsiveMotion()
   const rawX = useMotionValue(0)
   const rawY = useMotionValue(0)
-  const x = useSpring(rawX, { stiffness: 260, damping: 24, mass: 0.55 })
-  const y = useSpring(rawY, { stiffness: 260, damping: 24, mass: 0.55 })
+  const x = useSpring(rawX, { stiffness: 300, damping: 26, mass: 0.5 })
+  const y = useSpring(rawY, { stiffness: 300, damping: 26, mass: 0.5 })
   const enabled = !motion.reducedMotion && !motion.coarsePointer
 
   const handlePointerMove = (event) => {
     if (!enabled || !wrapperRef.current) return
     const bounds = wrapperRef.current.getBoundingClientRect()
-    rawX.set(((event.clientX - bounds.left) / bounds.width - 0.5) * 12)
-    rawY.set(((event.clientY - bounds.top) / bounds.height - 0.5) * 10)
+    rawX.set(((event.clientX - bounds.left) / bounds.width - 0.5) * 8)
+    rawY.set(((event.clientY - bounds.top) / bounds.height - 0.5) * 6)
   }
 
   const reset = () => {
@@ -270,10 +276,10 @@ export function PresenceRegion({ children, stateKey, className = '' }) {
       <m.div
         className={className}
         key={stateKey}
-        initial={motion.reducedMotion ? false : { opacity: 0, y: Math.min(motion.distance, 8) }}
+        initial={motion.reducedMotion ? false : { opacity: 0, y: Math.min(motion.distance, 6) }}
         animate={{ opacity: 1, y: 0 }}
         exit={motion.reducedMotion ? undefined : { opacity: 0 }}
-        transition={{ duration: motion.reducedMotion ? 0 : 0.18, ease: 'easeOut' }}
+        transition={{ duration: motion.reducedMotion ? 0 : 0.24, ease: EASE_OUT }}
       >
         {children}
       </m.div>
@@ -293,7 +299,7 @@ export function RouteMotion({ children }) {
         initial={motion.reducedMotion ? false : { opacity: 0, y: Math.min(motion.distance, 8) }}
         animate={{ opacity: 1, y: 0 }}
         exit={motion.reducedMotion ? undefined : { opacity: 0 }}
-        transition={{ duration: motion.reducedMotion ? 0 : 0.22, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: motion.reducedMotion ? 0 : 0.34, ease: EASE_OUT }}
       >
         {children}
       </m.div>

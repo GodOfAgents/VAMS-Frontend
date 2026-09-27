@@ -4,6 +4,16 @@ All notable frontend changes are documented here following Keep a Changelog.
 
 ## Unreleased
 
+### Frontend redesign
+
+- Replaced the visual layer across the marketing, console, and status surfaces with a new token-driven design system: Inter and Geist Mono typography, a near-black primary theme with a warm-paper light theme, hairline structure, and a single azure signal accent.
+- Rebuilt the homepage around scroll-driven storytelling: a centred hero, a pinned horizon stage that opens to full bleed and reveals the protocol readouts, a lifecycle timeline that tracks the step in view, an orbital architecture diagram synchronised with a ruled component list, a tilt-in evidence window, editorial entry-point rows, and an expanding destination panel.
+- Recomposed topic pages, the research hub, the status register, and the console as editorial rows, timelines, and open sections; card and cell grids were removed.
+- Added a floating navigation capsule with shared-layout hover and active indicators, a compact mobile sheet, and a scrim-backed console drawer.
+- Removed the Three.js neural field and GSAP timeline, and their dependencies; Motion for React is now the only animation library.
+- Added a pre-paint theme script, focusable scrollable regions, and colour-contrast fixes; browser tests and screenshot baselines were updated for the new layouts.
+- All displayed copy, links, labels, and data are unchanged.
+
 ### Added
 
 - Distinct Protocol, Network, Build, Operate, and Research public-page compositions with clearer builder and operator pathways.

@@ -4,21 +4,24 @@ import { Brand } from '../components/navigation/Brand.jsx'
 import { SimulationBanner } from '../components/disclosures/SimulationBanner.jsx'
 import { ThemeToggle } from '../components/ui/ThemeToggle.jsx'
 import { RouteMotion } from '../motion/primitives.jsx'
-import '../styles/publicPages.css'
+import '../styles/marketing.css'
+import '../styles/status.css'
 
 export function StatusLayout() {
   return (
     <div className="status-shell">
       <a className="skip-link" href="#status-content">Skip to status content</a>
       <SimulationBanner />
-      <header className="status-nav">
-        <Brand to="/status" />
-        <span className="status-nav__title">VERIFICATION STATUS</span>
-        <div>
-          <Link to="/">Protocol home</Link>
-          <a href="https://github.com/GodOfAgents/VAMS">Source <ExternalLink aria-hidden="true" size={13} /></a>
-          <Link to="/overview">Console</Link>
-          <ThemeToggle />
+      <header className="site-header status-header">
+        <div className="site-header__bar status-nav">
+          <Brand to="/status" />
+          <span className="status-nav__title">VERIFICATION STATUS</span>
+          <div className="status-nav__links">
+            <Link to="/">Protocol home</Link>
+            <a href="https://github.com/GodOfAgents/VAMS">Source <ExternalLink aria-hidden="true" size={13} /></a>
+            <Link to="/overview">Console</Link>
+            <ThemeToggle />
+          </div>
         </div>
       </header>
       <main id="status-content"><RouteMotion><Outlet /></RouteMotion></main>

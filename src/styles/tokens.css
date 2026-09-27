@@ -13,10 +13,10 @@
   --info: #9fc7de;
   --shadow: 0 28px 90px rgba(0, 0, 0, 0.42);
   --glass-subtle-bg: rgba(255, 255, 255, 0.035);
-  --glass-panel-bg: rgba(12, 12, 12, 0.62);
+  --glass-panel-bg: rgba(28, 28, 28, 0.8);
   --glass-strong-bg: rgba(5, 5, 5, 0.82);
-  --glass-border: rgba(255, 255, 255, 0.13);
-  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.075);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.12);
   --glass-shadow-subtle: 0 12px 40px rgba(0, 0, 0, 0.18);
   --glass-shadow-panel: 0 26px 78px rgba(0, 0, 0, 0.32);
   --glass-blur-subtle: 2px;
@@ -34,15 +34,15 @@
   --font-serif: var(--font-display);
   --font-mono: var(--font-label);
   /* Shared type roles: use these roles even when page-specific sizing varies. */
-  --type-display: clamp(2.75rem, 6.4vw, 6rem);
-  --type-page: clamp(2.5rem, 5.2vw, 4.75rem);
-  --type-section: clamp(2rem, 4vw, 3.75rem);
+  --type-display: clamp(2.9rem, 6.7vw, 6.25rem);
+  --type-page: clamp(2.6rem, 5.4vw, 5rem);
+  --type-section: clamp(2.1rem, 4.1vw, 3.9rem);
   --type-card: clamp(1.25rem, 2vw, 1.75rem);
   --type-console-page: clamp(2.1rem, 4vw, 4rem);
-  --leading-display: 1;
-  --leading-section: 1.12;
-  --leading-card: 1.2;
-  --leading-body: 1.6;
+  --leading-display: 0.96;
+  --leading-section: 1.08;
+  --leading-card: 1.16;
+  --leading-body: 1.65;
   --radius-sm: 2px;
   --radius-md: 8px;
   --space-1: 0.25rem;
@@ -54,12 +54,12 @@
   --space-7: 3rem;
   --space-8: 5rem;
   --page-gutter: 24px;
-  --section-space: 80px;
-  --heading-gap: 40px;
+  --section-space: 88px;
+  --heading-gap: 44px;
   --container-hero: 1440px;
   --container-editorial: 1280px;
   --container-data: 1180px;
-  --reading-measure: 68ch;
+  --reading-measure: 62ch;
   --page: min(var(--container-editorial), calc(100% - (var(--page-gutter) * 2)));
 }
 
@@ -78,10 +78,10 @@
   --info: #9fc7de;
   --shadow: 0 28px 90px rgba(0, 0, 0, 0.42);
   --glass-subtle-bg: rgba(255, 255, 255, 0.035);
-  --glass-panel-bg: rgba(12, 12, 12, 0.62);
+  --glass-panel-bg: rgba(28, 28, 28, 0.8);
   --glass-strong-bg: rgba(5, 5, 5, 0.82);
-  --glass-border: rgba(255, 255, 255, 0.13);
-  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.075);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.12);
   --glass-shadow-subtle: 0 12px 40px rgba(0, 0, 0, 0.18);
   --glass-shadow-panel: 0 26px 78px rgba(0, 0, 0, 0.32);
   --glass-hover-bg: rgba(255, 255, 255, 0.055);
@@ -101,39 +101,39 @@
 @media (min-width: 360px) and (max-width: 479px) {
   :root {
     --page-gutter: 20px;
-    --section-space: 64px;
-    --heading-gap: 32px;
+    --section-space: 72px;
+    --heading-gap: 36px;
   }
 }
 
 @media (min-width: 480px) and (max-width: 767px) {
   :root {
     --page-gutter: 24px;
-    --section-space: 64px;
-    --heading-gap: 32px;
+    --section-space: 80px;
+    --heading-gap: 40px;
   }
 }
 
 @media (min-width: 768px) and (max-width: 1199px) {
   :root {
     --page-gutter: 32px;
-    --section-space: 88px;
-    --heading-gap: 44px;
+    --section-space: 104px;
+    --heading-gap: 52px;
   }
 }
 
 @media (min-width: 1200px) and (max-width: 1599px) {
   :root {
     --page-gutter: 48px;
-    --section-space: 104px;
-    --heading-gap: 48px;
+    --section-space: 120px;
+    --heading-gap: 56px;
   }
 }
 
 @media (min-width: 1600px) {
   :root {
     --page-gutter: 64px;
-    --section-space: 104px;
-    --heading-gap: 48px;
+    --section-space: 132px;
+    --heading-gap: 64px;
   }
 }

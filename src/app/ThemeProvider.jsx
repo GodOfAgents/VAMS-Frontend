@@ -1,26 +1,14 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo } from 'react'
 
 const ThemeContext = createContext(null)
 
-function initialTheme() {
-  if (typeof window === 'undefined') return 'dark'
-  const saved = window.localStorage.getItem('vams-theme')
-  if (saved === 'light' || saved === 'dark') return saved
-  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
-}
-
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(initialTheme)
-
   useEffect(() => {
-    document.documentElement.dataset.theme = theme
-    window.localStorage.setItem('vams-theme', theme)
-  }, [theme])
+    document.documentElement.dataset.theme = 'dark'
+    document.documentElement.style.colorScheme = 'dark'
+  }, [])
 
-  const value = useMemo(() => ({
-    theme,
-    toggleTheme: () => setTheme((current) => current === 'dark' ? 'light' : 'dark'),
-  }), [theme])
+  const value = useMemo(() => ({ theme: 'dark' }), [])
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }

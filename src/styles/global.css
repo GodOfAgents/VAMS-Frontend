@@ -642,6 +642,31 @@ pre {
   font-size: 0.82rem;
 }
 
+.journey-grid__cta {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 28px;
+  color: var(--ink-muted);
+  font: .68rem var(--font-mono);
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+
+.journey-grid__cta svg {
+  transition: transform 180ms ease;
+}
+
+.journey-grid a:hover .journey-grid__cta,
+.journey-grid a:focus-visible .journey-grid__cta {
+  color: var(--ink);
+}
+
+.journey-grid a:hover .journey-grid__cta svg,
+.journey-grid a:focus-visible .journey-grid__cta svg {
+  transform: translateX(4px);
+}
+
 .final-cta {
   padding: 110px max(24px, calc((100vw - 1280px) / 2));
   background: #050505;
@@ -3059,6 +3084,55 @@ body {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07), 0 28px 90px rgba(0, 0, 0, 0.28);
   -webkit-backdrop-filter: blur(var(--glass-blur-strong)) saturate(110%);
   backdrop-filter: blur(var(--glass-blur-strong)) saturate(110%);
+}
+
+/* Monochrome glass treatment for content tiles. */
+:is(.protocol-strip > div, .lifecycle-list li, .architecture-grid article, .claim-stack .claim-card, .journey-grid a, .topic-principles article, .migration-path li, .operator-requirements article, .release-gates, .research-frontier, .research-card summary, .research-context-grid article, .research-sources-grid article, .architecture-diagram__node, .metric-card, .panel, .route-grid > div, .da-grid article, .data-state, .detail-metrics, .evidence-ladder li, .status-column) {
+  border-color: var(--glass-border);
+  background-color: var(--glass-panel-bg);
+  background-image: none;
+  box-shadow: var(--glass-highlight), var(--glass-shadow-subtle);
+  -webkit-backdrop-filter: blur(var(--glass-blur-panel)) saturate(105%);
+  backdrop-filter: blur(var(--glass-blur-panel)) saturate(105%);
+  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+}
+
+:is(.protocol-strip > div:hover, .lifecycle-list li:hover, .architecture-grid article:hover, .claim-stack .claim-card:hover, .journey-grid a:hover, .topic-principles article:hover, .migration-path li:hover, .operator-requirements article:hover, .release-gates:hover, .research-frontier:hover, .research-card summary:hover, .research-context-grid article:hover, .research-sources-grid article:hover, .architecture-diagram__node:hover, .metric-card:hover, .panel:hover, .route-grid > div:hover, .da-grid article:hover, .data-state:hover, .detail-metrics:hover, .evidence-ladder li:hover, .status-column:hover, .protocol-strip > div:focus-within, .lifecycle-list li:focus-within, .architecture-grid article:focus-within, .claim-stack .claim-card:focus-within, .journey-grid a:focus-visible, .topic-principles article:focus-within, .migration-path li:focus-within, .operator-requirements article:focus-within, .release-gates:focus-within, .research-frontier:focus-within, .research-card summary:focus-visible, .research-context-grid article:focus-within, .research-sources-grid article:focus-within, .architecture-diagram__node:focus-within, .metric-card:focus-within, .panel:focus-within, .route-grid > div:focus-within, .da-grid article:focus-within, .data-state:focus-within, .detail-metrics:focus-within, .evidence-ladder li:focus-within, .status-column:focus-within) {
+  color: var(--ink);
+  border-color: var(--glass-hover-border);
+  background-color: var(--glass-hover-bg);
+  background-image: none;
+  box-shadow: var(--glass-hover-shadow);
+  -webkit-backdrop-filter: blur(12px) saturate(110%);
+  backdrop-filter: blur(12px) saturate(110%);
+  transform: translateY(-3px);
+}
+
+/* Touch keeps the same glass surface while supplying brief press feedback. */
+:is(.protocol-strip > div, .lifecycle-list li, .architecture-grid article, .claim-stack .claim-card, .journey-grid a, .topic-principles article, .migration-path li, .operator-requirements article, .release-gates, .research-frontier, .research-card summary, .research-context-grid article, .research-sources-grid article, .architecture-diagram__node, .metric-card, .panel, .route-grid > div, .da-grid article, .data-state, .detail-metrics, .evidence-ladder li, .status-column):active {
+  color: var(--ink);
+  border-color: var(--glass-hover-border);
+  background-color: var(--glass-hover-bg);
+  background-image: none;
+  box-shadow: var(--glass-hover-shadow);
+  -webkit-backdrop-filter: blur(12px) saturate(110%);
+  backdrop-filter: blur(12px) saturate(110%);
+}
+
+:is(.journey-grid a:focus-visible, .research-card summary:focus-visible) {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+
+:is(.protocol-strip > div:active, .lifecycle-list li:active, .architecture-grid article:active, .claim-stack .claim-card:active, .journey-grid a:active, .topic-principles article:active, .migration-path li:active, .operator-requirements article:active, .release-gates:active, .research-frontier:active, .research-card summary:active, .research-context-grid article:active, .research-sources-grid article:active, .architecture-diagram__node:active, .metric-card:active, .panel:active, .route-grid > div:active, .da-grid article:active, .data-state:active, .detail-metrics:active, .evidence-ladder li:active, .status-column:active) {
+  transform: translateY(-1px) scale(.995);
+}
+
+@supports not ((backdrop-filter: blur(1px))) {
+  :is(.protocol-strip > div:hover, .lifecycle-list li:hover, .architecture-grid article:hover, .claim-stack .claim-card:hover, .journey-grid a:hover, .topic-principles article:hover, .migration-path li:hover, .operator-requirements article:hover, .release-gates:hover, .research-frontier:hover, .research-card summary:hover, .research-context-grid article:hover, .research-sources-grid article:hover, .architecture-diagram__node:hover, .metric-card:hover, .panel:hover, .route-grid > div:hover, .da-grid article:hover, .data-state:hover, .detail-metrics:hover, .evidence-ladder li:hover, .status-column:hover) {
+    background-color: var(--glass-hover-bg);
+    background-image: none;
+  }
 }
 
 .resource-table,

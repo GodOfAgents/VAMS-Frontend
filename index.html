@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark" style="background:#050505;color-scheme:dark">
 
 <head>
   <meta charset="UTF-8" />
@@ -15,6 +15,7 @@
   <meta name="twitter:card" content="summary" />
   <meta http-equiv="Content-Security-Policy"
     content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data:; connect-src 'self' https: http://127.0.0.1:* ws://127.0.0.1:*; object-src 'none'; base-uri 'self'; form-action 'self'" />
+  <script src="/theme-init.js"></script>
 
   <!-- Preconnect for faster Google Fonts DNS resolution -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -27,7 +28,7 @@
   <title>VAMS | Sovereign Web4 Infrastructure</title>
 </head>
 
-<body>
+<body style="margin:0;background:var(--initial-bg,#050505)">
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
 </body>

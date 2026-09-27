@@ -16,6 +16,7 @@ import { EvidencePage } from '../pages/console/EvidencePage.jsx'
 import { SystemPage } from '../pages/console/SystemPage.jsx'
 import { StatusPage } from '../pages/status/StatusPage.jsx'
 import { NotFoundPage } from '../pages/NotFoundPage.jsx'
+import { applyRouteMetadata } from './routeMetadata.js'
 
 const legacyHashes = {
   '#vision': '/protocol',
@@ -43,17 +44,7 @@ function RouteEffects() {
   }, [navigate])
 
   useEffect(() => {
-    const titles = {
-      '/': 'VAMS — Sovereign infrastructure for Web4',
-      '/protocol': 'Protocol architecture | VAMS',
-      '/network': 'Independent providers | VAMS',
-      '/build': 'Build portable services | VAMS',
-      '/operate': 'Operator requirements | VAMS',
-      '/research': 'Research and evidence | VAMS',
-      '/status': 'Verification status | VAMS',
-    }
-    const leaf = location.pathname.split('/').filter(Boolean).pop() || 'Home'
-    document.title = titles[location.pathname] || `${leaf.replaceAll('-', ' ')} | VAMS`
+    applyRouteMetadata(location.pathname)
     const frame = requestAnimationFrame(() => {
       const anchor = location.hash ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null
       if (anchor) anchor.scrollIntoView({ behavior: 'instant', block: 'start' })

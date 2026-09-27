@@ -304,14 +304,20 @@ export default function NeuralField({
     container.appendChild(renderer.domElement)
 
     const { lines: lineGeometry, points: pointGeometry } = createTerrainGeometry(profile)
+    const initialSceneState = sceneStateRef.current
+    let renderedChapterPosition = initialSceneState.renderedChapterPosition
+      ?? initialSceneState.chapterPosition
+      ?? initialSceneState.chapterFrom + initialSceneState.chapterMix
+    const initialChapterFrom = Math.floor(renderedChapterPosition)
+    const initialChapterTo = Math.min(initialChapterFrom + 1, 5)
     const uniforms = {
-      uChapterFrom: { value: 0 },
-      uChapterMix: { value: 0 },
-      uChapterTo: { value: 0 },
+      uChapterFrom: { value: initialChapterFrom },
+      uChapterMix: { value: renderedChapterPosition - initialChapterFrom },
+      uChapterTo: { value: initialChapterTo },
       uLineOpacity: { value: profile.opacity * 0.16 },
       uMotionScale: { value: tier === 'low' ? 0.58 : tier === 'medium' ? 0.76 : 1 },
       uOpacity: { value: profile.opacity },
-      uPageProgress: { value: 0 },
+      uPageProgress: { value: initialSceneState.pageProgress },
       uPixelRatio: { value: Math.min(window.devicePixelRatio, quality.maxDpr) },
       uPointDensity: { value: profile.density },
       uPointer: { value: new THREE.Vector2(0, 0) },
@@ -347,13 +353,13 @@ export default function NeuralField({
     scene.add(terrain)
     scene.add(network)
 
-    const clock = new THREE.Clock()
     const frameBudget = createFrameBudgetController({ thresholdMs: profile.budgetMs })
     const pointerTarget = new THREE.Vector2(0, 0)
     const minimumFrameInterval = quality.targetFps ? 1000 / quality.targetFps : 0
     let degradeRequested = false
     let lastAnimationAt = null
     let lastRenderAt = Number.NEGATIVE_INFINITY
+    let previousRenderAt = null
     let pageVisible = document.visibilityState === 'visible'
     let proofPlayed = false
     let proofStartsAt = null
@@ -385,16 +391,28 @@ export default function NeuralField({
       if (animationTime - lastRenderAt < minimumFrameInterval - 0.5) return
       lastRenderAt = animationTime
 
-      const time = clock.getElapsedTime()
+      const time = animationTime * 0.001
       const sceneState = sceneStateRef.current
+      const deltaSeconds = previousRenderAt === null
+        ? 1 / 60
+        : Math.min(0.1, Math.max(0, (animationTime - previousRenderAt) / 1000))
+      previousRenderAt = animationTime
+      const chapterAlpha = 1 - Math.exp(-5 * deltaSeconds)
+      const ambientAlpha = 1 - Math.exp(-4 * deltaSeconds)
+      const targetChapterPosition = sceneState.chapterPosition
+        ?? sceneState.chapterFrom + sceneState.chapterMix
+      renderedChapterPosition += (targetChapterPosition - renderedChapterPosition) * chapterAlpha
+      sceneState.renderedChapterPosition = renderedChapterPosition
+      const chapterFrom = Math.floor(renderedChapterPosition)
+      const chapterTo = Math.min(chapterFrom + 1, 5)
       uniforms.uTime.value = time
-      uniforms.uChapterFrom.value = sceneState.chapterFrom
-      uniforms.uChapterTo.value = sceneState.chapterTo
-      uniforms.uChapterMix.value += (sceneState.chapterMix - uniforms.uChapterMix.value) * 0.08
-      uniforms.uPageProgress.value += (sceneState.pageProgress - uniforms.uPageProgress.value) * 0.065
-      uniforms.uThemeMix.value += (sceneState.themeMix - uniforms.uThemeMix.value) * 0.08
-      uniforms.uPointer.value.lerp(pointerTarget, 0.065)
-      uniforms.uPointerStrength.value += (targetStrength - uniforms.uPointerStrength.value) * 0.055
+      uniforms.uChapterFrom.value = chapterFrom
+      uniforms.uChapterTo.value = chapterTo
+      uniforms.uChapterMix.value = renderedChapterPosition - chapterFrom
+      uniforms.uPageProgress.value += (sceneState.pageProgress - uniforms.uPageProgress.value) * ambientAlpha
+      uniforms.uThemeMix.value += (sceneState.themeMix - uniforms.uThemeMix.value) * chapterAlpha
+      uniforms.uPointer.value.lerp(pointerTarget, ambientAlpha)
+      uniforms.uPointerStrength.value += (targetStrength - uniforms.uPointerStrength.value) * ambientAlpha
 
       if (proofStartsAt !== null && animationTime >= proofStartsAt) {
         const proofProgress = (animationTime - proofStartsAt) / 1400
@@ -414,7 +432,7 @@ export default function NeuralField({
       camera.position.z = profile.camera[2] + Math.sin(time * 0.045) * 0.1 - scrollDrift * profile.camera[2] * 0.03
       camera.lookAt(0, -0.8, 0)
       const footerFade = 1 - THREE.MathUtils.smoothstep(sceneState.pageProgress, 0.94, 1)
-      uniforms.uOpacity.value = profile.opacity * (0.82 + (1 - sceneState.chapterMix) * 0.18) * footerFade
+      uniforms.uOpacity.value = profile.opacity * footerFade
       renderer.render(scene, camera)
 
       if (!readyReported) {

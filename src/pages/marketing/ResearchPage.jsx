@@ -45,7 +45,7 @@ function ResearchCard({ anchorId, entry }) {
           <div><span className="research-label">VAMS relevance</span><p>{entry.vamsRelevance}</p></div>
           <div><span className="research-label">Implementation surface</span><p className="research-code">{entry.implementationSurface}</p></div>
           <div><span className="research-label">Evidence tier</span><p><ResearchBadge tone="neutral">{label(entry.evidenceTier)}</ResearchBadge></p></div>
-          <div><span className="research-label">Source and verification</span><p><SourceLink path={entry.sourceDocument}>{entry.sourceAnchor}</SourceLink><small>Last verified {entry.lastVerified}</small></p></div>
+          <div><span className="research-label">Source record</span><p><SourceLink path={entry.sourceDocument}>{entry.sourceAnchor}</SourceLink><small>Source snapshot dated {entry.sourceDate}</small></p></div>
         </div>
         <p className="research-card__caveat"><CircleDashed aria-hidden="true" size={15} /> {entry.caveat}</p>
         {entry.externalUrl && <a className="text-link" href={entry.externalUrl} target="_blank" rel="noreferrer">Open canonical paper reference <ArrowUpRight aria-hidden="true" size={15} /></a>}
@@ -93,55 +93,64 @@ export function ResearchPage() {
 
   return (
     <div className="research-hub">
-      <PageHeader eyebrow="Research and evidence" title="Open questions, explicit evidence." description="A curated research snapshot connecting VAMS academic foundations, implementation surfaces, security posture, and current pre-testnet boundaries." smoke>
-        <span className="topic-lifecycle">{researchSnapshotMeta.architecture} · Snapshot {researchSnapshotMeta.lastVerified}</span>
+      <PageHeader eyebrow="Research and evidence" title="Questions. Sources. Proof." description="A clear view of what informs VAMS, what exists in code, and what remains unproven." smoke>
+        <span className="topic-lifecycle">{researchSnapshotMeta.architecture} · Snapshot {researchSnapshotMeta.snapshotDate}</span>
       </PageHeader>
 
-      <section className="research-posture" aria-labelledby="research-posture-title">
-        <div className="research-section-heading"><p className="eyebrow">Current research posture</p><h2 id="research-posture-title">Research should sharpen the boundary between a promising design and a proven system.</h2><p>VAMS keeps papers, architecture, code, verification, deployment, and live observation distinct. The cards below summarize the five active frontiers that shape the current stack.</p></div>
+      <nav className="research-contents" aria-label="Research page contents">
+        <span>On this page</span>
+        <a href="#posture">Posture</a>
+        <a href="#updates">Updates</a>
+        <a href="#ledger">Research ledger</a>
+        <a href="#implementation-map">Implementation map</a>
+        <a href="#sources">Sources</a>
+      </nav>
+
+      <section className="research-posture" id="posture" aria-labelledby="research-posture-title">
+        <div className="research-section-heading"><p className="eyebrow">Current research posture</p><h2 id="research-posture-title">Promise is not proof.</h2><p>These five research areas shape the current VAMS design.</p></div>
         <StaggerGroup className="research-frontier-grid">
           {postureFamilies.map((id) => { const familyData = researchFamilies.find((item) => item.id === id); return <StaggerItem as="article" className="research-frontier" key={id}><span className="research-card__id">{id}</span><h3>{familyData.title}</h3><p>{familyData.description}</p><a className="text-link" href={`#ledger-${id}`}>Inspect ledger <ArrowUpRight aria-hidden="true" size={15} /></a></StaggerItem> })}
         </StaggerGroup>
       </section>
 
       <section className="research-ledger-section" id="ledger" aria-labelledby="research-ledger-title">
-        <div className="research-section-heading"><p className="eyebrow">Academic research ledger</p><h2 id="research-ledger-title">Thirty-five references mapped to VAMS surfaces.</h2><p>External references are linked for reading. Their presence here records research alignment, not implementation or deployment.</p></div>
+        <div className="research-section-heading"><p className="eyebrow">Academic research ledger</p><h2 id="research-ledger-title">{researchReferences.length} references, mapped.</h2><p>A citation shows influence—not implementation or deployment.</p></div>
         <ResearchFilters />
-        <div className="research-ledger-meta" aria-live="polite"><span>{filteredReferences.length} of {researchReferences.length} references</span><span>Snapshot last verified {researchSnapshotMeta.lastVerified}</span></div>
+        <div className="research-ledger-meta" aria-live="polite"><span>{filteredReferences.length} of {researchReferences.length} references</span><span>Bundled snapshot dated {researchSnapshotMeta.snapshotDate}</span></div>
         <div className="research-ledger">
           {filteredReferences.length ? filteredReferences.map((entry, index) => <ResearchCard anchorId={index === 0 || filteredReferences[index - 1].family !== entry.family ? `ledger-${entry.family}` : undefined} entry={entry} key={entry.id} />) : <div className="research-empty"><Search aria-hidden="true" size={22} /><h3>No research references match those filters.</h3><p>Clear the search or choose “All” to restore the complete ledger.</p></div>}
         </div>
       </section>
 
       <section className="research-timeline-section" aria-labelledby="architecture-timeline-title">
-        <div className="research-section-heading"><p className="eyebrow">Architecture evolution</p><h2 id="architecture-timeline-title">An additive path from monolith to cognitive/composer architecture.</h2></div>
+        <div className="research-section-heading"><p className="eyebrow">Architecture evolution</p><h2 id="architecture-timeline-title">How the architecture evolved.</h2></div>
         <ol className="research-timeline">{architectureTimeline.map((item) => <li key={item.id}><span className="research-timeline__marker">{item.id}</span><div><div className="research-timeline__head"><h3>{item.label}</h3><ResearchBadge tone={item.status.includes('current') ? 'positive' : 'neutral'}>{item.status}</ResearchBadge></div><p>{item.detail}</p><SourceLink path={item.source}>Read source</SourceLink></div></li>)}</ol>
       </section>
 
-      <section className="research-map-section" aria-labelledby="implementation-map-title">
-        <div className="research-section-heading"><p className="eyebrow">Research-to-implementation map</p><h2 id="implementation-map-title">Every frontier has a named surface and an evidence state.</h2></div>
+      <section className="research-map-section" id="implementation-map" aria-labelledby="implementation-map-title">
+        <div className="research-section-heading"><p className="eyebrow">Research-to-implementation map</p><h2 id="implementation-map-title">Implementation map</h2></div>
         <div className="research-map" role="table" aria-label="Research to implementation map"><div className="research-map__row research-map__row--head" role="row"><span role="columnheader">Surface</span><span role="columnheader">Research</span><span role="columnheader">Maturity</span><span role="columnheader">Evidence</span></div>{implementationMap.map((item) => <div className="research-map__row" role="row" key={item.surface}><strong role="cell">{item.surface}</strong><span role="cell">{item.families.join(' · ')}</span><span role="cell"><ResearchBadge tone={item.maturity === 'implemented' ? 'positive' : 'info'}>{label(item.maturity)}</ResearchBadge></span><span role="cell"><ResearchBadge tone="neutral">{label(item.evidenceTier)}</ResearchBadge><small>{item.note}</small></span></div>)}</div>
       </section>
 
       <section className="research-audit-section" aria-labelledby="audit-posture-title">
-        <div className="research-section-heading"><p className="eyebrow">Audit and verification posture</p><h2 id="audit-posture-title">Historical remediation is not current release evidence.</h2><p>The historical audit baseline resolved 68 findings. The current candidate remains fail-closed until commit-bound CI, deployment, and independent evidence gates pass.</p></div>
+        <div className="research-section-heading"><p className="eyebrow">Audit and verification posture</p><h2 id="audit-posture-title">Past fixes do not prove release readiness.</h2><p>The audit resolved 68 findings. CI, deployment, and independent evidence are still required.</p></div>
         <div className="research-audit-grid"><article className="research-audit-card"><History aria-hidden="true" size={22} /><span className="research-label">{auditPosture.historical.label}</span><strong>{auditPosture.historical.value}</strong><p>{auditPosture.historical.detail}</p><SourceLink path={auditPosture.historical.source}>Audit baseline</SourceLink></article><article className="research-audit-card research-audit-card--current"><ShieldCheck aria-hidden="true" size={22} /><span className="research-label">{auditPosture.current.label}</span><strong>{auditPosture.current.value}</strong><p>{auditPosture.current.detail}</p><SourceLink path={auditPosture.current.source}>Current status</SourceLink></article></div>
         <div className="research-gates">{auditPosture.gates.map(([title, detail, state]) => <div key={title}><span className="research-gate-icon" aria-hidden="true">{state === 'locally verified' ? <CheckCircle2 size={17} /> : <CircleDashed size={17} />}</span><div><strong>{title}</strong><p>{detail}</p></div><ResearchBadge tone={state === 'locally verified' ? 'positive' : 'warning'}>{state}</ResearchBadge></div>)}</div>
       </section>
 
-      <section className="research-updates-section" aria-labelledby="updates-title">
-        <div className="research-section-heading"><p className="eyebrow">Project updates</p><h2 id="updates-title">A chronology of the research becoming architecture.</h2></div>
+      <section className="research-updates-section" id="updates" aria-labelledby="updates-title">
+        <div className="research-section-heading"><p className="eyebrow">Project updates</p><h2 id="updates-title">Documented project updates</h2></div>
         <ol className="research-updates">{projectUpdates.map((item) => <li key={item.id}><span className="research-update-date">{item.date}</span><div><div className="research-timeline__head"><h3>{item.label}</h3><ResearchBadge tone="neutral">{item.evidenceTier}</ResearchBadge></div><p>{item.detail}</p><small>{item.surface} · <SourceLink path={item.source}>source</SourceLink></small></div></li>)}</ol>
       </section>
 
       <section className="research-context-section" aria-labelledby="context-title">
-        <div className="research-section-heading"><p className="eyebrow">Strategy and historical context</p><h2 id="context-title">Useful context, kept separate from proof.</h2><p>These documents describe direction, opportunity, and historical intent. They do not prove implementation, deployment, financial terms, or live integrations.</p></div>
+        <div className="research-section-heading"><p className="eyebrow">Strategy and historical context</p><h2 id="context-title">Context is not proof.</h2><p>These documents explain direction and history. They do not prove delivery or deployment.</p></div>
         <div className="research-context-grid">{strategyDocuments.map((item) => <article key={item.path}><BookOpen aria-hidden="true" size={19} /><span className="research-label">{item.type}</span><h3>{item.title}</h3><p>{item.detail}</p><SourceLink path={item.path}>Open document</SourceLink></article>)}</div>
       </section>
 
-      <Reveal as="section" className="research-sources-section" aria-labelledby="sources-title">
-        <div className="research-section-heading"><p className="eyebrow">Sources and methodology</p><h2 id="sources-title">Read the source before extending the claim.</h2><p>{researchSnapshotMeta.scope} Source dates are preserved as published. External paper links are references, not claims of VAMS implementation.</p></div>
-        <div className="research-sources-grid">{sourceDocuments.map((source) => <article key={source.path}><GitBranch aria-hidden="true" size={18} /><div><h3>{source.title}</h3><p>{source.role}</p><small>Last verified {source.date}</small><SourceLink path={source.path}>Open source</SourceLink></div></article>)}</div>
+      <Reveal as="section" className="research-sources-section" id="sources" aria-labelledby="sources-title">
+        <div className="research-section-heading"><p className="eyebrow">Sources and methodology</p><h2 id="sources-title">Follow every claim to its source.</h2><p>{researchSnapshotMeta.scope} Dates are preserved. Paper links show influence, not implementation.</p></div>
+        <div className="research-sources-grid">{sourceDocuments.map((source) => <article key={source.path}><GitBranch aria-hidden="true" size={18} /><div><h3>{source.title}</h3><p>{source.role}</p><small>Source dated {source.date}</small><SourceLink path={source.path}>Open source</SourceLink></div></article>)}</div>
       </Reveal>
     </div>
   )

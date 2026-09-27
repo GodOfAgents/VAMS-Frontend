@@ -4,8 +4,6 @@ import { Link, NavLink, Outlet } from 'react-router-dom'
 import * as m from 'motion/react-m'
 import { Brand } from '../components/navigation/Brand.jsx'
 import { SimulationBanner } from '../components/disclosures/SimulationBanner.jsx'
-import { ThemeToggle } from '../components/ui/ThemeToggle.jsx'
-import { MotionToggle } from '../components/ui/MotionToggle.jsx'
 import '../styles/publicPages.css'
 import { NoiseOverlay } from '../components/ui/NoiseOverlay.jsx'
 import { appEnvironment } from '../config/environment.js'
@@ -74,8 +72,6 @@ export function MarketingLayout() {
             <a href={appEnvironment.docsUrl}>Read docs <ExternalLink aria-hidden="true" size={13} /></a>
           </MotionNav>
           <div className="marketing-nav__actions">
-            <ThemeToggle />
-            <MotionToggle />
             <Link className="button button--small" to="/overview">Open console</Link>
             <button ref={menuButton} className="icon-button nav-menu" type="button" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="primary-navigation" aria-label={open ? 'Close navigation' : 'Open navigation'}>
               {open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}

@@ -68,12 +68,12 @@ test('motion and neural topography activate only for the capable marketing profi
   await page.evaluate(() => document.fonts.ready)
   await expect(page.locator('[data-hero-renderer="ready"]')).toBeVisible()
   await expect(page.locator('[data-marketing-three] canvas')).toBeVisible()
-  await expect(page.locator('[data-smoke-final="true"]')).toHaveCSS('opacity', '1')
+  await expect(page.locator('.hero [data-smoke-final="true"]')).toHaveCSS('opacity', '1')
   await expect(page.locator('[data-neural-quality="high"]')).toBeVisible()
   await expect(page.locator('[data-marketing-three]')).toHaveAttribute('data-proof-count', '1')
   await expect(page.locator('[data-marketing-three]')).toHaveAttribute('data-proof-wave', 'complete')
 
-  const wordIndexes = await page.locator('[data-smoke-mode="words"] .smoke-text__word--animated')
+  const wordIndexes = await page.locator('.hero [data-smoke-mode="words"] .smoke-text__word--animated')
     .evaluateAll((words) => words.map((word) => Number(word.dataset.smokeIndex)))
   expect(wordIndexes).toEqual([0, 1, 2, 3, 4])
 
@@ -86,7 +86,7 @@ test('motion and neural topography activate only for the capable marketing profi
   await page.locator('.lifecycle-section').scrollIntoViewIfNeeded()
   await expect.poll(async () => page.locator('.lifecycle-list .is-active').count()).toBeGreaterThan(0)
   await page.locator('.hero').scrollIntoViewIfNeeded()
-  await expect(page.locator('[data-smoke-mode="words"] .smoke-text__word--animated').first()).toHaveCSS('opacity', '1')
+  await expect(page.locator('.hero [data-smoke-mode="words"] .smoke-text__word--animated').first()).toHaveCSS('opacity', '1')
   await expect(page.locator('[data-marketing-three]')).toHaveAttribute('data-proof-count', '1')
 
   expect(requestedAssets.some((url) => url.includes('three-marketing'))).toBe(true)
@@ -141,7 +141,7 @@ test('reduced motion uses the complete static hero without loading cinematic bun
 
   await expect(page.locator('.hero-visual--static')).toBeVisible()
   await expect(page.locator('[data-marketing-three]')).toHaveCount(0)
-  await expect(page.locator('[data-smoke-mode="words"] .smoke-text__word')).toHaveCount(5)
+  await expect(page.locator('.hero [data-smoke-mode="words"] .smoke-text__word')).toHaveCount(5)
   await expect(page.locator('.smoke-text__word--animated')).toHaveCount(0)
   expect(requestedAssets.some((url) => /three-marketing|gsap-marketing/.test(url))).toBe(false)
 })
@@ -163,12 +163,16 @@ for (const surface of [
     expect(documentWidth).toBeLessThanOrEqual(390)
     expect(requestedAssets.some((url) => /three-marketing|gsap-marketing/.test(url))).toBe(false)
 
-    const glassSurface = surface.name === 'console' ? '.console-header' : '.status-column'
-    const glassFilter = await page.locator(glassSurface).first().evaluate((element) => {
+    const surfaceSelector = surface.name === 'console' ? '.console-header' : '.status-column'
+    const surfaceStyle = await page.locator(surfaceSelector).first().evaluate((element) => {
       const style = getComputedStyle(element)
-      return style.backdropFilter || style.webkitBackdropFilter
+      return {
+        backgroundColor: style.backgroundColor,
+        backdropFilter: style.backdropFilter || style.webkitBackdropFilter,
+      }
     })
-    expect(glassFilter).not.toBe('none')
+    if (surface.name === 'console') expect(surfaceStyle.backdropFilter).not.toBe('none')
+    else expect(surfaceStyle.backgroundColor).not.toBe('rgba(0, 0, 0, 0)')
 
     await expect(page).toHaveScreenshot(`${surface.name}-390x844.png`, {
       animations: 'disabled',

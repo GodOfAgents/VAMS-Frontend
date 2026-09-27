@@ -1,4 +1,4 @@
-const AUDIT_DATE = '2026-07-12'
+const AUDIT_SOURCE_DATE = '2026-07-12'
 
 const arxiv = (id) => `https://arxiv.org/abs/${id}`
 
@@ -16,7 +16,7 @@ const reference = ({ family, title, year, paperId = null, externalUrl = null, re
   evidenceTier,
   sourceDocument: 'audit.md',
   sourceAnchor: `Academic References & Research Foundations · ${family}`,
-  lastVerified: AUDIT_DATE,
+  sourceDate: AUDIT_SOURCE_DATE,
   caveat,
 })
 
@@ -105,9 +105,9 @@ export const auditPosture = {
   current: { label: 'Current readiness', value: '3 implemented · 29 partial · 4 blocked · 0 verified', detail: 'The public-testnet candidate remains fail-closed until commit-bound CI, deployment, and independent evidence gates pass.', source: 'REPO_STATUS_REPORT.md' },
   gates: [
     ['Local verification', 'Implemented local test suites pass across the major protocol surfaces.', 'locally verified'],
-    ['CI-bound evidence', 'Exact-commit CI reruns and security evidence remain required before release promotion.', 'CI verified'],
+    ['CI-bound evidence', 'Exact-commit CI reruns and security evidence remain required before release promotion.', 'verification pending'],
     ['Deployment evidence', 'Chain IDs, addresses, transactions, verification, and role ownership are still pending.', 'deployment pending'],
-    ['Live observation', 'No public live deployment or live economic activity is claimed by this frontend.', 'live observed'],
+    ['Live observation', 'No public live deployment or live economic activity is claimed by this frontend.', 'not observed'],
   ],
 }
 
@@ -130,7 +130,7 @@ export const sourceDocuments = [
 export const researchSnapshotMeta = {
   architecture: 'v0.8.0 cognitive/composer layer',
   lifecycle: 'Hardened pre-testnet candidate',
-  lastVerified: '2026-07-25',
+  snapshotDate: '2026-07-25',
   scope: 'Bundled research snapshot; no live repository synchronization.',
 }
 

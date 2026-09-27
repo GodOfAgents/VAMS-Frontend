@@ -28,6 +28,7 @@ describe('calculateSceneProgress', () => {
     expect(state.chapterFrom).toBe(HOME_SCENE_CHAPTER_INDEX.lifecycle)
     expect(state.chapterTo).toBe(HOME_SCENE_CHAPTER_INDEX.architecture)
     expect(state.chapterMix).toBeCloseTo(0.516, 3)
+    expect(state.chapterPosition).toBeCloseTo(1.516, 3)
     expect(state.pageProgress).toBeCloseTo(1 / 4.8, 3)
   })
 
@@ -42,6 +43,7 @@ describe('calculateSceneProgress', () => {
     expect(state.activeChapter).toBe('cta')
     expect(state.nextChapter).toBe('cta')
     expect(state.chapterMix).toBe(0)
+    expect(state.chapterPosition).toBe(HOME_SCENE_CHAPTER_INDEX.cta)
     expect(state.pageProgress).toBe(1)
   })
 
@@ -55,11 +57,31 @@ describe('calculateSceneProgress', () => {
       activeChapter: 'intro',
       chapterFrom: 0,
       chapterMix: 0,
+      chapterPosition: 0,
       chapterProgress: 0,
       chapterTo: 0,
       nextChapter: 'intro',
       pageProgress: 0,
     })
+  })
+
+  it('keeps the rendered chapter position continuous across a boundary', () => {
+    const before = calculateSceneProgress({
+      chapters,
+      documentHeight: 5600,
+      scrollY: 483,
+      viewportHeight: 800,
+    })
+    const after = calculateSceneProgress({
+      chapters,
+      documentHeight: 5600,
+      scrollY: 484,
+      viewportHeight: 800,
+    })
+
+    expect(before.chapterPosition).toBeCloseTo(899 / 900, 5)
+    expect(after.chapterPosition).toBe(1)
+    expect(after.chapterPosition - before.chapterPosition).toBeCloseTo(1 / 900, 5)
   })
 })
 

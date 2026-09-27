@@ -19,6 +19,7 @@ const initialSceneState = {
   activeChapter: 'intro',
   chapterFrom: 0,
   chapterMix: 0,
+  chapterPosition: 0,
   chapterTo: 0,
   nextChapter: 'intro',
   pageProgress: 0,
@@ -49,7 +50,6 @@ export function MarketingVisual({ proofSignal = 0 }) {
   const handleReady = useCallback(() => setReady(true), [])
   const handleDegrade = useCallback((nextTier) => {
     setDegraded(true)
-    setReady(false)
     setTier((currentTier) => {
       const currentIndex = HERO_QUALITY_ORDER.indexOf(currentTier)
       const nextIndex = HERO_QUALITY_ORDER.indexOf(nextTier)
@@ -165,7 +165,6 @@ export function MarketingVisual({ proofSignal = 0 }) {
       {!failed && effectiveTier !== 'static' && (
         <Suspense fallback={null}>
           <NeuralField
-            key={effectiveTier}
             onDegrade={handleDegrade}
             onFailure={handleFailure}
             onReady={handleReady}

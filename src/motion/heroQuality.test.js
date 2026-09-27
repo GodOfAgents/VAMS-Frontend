@@ -42,6 +42,15 @@ describe('hero quality selection', () => {
     })).toEqual(expect.objectContaining({ pointerEnabled: true, tier: 'high' }))
   })
 
+  it('lets animated tiers follow the display refresh cadence', () => {
+    for (const viewportWidth of [320, 768, 1200, 1600]) {
+      expect(describeHeroQuality({
+        reducedMotion: false,
+        viewportWidth,
+      }).targetFps).toBeNull()
+    }
+  })
+
   it('identifies constrained memory or CPU without treating missing hints as constrained', () => {
     expect(isLowPowerDevice({ deviceMemory: 2, hardwareConcurrency: 8 })).toBe(true)
     expect(isLowPowerDevice({ deviceMemory: 8, hardwareConcurrency: 2 })).toBe(true)

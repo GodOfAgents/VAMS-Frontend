@@ -33,12 +33,12 @@ test('one adaptive neural scene carries the homepage topology from hero through 
   }
 })
 
-test('light theme preserves the dark hero before transitioning to editorial contrast', async ({ page }) => {
-  await page.addInitScript(() => window.localStorage.setItem('vams-theme', 'light'))
+test('homepage remains dark across every scene chapter', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('/', { waitUntil: 'commit' })
 
   const scene = page.locator('[data-marketing-scene]')
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
   await expect(scene).toHaveCSS('position', 'fixed')
   await expect(scene).toHaveAttribute('data-scene-active', 'intro')
   await expect.poll(() => scene.evaluate((element) => element.style.getPropertyValue('--scene-theme-mix'))).toBe('1.000')
@@ -47,7 +47,7 @@ test('light theme preserves the dark hero before transitioning to editorial cont
     window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY, behavior: 'instant' })
   })
   await expect(scene).toHaveAttribute('data-scene-active', 'lifecycle')
-  await expect.poll(() => scene.evaluate((element) => element.style.getPropertyValue('--scene-theme-mix'))).toBe('0.000')
+  await expect.poll(() => scene.evaluate((element) => element.style.getPropertyValue('--scene-theme-mix'))).toBe('1.000')
 })
 
 test('compact mobile uses the low-quality neural scene and keeps the first CTA in view', async ({ page }) => {
@@ -64,7 +64,7 @@ test('compact mobile uses the low-quality neural scene and keeps the first CTA i
     await expect(page.locator('.neural-field--static')).toBeVisible()
   }
   await expect(page.locator('.scene-progress')).toBeHidden()
-  const ctaBounds = await page.getByRole('link', { name: /Explore the network/ }).boundingBox()
+  const ctaBounds = await page.getByRole('link', { name: /Open read-only console/ }).boundingBox()
   expect(ctaBounds).not.toBeNull()
   expect(ctaBounds.y + ctaBounds.height).toBeLessThanOrEqual(568)
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0)

@@ -34,7 +34,7 @@ export function calculateSceneProgress({ chapters, documentHeight, scrollY, view
   if (safeChapters.length === 0) {
     return {
       activeChapter: 'intro', chapterFrom: 0, chapterMix: 0, chapterProgress: 0,
-      chapterTo: 0, nextChapter: 'intro', pageProgress: 0,
+      chapterPosition: 0, chapterTo: 0, nextChapter: 'intro', pageProgress: 0,
     }
   }
 
@@ -59,6 +59,7 @@ export function calculateSceneProgress({ chapters, documentHeight, scrollY, view
     activeChapter: active.id,
     chapterFrom: HOME_SCENE_CHAPTER_INDEX[active.id],
     chapterMix: chapterProgress,
+    chapterPosition: HOME_SCENE_CHAPTER_INDEX[active.id] + chapterProgress,
     chapterProgress,
     chapterTo: HOME_SCENE_CHAPTER_INDEX[next.id],
     nextChapter: next.id,

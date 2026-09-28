@@ -2,11 +2,16 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 
 const ThemeContext = createContext(null)
 
+const CHOICE_KEY = 'vams-theme-choice'
+
+// Light is the default theme. Only an explicit toggle is remembered.
 function initialTheme() {
-  if (typeof window === 'undefined') return 'dark'
-  const saved = window.localStorage.getItem('vams-theme')
-  if (saved === 'light' || saved === 'dark') return saved
-  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
+  if (typeof window === 'undefined') return 'light'
+  try {
+    const chosen = window.localStorage.getItem(CHOICE_KEY)
+    if (chosen === 'light' || chosen === 'dark') return chosen
+  } catch { /* Storage is optional. */ }
+  return 'light'
 }
 
 export function ThemeProvider({ children }) {
@@ -14,12 +19,15 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
-    window.localStorage.setItem('vams-theme', theme)
   }, [theme])
 
   const value = useMemo(() => ({
     theme,
-    toggleTheme: () => setTheme((current) => current === 'dark' ? 'light' : 'dark'),
+    toggleTheme: () => setTheme((current) => {
+      const next = current === 'dark' ? 'light' : 'dark'
+      try { window.localStorage.setItem(CHOICE_KEY, next) } catch { /* Storage is optional. */ }
+      return next
+    }),
   }), [theme])
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>

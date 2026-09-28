@@ -76,7 +76,10 @@ test('the hero heading reveal completes and the marketing bundle stays lean', as
   expect(wordIndexes).toEqual([0, 1, 2, 3, 4])
   await expect(page.locator('.hero h1')).toHaveAccessibleName('Sovereign infrastructure for enduring services.')
 
-  await expect(page.locator('canvas')).toHaveCount(0)
+  // At most one canvas: the hero light slats, which fall back to CSS without WebGL.
+  expect(await page.locator('canvas').count()).toBeLessThanOrEqual(1)
+  expect(await page.locator('canvas').evaluateAll((canvases) => canvases.every((canvas) => canvas.closest('.hero .slats')))).toBe(true)
+  await expect(page.locator('.hero .slats')).toHaveAttribute('data-slats', /^(ready|fallback)$/)
   expect(requestedAssets.some((url) => /three|gsap/.test(url))).toBe(false)
 })
 

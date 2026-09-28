@@ -1,12 +1,60 @@
 /*
  * VAMS design tokens.
  *
- * Dark is the primary stage (near-black canvas, hairline borders, one azure
- * signal accent). Light is a warm paper editorial variant. Any subtree can opt
- * into the dark stage with data-theme="dark". Status colors are reserved for
+ * Light (warm paper) is the default document theme; dark (near-black canvas,
+ * hairline borders, one azure signal accent) is the alternate theme. Any subtree
+ * can opt into the dark stage with data-theme="dark". Status colors are reserved for
  * evidence and runtime states.
  */
 :root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #f7f6f3;
+  --bg-sunken: #efede8;
+  --surface-1: #ffffff;
+  --surface-2: #f0efea;
+  --surface-3: #e7e5df;
+  --overlay: rgba(247, 246, 243, 0.8);
+
+  --text: #141413;
+  --text-2: #5c5b56;
+  --text-3: #66645e;
+  --text-inverse: #f7f6f3;
+
+  --line-soft: rgba(20, 20, 19, 0.06);
+  --line: rgba(20, 20, 19, 0.1);
+  --line-strong: rgba(20, 20, 19, 0.18);
+
+  --accent: #0369a1;
+  --accent-strong: #075985;
+  --accent-soft: rgba(3, 105, 161, 0.09);
+  --accent-glow: rgba(3, 105, 161, 0.2);
+
+  --positive: #1d6b43;
+  --warning: #875300;
+  --critical: #9d2d2d;
+  --info: #255f82;
+
+  --button-bg: #141413;
+  --button-text: #f7f6f3;
+  --button-hover: #2a2a28;
+  --button-shadow:
+    rgba(20, 20, 19, 0.08) 0 0 0 1px,
+    rgba(255, 255, 255, 0.14) 0 1px 0 0 inset,
+    0 6px 16px -8px rgba(20, 20, 19, 0.45);
+  --button-shadow-hover:
+    rgba(20, 20, 19, 0.08) 0 0 0 1px,
+    rgba(255, 255, 255, 0.16) 0 1px 0 0 inset,
+    0 10px 22px -10px rgba(20, 20, 19, 0.5);
+
+  --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --shadow-sm: 0 1px 2px rgba(20, 20, 19, 0.05);
+  --shadow-md: 0 14px 34px -18px rgba(20, 20, 19, 0.22);
+  --shadow-lg: 0 34px 80px -34px rgba(20, 20, 19, 0.3);
+  --card-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 42%);
+}
+
 [data-theme="dark"] {
   color-scheme: dark;
 
@@ -55,54 +103,6 @@
   --shadow-md: 0 16px 36px -16px rgba(0, 0, 0, 0.8);
   --shadow-lg: 0 40px 100px -30px rgba(0, 0, 0, 0.9);
   --card-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0) 42%);
-}
-
-[data-theme="light"] {
-  color-scheme: light;
-
-  --bg: #f7f6f3;
-  --bg-sunken: #efede8;
-  --surface-1: #ffffff;
-  --surface-2: #f0efea;
-  --surface-3: #e7e5df;
-  --overlay: rgba(247, 246, 243, 0.8);
-
-  --text: #141413;
-  --text-2: #5c5b56;
-  --text-3: #66645e;
-  --text-inverse: #f7f6f3;
-
-  --line-soft: rgba(20, 20, 19, 0.06);
-  --line: rgba(20, 20, 19, 0.1);
-  --line-strong: rgba(20, 20, 19, 0.18);
-
-  --accent: #0369a1;
-  --accent-strong: #075985;
-  --accent-soft: rgba(3, 105, 161, 0.09);
-  --accent-glow: rgba(3, 105, 161, 0.2);
-
-  --positive: #1d6b43;
-  --warning: #875300;
-  --critical: #9d2d2d;
-  --info: #255f82;
-
-  --button-bg: #141413;
-  --button-text: #f7f6f3;
-  --button-hover: #2a2a28;
-  --button-shadow:
-    rgba(20, 20, 19, 0.08) 0 0 0 1px,
-    rgba(255, 255, 255, 0.14) 0 1px 0 0 inset,
-    0 6px 16px -8px rgba(20, 20, 19, 0.45);
-  --button-shadow-hover:
-    rgba(20, 20, 19, 0.08) 0 0 0 1px,
-    rgba(255, 255, 255, 0.16) 0 1px 0 0 inset,
-    0 10px 22px -10px rgba(20, 20, 19, 0.5);
-
-  --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  --shadow-sm: 0 1px 2px rgba(20, 20, 19, 0.05);
-  --shadow-md: 0 14px 34px -18px rgba(20, 20, 19, 0.22);
-  --shadow-lg: 0 34px 80px -34px rgba(20, 20, 19, 0.3);
-  --card-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 42%);
 }
 
 :root {

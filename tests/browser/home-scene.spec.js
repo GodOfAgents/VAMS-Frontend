@@ -6,6 +6,31 @@ async function scrollToSelector(page, selector, offset = 0) {
   }, offset)
 }
 
+test('the hero light slats render and pause off screen without leaking into other routes', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('/', { waitUntil: 'networkidle' })
+  const slats = page.locator('.hero .slats')
+  await expect(slats).toHaveAttribute('data-slats', /^(ready|fallback)$/)
+  await expect(slats).toHaveAttribute('aria-hidden', 'true')
+
+  await page.goto('/protocol', { waitUntil: 'networkidle' })
+  await expect(page.locator('.slats')).toHaveCount(0)
+  await expect(page.locator('canvas')).toHaveCount(0)
+})
+
+test('the horizon panel starts narrow with the wordmark in view and grows to full bleed', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('/', { waitUntil: 'networkidle' })
+  await page.evaluate(() => document.fonts.ready)
+
+  const wordmark = page.locator('.stage__wordmark')
+  await expect(wordmark).toBeVisible()
+  const initial = await page.locator('.stage__card').evaluate((element) => getComputedStyle(element).clipPath)
+  expect(initial).toMatch(/inset\(0% (1[0-4]|[5-9])\.?\d*%/)
+  const wordTop = await wordmark.evaluate((element) => element.getBoundingClientRect().top)
+  expect(wordTop).toBeLessThan(900)
+})
+
 test('the horizon stage pins, opens to full bleed, and reveals every protocol readout', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('/', { waitUntil: 'networkidle' })

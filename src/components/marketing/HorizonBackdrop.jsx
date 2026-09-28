@@ -6,7 +6,7 @@ import { useResponsiveMotion } from '../../motion/ResponsiveMotionProvider.jsx'
  * On fine pointers a soft flare follows the cursor along the curved rim.
  * The element is purely presentational and hidden from assistive technology.
  */
-export function HorizonBackdrop({ variant = 'hero' }) {
+export function HorizonBackdrop({ children, variant = 'hero' }) {
   const rootRef = useRef(null)
   const { coarsePointer, reducedMotion } = useResponsiveMotion()
 
@@ -58,6 +58,7 @@ export function HorizonBackdrop({ variant = 'hero' }) {
     <div className={`horizon horizon--${variant}`} ref={rootRef} aria-hidden="true" data-pointer="idle">
       <div className="horizon__sky" />
       <div className="horizon__aurora" />
+      {children && <div className="horizon__behind">{children}</div>}
       <div className="horizon__planet" />
       <div className="horizon__grid" />
       <div className="horizon__flare" />

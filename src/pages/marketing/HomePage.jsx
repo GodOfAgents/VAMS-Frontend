@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 import { ArchitectureOrbit } from '../../components/marketing/ArchitectureOrbit.jsx'
 import { HorizonBackdrop } from '../../components/marketing/HorizonBackdrop.jsx'
 import { LifecycleTimeline } from '../../components/marketing/LifecycleTimeline.jsx'
+import { LightSlats } from '../../components/marketing/LightSlats.jsx'
 import { ClaimStatus } from '../../components/ui/ClaimStatus.jsx'
 import { SectionHeading } from '../../components/ui/SectionHeading.jsx'
 import { StatusBadge } from '../../components/ui/StatusBadge.jsx'
@@ -34,7 +35,7 @@ const architecture = [
 function Hero() {
   return (
     <section className="hero">
-      <div className="hero__backdrop" aria-hidden="true" />
+      <LightSlats />
       <div className="hero__inner wrap">
         <Reveal className="hero__badge" delay={0.05}><StatusBadge state="DEPLOYMENT_PENDING" prefix="Hardened pre-testnet candidate" /></Reveal>
         <Reveal delay={0.12}><p className="hero__kicker">VERIFIABLE AGENTIC MODULAR STACK</p></Reveal>
@@ -65,8 +66,8 @@ const protocolFacts = [
 
 // Scroll choreography for the pinned horizon stage (fractions of the stage scroll).
 const stageTimeline = {
-  desktop: { open: [0.06, 0.54], rise: [0.02, 0.62], facts: 0.58, factSpan: 0.1, factStep: 0.05, cue: [0.8, 0.9] },
-  mobile: { open: [0.04, 0.6], rise: [0.02, 0.66], facts: 0.62, factSpan: 0.1, factStep: 0.045, cue: [0.82, 0.92] },
+  desktop: { open: [0.02, 0.56], rise: [0.02, 0.62], facts: 0.58, factSpan: 0.1, factStep: 0.05, cue: [0.8, 0.9] },
+  mobile: { open: [0.02, 0.62], rise: [0.02, 0.66], facts: 0.62, factSpan: 0.1, factStep: 0.045, cue: [0.82, 0.92] },
 }
 
 function StageFact({ animated, index, label, progress, timeline, value }) {
@@ -87,18 +88,24 @@ function HorizonStage() {
   const stageRef = useRef(null)
   const { progress, reducedMotion, isMobile } = useStageProgress(stageRef)
   const timeline = isMobile ? stageTimeline.mobile : stageTimeline.desktop
-  const inset = isMobile ? 3 : 4.5
-  const clipPath = useTransform(progress, timeline.open, [`inset(0% ${inset}% 0% ${inset}% round 28px)`, 'inset(0% 0% 0% 0% round 0px)'])
+  // The card starts as a narrow inset panel and grows to full bleed.
+  const inset = isMobile ? 6 : 14
+  const clipPath = useTransform(progress, timeline.open, [`inset(0% ${inset}% 0% ${inset}% round 36px)`, 'inset(0% 0% 0% 0% round 0px)'])
   const rise = useTransform(progress, timeline.rise, ['44px', '0px'])
   const glow = useTransform(progress, timeline.rise, [0.4, 1])
   const cue = useTransform(progress, timeline.cue, [0, 1])
+  const wordRise = useTransform(progress, timeline.open, ['16%', '0%'])
+  const wordScale = useTransform(progress, timeline.open, [0.88, 1])
+  const wordOpacity = useTransform(progress, timeline.open, [0.7, 1])
   const animated = !reducedMotion
 
   return (
     <div className={`stage${animated ? ' stage--animated' : ''}`} ref={stageRef}>
       <div className="stage__sticky">
         <m.div className="stage__card" data-theme="dark" style={animated ? { clipPath, '--horizon-rise': rise, '--horizon-glow': glow } : undefined}>
-          <HorizonBackdrop variant="stage" />
+          <HorizonBackdrop variant="stage">
+            <m.span className="stage__wordmark" style={animated ? { y: wordRise, scale: wordScale, opacity: wordOpacity } : undefined}>VAMS</m.span>
+          </HorizonBackdrop>
           <div className="stage__content wrap">
             <section className="protocol-strip" aria-label="Protocol lifecycle state">
               {protocolFacts.map(([label, value], index) => (

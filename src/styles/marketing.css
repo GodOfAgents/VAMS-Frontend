@@ -29,6 +29,7 @@
   width: auto;
   height: 25px;
   filter: var(--logo-filter, none);
+  transition: filter var(--dur-slow) var(--ease-standard);
 }
 
 .brand--compact img {
@@ -46,12 +47,25 @@
 
 /* ---------- Header ---------- */
 .site-header {
+  --bar-bg: color-mix(in srgb, var(--bg) 88%, transparent);
+  --bar-bg-raised: color-mix(in srgb, var(--bg) 94%, transparent);
+  --bar-shadow: 0 12px 30px -22px rgba(20, 20, 19, 0.35);
+  --bar-shadow-raised: 0 18px 40px -24px rgba(20, 20, 19, 0.42);
   position: sticky;
   z-index: var(--z-nav);
   top: 0;
   height: calc(var(--nav-height) + 12px);
   padding: 12px var(--gutter) 0;
+  color: var(--text);
   pointer-events: none;
+}
+
+/* Over a dark island (the home hero) the bar switches to the dark stage. */
+.site-header[data-theme="dark"] {
+  --bar-bg: color-mix(in srgb, var(--bg) 62%, transparent);
+  --bar-bg-raised: color-mix(in srgb, var(--bg) 80%, transparent);
+  --bar-shadow: 0 12px 32px -20px rgba(0, 0, 0, 0.7);
+  --bar-shadow-raised: 0 18px 44px -22px rgba(0, 0, 0, 0.8);
 }
 
 .site-header::before {
@@ -82,8 +96,8 @@
   padding: 0 8px 0 12px;
   border: 1px solid var(--line);
   border-radius: 14px;
-  background: color-mix(in srgb, var(--bg) 68%, transparent);
-  box-shadow: var(--highlight), 0 12px 32px -20px rgba(0, 0, 0, 0.7);
+  background: var(--bar-bg);
+  box-shadow: var(--highlight), var(--bar-shadow);
   -webkit-backdrop-filter: blur(20px) saturate(150%);
   backdrop-filter: blur(20px) saturate(150%);
   pointer-events: auto;
@@ -96,17 +110,8 @@
 .site-header[data-scrolled="true"] .site-header__bar,
 .site-header[data-menu-open="true"] .site-header__bar {
   border-color: var(--line-strong);
-  background: color-mix(in srgb, var(--bg) 84%, transparent);
-  box-shadow: var(--highlight), 0 18px 44px -22px rgba(0, 0, 0, 0.8);
-}
-
-[data-theme="light"] .site-header__bar {
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
-  box-shadow: var(--highlight), 0 12px 30px -22px rgba(20, 20, 19, 0.35);
-}
-
-[data-theme="light"] .site-header[data-scrolled="true"] .site-header__bar {
-  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  background: var(--bar-bg-raised);
+  box-shadow: var(--highlight), var(--bar-shadow-raised);
 }
 
 .site-nav {
@@ -249,10 +254,17 @@
   position: relative;
 }
 
+/* The hero and the chrome stage form one dark island under the sticky header. */
+.home-intro {
+  position: relative;
+  margin-top: calc(-1 * (var(--nav-height) + 12px));
+  background: var(--bg);
+  color: var(--text);
+}
+
 .hero {
   position: relative;
   z-index: 0;
-  margin-top: calc(-1 * (var(--nav-height) + 12px));
   padding: calc(var(--nav-height) + 12px) 0 clamp(40px, 6vh, 72px);
   isolation: isolate;
 }
@@ -289,17 +301,26 @@
 }
 
 .slats__fallback {
-  background: repeating-linear-gradient(128deg, transparent 0 30px, rgba(214, 220, 230, 0.09) 30px 104px, transparent 104px 134px);
+  background: repeating-linear-gradient(128deg, transparent 0 30px, rgba(222, 222, 220, 0.09) 30px 104px, transparent 104px 134px);
   -webkit-mask-image: radial-gradient(52% 60% at 54% 60%, #000 12%, transparent 74%);
   mask-image: radial-gradient(52% 60% at 54% 60%, #000 12%, transparent 74%);
 }
 
-[data-theme="light"] .slats__fallback {
-  background: repeating-linear-gradient(128deg, transparent 0 30px, rgba(20, 20, 19, 0.05) 30px 104px, transparent 104px 134px);
-}
-
 .slats[data-slats="ready"] .slats__fallback {
   opacity: 0;
+}
+
+/* The closer mirrors the hero: slats converge above the frame and fade at the seam. */
+.slats--closer {
+  bottom: 0;
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 100%);
+  mask-image: linear-gradient(180deg, transparent 0, #000 18%, #000 100%);
+}
+
+.slats--closer .slats__fallback {
+  background: repeating-linear-gradient(52deg, transparent 0 24px, rgba(222, 222, 220, 0.08) 24px 78px, transparent 78px 102px);
+  -webkit-mask-image: radial-gradient(52% 60% at 50% 56%, #000 12%, transparent 74%);
+  mask-image: radial-gradient(52% 60% at 50% 56%, #000 12%, transparent 74%);
 }
 
 .hero__inner {
@@ -348,10 +369,6 @@
   line-height: 1;
   letter-spacing: -0.034em;
   text-shadow: 0 2px 30px rgba(0, 0, 0, 0.55);
-}
-
-[data-theme="light"] .hero__title {
-  text-shadow: none;
 }
 
 .hero__lede {
@@ -429,147 +446,7 @@
   text-transform: uppercase;
 }
 
-/* ---------- Horizon art ---------- */
-.horizon {
-  --horizon-top: 76%;
-  --planet-size: max(1500px, 150vw);
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.horizon__sky {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(90% 60% at 50% 0%, rgba(56, 78, 110, 0.16), transparent 62%),
-    linear-gradient(180deg, #060708 0%, #08090b 58%, #07090c 100%);
-}
-
-.horizon__aurora {
-  position: absolute;
-  top: var(--horizon-top);
-  left: 50%;
-  width: min(1600px, 150%);
-  height: 130%;
-  background:
-    radial-gradient(44% 34% at 50% 50%, rgba(87, 196, 255, 0.3), transparent 72%),
-    radial-gradient(28% 26% at 30% 50%, rgba(99, 102, 241, 0.2), transparent 72%),
-    radial-gradient(24% 24% at 71% 50%, rgba(45, 212, 191, 0.13), transparent 72%);
-  opacity: calc(0.95 * var(--horizon-glow, 1));
-  transform: translate(-50%, calc(-50% + var(--horizon-rise, 0px)));
-}
-
-.horizon__planet {
-  position: absolute;
-  top: var(--horizon-top);
-  left: 50%;
-  width: var(--planet-size);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background:
-    radial-gradient(56% 14% at 50% 0%, rgba(87, 196, 255, 0.2), transparent 100%),
-    linear-gradient(180deg, #0b0f15 0%, #050607 10%);
-  box-shadow:
-    inset 0 1px 0 rgba(214, 240, 255, 0.95),
-    inset 0 3px 8px rgba(168, 224, 255, 0.45),
-    inset 0 30px 70px -34px rgba(87, 196, 255, 0.6),
-    0 -1px 10px rgba(168, 224, 255, 0.6),
-    0 -14px 44px -8px rgba(87, 196, 255, 0.5),
-    0 -70px 160px -40px rgba(87, 196, 255, 0.4);
-  transform: translate(-50%, var(--horizon-rise, 0px));
-}
-
-.horizon__grid {
-  position: absolute;
-  top: var(--horizon-top);
-  left: 50%;
-  width: var(--planet-size);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: repeating-radial-gradient(circle at 50% 50%, transparent 0 62px, rgba(140, 210, 255, 0.075) 62px 63.5px);
-  mask-image: radial-gradient(48% 26% at 50% 0%, #000 0%, rgba(0, 0, 0, 0.4) 55%, transparent 100%);
-  transform: translate(-50%, var(--horizon-rise, 0px));
-}
-
-.horizon__flare {
-  position: absolute;
-  top: var(--flare-y, var(--horizon-top));
-  left: var(--flare-x, 50%);
-  width: 460px;
-  height: 130px;
-  background: radial-gradient(closest-side, rgba(214, 240, 255, 0.6), rgba(87, 196, 255, 0.2) 45%, transparent 76%);
-  mix-blend-mode: screen;
-  opacity: 0;
-  transform: translate(-50%, -50%);
-  transition: opacity 700ms var(--ease-standard);
-}
-
-.horizon[data-pointer="active"] .horizon__flare {
-  opacity: 1;
-}
-
-.horizon__fade {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: 18%;
-  background: linear-gradient(180deg, transparent, var(--bg));
-}
-
-.horizon--stage {
-  --wordmark-top: clamp(36px, 6.5vh, 80px);
-  --wordmark-size: clamp(5.5rem, min(21vw, 30vh), 20rem);
-  --horizon-top: calc(var(--wordmark-top) + var(--wordmark-size) * 0.68);
-  --planet-size: max(1800px, 170vw);
-}
-
-.horizon__behind {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding-top: var(--wordmark-top);
-}
-
-.stage__wordmark {
-  display: block;
-  font-size: var(--wordmark-size);
-  font-weight: 640;
-  letter-spacing: -0.06em;
-  line-height: 0.8;
-  white-space: nowrap;
-  background: linear-gradient(180deg, #ffffff 0%, #e4e8ee 34%, rgba(176, 188, 204, 0.6) 70%, rgba(120, 138, 160, 0.12) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 0 48px rgba(180, 205, 235, 0.14));
-  transform-origin: 50% 100%;
-  user-select: none;
-}
-
-.horizon--stage .horizon__fade {
-  display: none;
-}
-
-.horizon--destination {
-  --horizon-top: 74%;
-  --planet-size: max(1300px, 125vw);
-}
-
-.horizon--destination .horizon__sky {
-  background: linear-gradient(180deg, var(--bg) 0%, #07080a 100%);
-}
-
-.horizon--destination .horizon__fade {
-  display: none;
-}
-
-/* ---------- Home: pinned horizon stage ---------- */
+/* ---------- Home: pinned liquid-chrome stage ---------- */
 .stage {
   position: relative;
   z-index: 1;
@@ -592,13 +469,77 @@
   overflow: hidden;
 }
 
+/* Static layout (reduced motion): the light panel meets the dark hero with rounded shoulders. */
+.stage:not(.stage--animated) .stage__card {
+  border-radius: 36px 36px 0 0;
+}
+
+/* A light island inside the dark intro: a paper studio sweep. */
 .stage__card {
   position: absolute;
   inset: 0;
   overflow: hidden;
   isolation: isolate;
-  background: var(--bg);
+  background:
+    radial-gradient(70% 58% at 50% 16%, #fefdfb 0%, rgba(254, 253, 251, 0) 72%),
+    linear-gradient(180deg, #f2f1ed 0%, var(--bg) 40%, #eeede8 100%);
   color: var(--text);
+}
+
+.stage__art {
+  --wordmark-top: clamp(96px, 23vh, 250px);
+  --wordmark-peek: 28px;
+  --wordmark-size: clamp(5.5rem, min(25vw, 34vh), 22rem);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: var(--wordmark-top);
+  pointer-events: none;
+}
+
+/* CSS rendition (no WebGL2): monochrome chrome type with a hard horizon line. */
+.stage__wordmark {
+  display: block;
+  font-size: var(--wordmark-size);
+  font-weight: 640;
+  letter-spacing: -0.025em;
+  line-height: 0.8;
+  white-space: nowrap;
+  background: linear-gradient(180deg, #2c2c2a 0%, #7a7974 40%, #121211 51%, #a09f99 63%, #dcdad4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transform-origin: 50% 100%;
+  translate: 0 calc(var(--lift, 0) * min(0px, var(--wordmark-peek) - var(--wordmark-top)));
+  user-select: none;
+}
+
+.stage__art[data-chrome="ready"] .stage__wordmark {
+  visibility: hidden;
+  transition: visibility 0s linear 0.9s;
+}
+
+.chrome {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: calc(var(--wordmark-top) + var(--wordmark-size) * 1.75);
+}
+
+.chrome__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.9s var(--ease-out);
+}
+
+.stage__art[data-chrome="ready"] .chrome__canvas {
+  opacity: 1;
 }
 
 .stage__content {
@@ -1194,8 +1135,11 @@
 .destination {
   position: relative;
   z-index: 0;
+  display: grid;
+  min-height: min(88vh, 860px);
+  align-items: center;
   overflow: hidden;
-  padding: clamp(96px, 13vw, 176px) 0 clamp(180px, 22vw, 300px);
+  padding: clamp(112px, 14vw, 190px) 0;
   isolation: isolate;
   background: var(--bg);
   color: var(--text);
@@ -1383,14 +1327,10 @@
     width: 100%;
   }
 
-  .horizon--stage {
-    --wordmark-top: 36px;
-    --planet-size: max(1300px, 340vw);
-  }
-
-  .horizon--destination {
-    --horizon-top: 80%;
-    --planet-size: max(1100px, 300vw);
+  .stage__art {
+    --wordmark-top: clamp(84px, 25vh, 230px);
+    --wordmark-peek: 22px;
+    --wordmark-size: clamp(5.5rem, min(34vw, 30vh), 20rem);
   }
 
   .journey-row {

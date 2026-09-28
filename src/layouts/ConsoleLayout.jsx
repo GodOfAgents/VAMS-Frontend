@@ -6,7 +6,6 @@ import { useState } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { Brand } from '../components/navigation/Brand.jsx'
 import { SimulationBanner } from '../components/disclosures/SimulationBanner.jsx'
-import { ThemeToggle } from '../components/ui/ThemeToggle.jsx'
 import { StatusBadge } from '../components/ui/StatusBadge.jsx'
 import { useProtocol } from '../features/protocol/ProtocolProvider.jsx'
 import { useResource } from '../features/protocol/useResource.js'
@@ -80,7 +79,6 @@ export function ConsoleLayout() {
           </div>
           <div className="console-header__actions">
             <Link to="/">Protocol site</Link>
-            <ThemeToggle />
           </div>
         </header>
         <main id="console-content" className="console-content"><RouteMotion><Outlet /></RouteMotion></main>

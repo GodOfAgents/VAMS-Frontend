@@ -1,12 +1,12 @@
 import { ArrowDown, ArrowRight, ArrowUpRight, Boxes, Braces, Cpu, FileCheck2, Globe2, ShieldCheck } from 'lucide-react'
 import { useRef } from 'react'
-import { useTransform } from 'motion/react'
+import { useMotionValue, useTransform } from 'motion/react'
 import * as m from 'motion/react-m'
 import { Link } from 'react-router-dom'
 import { ArchitectureOrbit } from '../../components/marketing/ArchitectureOrbit.jsx'
-import { HorizonBackdrop } from '../../components/marketing/HorizonBackdrop.jsx'
 import { LifecycleTimeline } from '../../components/marketing/LifecycleTimeline.jsx'
 import { LightSlats } from '../../components/marketing/LightSlats.jsx'
+import { LiquidChrome } from '../../components/marketing/LiquidChrome.jsx'
 import { ClaimStatus } from '../../components/ui/ClaimStatus.jsx'
 import { SectionHeading } from '../../components/ui/SectionHeading.jsx'
 import { StatusBadge } from '../../components/ui/StatusBadge.jsx'
@@ -40,7 +40,7 @@ function Hero() {
         <Reveal className="hero__badge" delay={0.05}><StatusBadge state="DEPLOYMENT_PENDING" prefix="Hardened pre-testnet candidate" /></Reveal>
         <Reveal delay={0.12}><p className="hero__kicker">VERIFIABLE AGENTIC MODULAR STACK</p></Reveal>
         <SmokeText
-          className="hero__title"
+          className="hero__title vt-title"
           delay={0.16}
           mode="words"
           phrases={['Sovereign', 'infrastructure for', 'enduring services.']}
@@ -50,7 +50,7 @@ function Hero() {
         </Reveal>
         <Reveal className="hero__actions" delay={0.56}>
           <MagneticLink className="button" to="/overview">Explore the network <ArrowRight aria-hidden="true" size={16} /></MagneticLink>
-          <MagneticLink className="button button--ghost" to="/protocol">Understand VAMS</MagneticLink>
+          <MagneticLink className="button button--ghost" data-glass="true" to="/protocol">Understand VAMS</MagneticLink>
         </Reveal>
       </div>
     </section>
@@ -64,7 +64,7 @@ const protocolFacts = [
   ['Public surface', 'Read-only and evidence-led'],
 ]
 
-// Scroll choreography for the pinned horizon stage (fractions of the stage scroll).
+// Scroll choreography for the pinned chrome stage (fractions of the stage scroll).
 const stageTimeline = {
   desktop: { open: [0.02, 0.56], rise: [0.02, 0.62], facts: 0.58, factSpan: 0.1, factStep: 0.05, cue: [0.8, 0.9] },
   mobile: { open: [0.02, 0.62], rise: [0.02, 0.66], facts: 0.62, factSpan: 0.1, factStep: 0.045, cue: [0.82, 0.92] },
@@ -84,28 +84,30 @@ function StageFact({ animated, index, label, progress, timeline, value }) {
   )
 }
 
-function HorizonStage() {
+// A light window opens at the foot of the dark hero and grows until the light
+// theme fills the screen. Inside it the wordmark pours together in liquid chrome.
+function ChromeStage() {
   const stageRef = useRef(null)
+  const wordmarkRef = useRef(null)
   const { progress, reducedMotion, isMobile } = useStageProgress(stageRef)
   const timeline = isMobile ? stageTimeline.mobile : stageTimeline.desktop
   // The card starts as a narrow inset panel and grows to full bleed.
   const inset = isMobile ? 6 : 14
   const clipPath = useTransform(progress, timeline.open, [`inset(0% ${inset}% 0% ${inset}% round 36px)`, 'inset(0% 0% 0% 0% round 0px)'])
-  const rise = useTransform(progress, timeline.rise, ['44px', '0px'])
-  const glow = useTransform(progress, timeline.rise, [0.4, 1])
   const cue = useTransform(progress, timeline.cue, [0, 1])
-  const wordRise = useTransform(progress, timeline.open, ['16%', '0%'])
-  const wordScale = useTransform(progress, timeline.open, [0.88, 1])
-  const wordOpacity = useTransform(progress, timeline.open, [0.7, 1])
+  const lift = useTransform(progress, timeline.open, [1, 0])
+  const wordScale = useTransform(progress, timeline.open, [0.9, 1])
+  const wordOpacity = useTransform(progress, timeline.open, [0.75, 1])
   const animated = !reducedMotion
 
   return (
     <div className={`stage${animated ? ' stage--animated' : ''}`} ref={stageRef}>
       <div className="stage__sticky">
-        <m.div className="stage__card" data-theme="dark" style={animated ? { clipPath, '--horizon-rise': rise, '--horizon-glow': glow } : undefined}>
-          <HorizonBackdrop variant="stage">
-            <m.span className="stage__wordmark" style={animated ? { y: wordRise, scale: wordScale, opacity: wordOpacity } : undefined}>VAMS</m.span>
-          </HorizonBackdrop>
+        <m.div className="stage__card" data-theme="light" style={animated ? { clipPath } : undefined}>
+          <m.div className="stage__art" aria-hidden="true" style={animated ? { '--lift': lift } : undefined}>
+            <m.span className="stage__wordmark" ref={wordmarkRef} style={animated ? { scale: wordScale, opacity: wordOpacity } : undefined}>VAMS</m.span>
+            <LiquidChrome liftRange={timeline.open} progress={animated ? progress : null} wordmarkRef={wordmarkRef} />
+          </m.div>
           <div className="stage__content wrap">
             <section className="protocol-strip" aria-label="Protocol lifecycle state">
               {protocolFacts.map(([label, value], index) => (
@@ -184,26 +186,30 @@ function JourneySection() {
       <div className="wrap journey-section__grid">
         <Reveal><p className="eyebrow journey-section__title">Choose your entry point</p></Reveal>
         <StaggerGroup className="journey-list">
-          <StaggerItem><Link className="journey-row" to="/build"><span>01</span><h3>Application team</h3><p>Explore portable services, blueprints, and composition.</p><ArrowUpRight aria-hidden="true" className="journey-row__arrow" size={18} /></Link></StaggerItem>
-          <StaggerItem><Link className="journey-row" to="/operate"><span>02</span><h3>Infrastructure operator</h3><p>Review participation requirements and release gates.</p><ArrowUpRight aria-hidden="true" className="journey-row__arrow" size={18} /></Link></StaggerItem>
-          <StaggerItem><Link className="journey-row" to="/protocol"><span>03</span><h3>Enterprise or institution</h3><p>Inspect continuity, sovereignty, and accountability boundaries.</p><ArrowUpRight aria-hidden="true" className="journey-row__arrow" size={18} /></Link></StaggerItem>
-          <StaggerItem><Link className="journey-row" to="/research"><span>04</span><h3>Researcher or auditor</h3><p>Trace ambitious claims to specifications and evidence.</p><ArrowUpRight aria-hidden="true" className="journey-row__arrow" size={18} /></Link></StaggerItem>
+          <StaggerItem><Link className="journey-row" to="/build"><span>01</span><h3 data-morph-title>Application team</h3><p>Explore portable services, blueprints, and composition.</p><ArrowUpRight aria-hidden="true" className="journey-row__arrow" size={18} /></Link></StaggerItem>
+          <StaggerItem><Link className="journey-row" to="/operate"><span>02</span><h3 data-morph-title>Infrastructure operator</h3><p>Review participation requirements and release gates.</p><ArrowUpRight aria-hidden="true" className="journey-row__arrow" size={18} /></Link></StaggerItem>
+          <StaggerItem><Link className="journey-row" to="/protocol"><span>03</span><h3 data-morph-title>Enterprise or institution</h3><p>Inspect continuity, sovereignty, and accountability boundaries.</p><ArrowUpRight aria-hidden="true" className="journey-row__arrow" size={18} /></Link></StaggerItem>
+          <StaggerItem><Link className="journey-row" to="/research"><span>04</span><h3 data-morph-title>Researcher or auditor</h3><p>Trace ambitious claims to specifications and evidence.</p><ArrowUpRight aria-hidden="true" className="journey-row__arrow" size={18} /></Link></StaggerItem>
         </StaggerGroup>
       </div>
     </section>
   )
 }
 
+// The page closes on the hero's answering diagonal: the slats return mirrored,
+// growing with the panel, and light gathers around the primary action.
 function DestinationSection() {
+  const opening = useMotionValue(0)
+
   return (
-    <ExpandingPanel className="destination" data-theme="dark">
-      <HorizonBackdrop variant="destination" />
+    <ExpandingPanel className="destination" data-theme="dark" progressValue={opening}>
+      <LightSlats progress={opening} variant="closer" />
       <div className="destination__inner wrap">
         <Reveal><p className="eyebrow eyebrow--signal">The destination</p></Reveal>
         <SmokeText as="h2" className="destination__title" mode="words" triggerOnView phrases={['A web where our work can endure, our intelligence can evolve, and our sovereignty remains our own.']} />
         <Reveal className="destination__actions" delay={0.2}>
-          <MagneticLink className="button" to="/overview">Open console</MagneticLink>
-          <Link className="button button--ghost" to="/research">Inspect research</Link>
+          <MagneticLink className="button" data-slats-focus="true" to="/overview">Open console</MagneticLink>
+          <Link className="button button--ghost" data-glass="true" to="/research">Inspect research</Link>
         </Reveal>
       </div>
     </ExpandingPanel>
@@ -213,8 +219,10 @@ function DestinationSection() {
 export function HomePage() {
   return (
     <div className="marketing-home">
-      <Hero />
-      <HorizonStage />
+      <div className="home-intro" data-theme="dark">
+        <Hero />
+        <ChromeStage />
+      </div>
       <LifecycleSection />
       <ArchitectureSection />
       <EvidenceSection />

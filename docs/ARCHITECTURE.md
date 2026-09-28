@@ -4,7 +4,7 @@
 
 VAMS uses one React/Vite source tree with three logically separate surfaces:
 
-- `MarketingLayout`: editorial protocol routes with a CSS-rendered horizon visual on the homepage
+- `MarketingLayout`: editorial protocol routes with the shader-drawn homepage scenes (light slats, liquid-chrome wordmark)
 - `ConsoleLayout`: read-only protocol entity inspection
 - `StatusLayout`: operational observations and release-readiness evidence
 
@@ -72,9 +72,9 @@ The explorer is always read-only.
 
 ## Visual system boundary
 
-The interface is built from one token layer (`styles/tokens.css`) and three shared layers: `base.css`, `components.css`, and a stylesheet per surface (`marketing.css`, `topics.css`, `research.css`, `console.css`, `status.css`). Dark is the primary theme; light is a warm editorial variant, and any subtree can opt into the dark stage with `data-theme="dark"`. `public/theme-init.js` applies the stored or preferred theme before first paint (the CSP forbids inline scripts).
+The interface is built from one token layer (`styles/tokens.css`) and three shared layers: `base.css`, `components.css`, and a stylesheet per surface (`marketing.css`, `topics.css`, `research.css`, `console.css`, `status.css`). The palette is monochrome (ink, graphite, silver, warm paper) with green, amber, and red reserved for status. The document is light; a subtree opts into the dark stage with `data-theme="dark"` (the home hero and the closing panel), a light island inside it uses `data-theme="light"`, and the marketing header adopts the theme of whatever section sits beneath it. There is no theme switch.
 
-Content is presented on hairlines, rules, and whitespace rather than card grids. Decorative drawings (`HorizonBackdrop`, `ArchitectureOrbit`) are CSS or inline SVG, carry no text or data, and are hidden from assistive technology. They are not protocol maps or entity graphs.
+Content is presented on hairlines, rules, and whitespace rather than card grids. Decorative scenes (`LightSlats`, `LiquidChrome`, `ArchitectureOrbit`) are small raw-WebGL shaders with CSS fallbacks or inline SVG; they carry no text or data and are hidden from assistive technology. They are not protocol maps or entity graphs. `motion/liquidGlass.jsx` adds per-element refraction maps to `data-glass` surfaces, and `motion/GooCursor.jsx` supplies the fine-pointer cursor.
 
 No WebGL renderer ships with any surface. The console and status surfaces do not mount homepage visuals.
 
@@ -95,7 +95,7 @@ Gutters, section rhythm, and type sizes are fluid (`clamp()`), with layout chang
 
 - CSS owns focus, hover, press feedback, borders, and the decorative drawing states.
 - Motion owns route presence, in-view reveals, stagger groups, heading word reveals, magnetic links, the navigation indicators (shared layout), research-ledger filtering (layout animations), and data-state transitions.
-- Scroll-linked choreography uses `useScroll`/`useTransform` (`motion/scroll.jsx`): the pinned homepage horizon stage, the tilt-in evidence window, the expanding destination panel, and the lifecycle rail.
+- Scroll-linked choreography uses `useScroll`/`useTransform` (`motion/scroll.jsx`): the pinned homepage chrome stage, the tilt-in evidence window, the expanding destination panel (which also drives the closing slats), and the lifecycle rail. Route changes use the View Transitions API (`motion/viewTransitions.js`) so page titles morph between routes.
 - Active lifecycle steps and architecture boundaries are tracked with one `IntersectionObserver` each.
 
 Reduced motion (system setting or the in-page pause control) removes pinning, scrubbing, transforms, and looping cues while retaining the complete static composition.

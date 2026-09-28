@@ -1,9 +1,8 @@
 import { ExternalLink, Menu, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import * as m from 'motion/react-m'
 import { Brand } from './Brand.jsx'
-import { ThemeToggle } from '../ui/ThemeToggle.jsx'
 import { MotionToggle } from '../ui/MotionToggle.jsx'
 import { appEnvironment } from '../../config/environment.js'
 import { useResponsiveMotion } from '../../motion/ResponsiveMotionProvider.jsx'
@@ -20,6 +19,7 @@ const links = [
 const INLINE_NAVIGATION_MIN_WIDTH = 1100
 const COMPACT_BAR_MAX_WIDTH = 640
 const indicatorSpring = { type: 'spring', stiffness: 520, damping: 42, mass: 0.7 }
+const SURFACE_COLORS = { dark: '#08090a', light: '#f7f6f3' }
 
 function useScrolled(threshold = 8) {
   const [scrolled, setScrolled] = useState(false)
@@ -44,6 +44,55 @@ function useScrolled(threshold = 8) {
   return scrolled
 }
 
+// The site is light; some sections (the home hero) are dark islands. The bar takes the
+// theme of whatever sits beneath its centre so it always reads against the page.
+function useHeaderSurface(headerRef) {
+  const [surface, setSurface] = useState('light')
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    const header = headerRef.current
+    if (!header) return undefined
+    let frame = null
+
+    const update = () => {
+      frame = null
+      const bar = header.querySelector('.site-header__bar')
+      if (!bar) return
+      const bounds = bar.getBoundingClientRect()
+      let next = 'light'
+      for (const element of document.elementsFromPoint(window.innerWidth / 2, bounds.top + bounds.height / 2)) {
+        if (header.contains(element)) continue
+        next = element.closest('[data-theme]')?.getAttribute('data-theme') === 'dark' ? 'dark' : 'light'
+        break
+      }
+      setSurface(next)
+    }
+    const schedule = () => {
+      if (frame === null) frame = window.requestAnimationFrame(update)
+    }
+
+    const main = document.getElementById('main-content')
+    const mutations = new MutationObserver(schedule)
+    if (main) mutations.observe(main, { childList: true, subtree: true })
+    window.addEventListener('scroll', schedule, { passive: true })
+    window.addEventListener('resize', schedule)
+    schedule()
+    return () => {
+      mutations.disconnect()
+      window.removeEventListener('scroll', schedule)
+      window.removeEventListener('resize', schedule)
+      if (frame !== null) window.cancelAnimationFrame(frame)
+    }
+  }, [headerRef, pathname])
+
+  useEffect(() => {
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', SURFACE_COLORS[surface])
+  }, [surface])
+
+  return surface
+}
+
 export function MarketingNav() {
   const [menuOpen, setOpen] = useState(false)
   const [hovered, setHovered] = useState(null)
@@ -51,6 +100,7 @@ export function MarketingNav() {
   const header = useRef(null)
   const motion = useResponsiveMotion()
   const scrolled = useScrolled()
+  const surface = useHeaderSurface(header)
   const inline = motion.viewportWidth >= INLINE_NAVIGATION_MIN_WIDTH
   const open = menuOpen && !inline
   const expandedNavigation = inline || open
@@ -87,8 +137,8 @@ export function MarketingNav() {
     }
 
   return (
-    <header className="site-header" data-scrolled={scrolled ? 'true' : 'false'} data-menu-open={open ? 'true' : 'false'} ref={header}>
-      <div className="site-header__bar">
+    <header className="site-header" data-menu-open={open ? 'true' : 'false'} data-scrolled={scrolled ? 'true' : 'false'} data-theme={surface} ref={header}>
+      <div className="site-header__bar" data-glass="true">
         <Brand />
         <m.nav
           animate={expandedNavigation ? 'open' : 'closed'}
@@ -138,13 +188,11 @@ export function MarketingNav() {
           </a>
           {compactBar && (
             <m.div className="site-nav__tools" variants={itemVariants}>
-              <ThemeToggle />
               <MotionToggle />
             </m.div>
           )}
         </m.nav>
         <div className="site-header__actions">
-          {!compactBar && <ThemeToggle />}
           {!compactBar && <MotionToggle />}
           <Link className="button button--small site-header__cta" to="/overview">Open console</Link>
           <button

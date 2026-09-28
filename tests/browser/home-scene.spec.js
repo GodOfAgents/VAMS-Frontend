@@ -102,7 +102,7 @@ test('compact mobile keeps the first call to action in the initial viewport', as
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0)
 })
 
-test('the mobile menu opens, carries the preference toggles, and closes with Escape', async ({ page }) => {
+test('the mobile menu opens, carries the motion toggle, and closes with Escape', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/protocol', { waitUntil: 'networkidle' })
 
@@ -111,7 +111,7 @@ test('the mobile menu opens, carries the preference toggles, and closes with Esc
   const navigation = page.locator('#primary-navigation')
   await expect(navigation).toHaveClass(/is-open/)
   await expect(navigation.getByRole('link', { name: 'Research' })).toBeVisible()
-  await expect(navigation.locator('.site-nav__tools .icon-button')).toHaveCount(2)
+  await expect(navigation.locator('.site-nav__tools .icon-button')).toHaveCount(1)
   await page.keyboard.press('Escape')
   await expect(navigation).not.toHaveClass(/is-open/)
   await expect(page.getByRole('button', { name: 'Open navigation' })).toBeFocused()

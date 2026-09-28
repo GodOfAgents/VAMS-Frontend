@@ -4,6 +4,16 @@ All notable frontend changes are documented here following Keep a Changelog.
 
 ## Unreleased
 
+### Monochrome light theme and flagship motion
+
+- The site is now one light, monochrome theme (ink, graphite, silver, warm paper); the blue signal accent is gone and green, amber, and red remain only for status. The theme toggle and pre-paint theme script were removed.
+- The home hero is a dark island: the silver light slats stay, and the floating navigation capsule adopts the theme of whatever section sits beneath it.
+- The planet horizon was replaced by a liquid-chrome stage: a light panel opens beneath the hero and the VAMS wordmark pours together from mercury droplets as it grows (WebGL2, with a CSS chrome fallback), with the protocol readouts following.
+- The closing panel now mirrors the hero's slats, growing as it opens, and lights up around the primary action.
+- Page titles morph between routes through the View Transitions API, with a plain fade on history navigation and no animation under reduced motion.
+- Added liquid-glass refraction and a pointer sheen to the navigation capsule and ghost buttons (Chromium; other browsers keep blurred glass), and a gooey cursor that snaps onto controls on fine pointers.
+- All displayed copy, links, labels, and data are unchanged.
+
 ### Frontend redesign
 
 - Replaced the visual layer across the marketing, console, and status surfaces with a new token-driven design system: Inter and Geist Mono typography, a near-black primary theme with a warm-paper light theme, hairline structure, and a single azure signal accent.

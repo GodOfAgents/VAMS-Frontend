@@ -15,7 +15,7 @@
   height: 560px;
   background:
     radial-gradient(40% 55% at 70% 18%, var(--accent-soft), transparent 70%),
-    radial-gradient(30% 45% at 28% 8%, rgba(99, 102, 241, 0.06), transparent 70%);
+    radial-gradient(30% 45% at 28% 8%, rgba(20, 20, 19, 0.035), transparent 70%);
   content: "";
   pointer-events: none;
   transform: translateX(-50%);

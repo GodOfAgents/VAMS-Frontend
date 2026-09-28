@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useLayoutEffect } from 'react'
 import { createBrowserRouter, Navigate, Outlet, useLocation, useNavigate, useRouteError } from 'react-router-dom'
 import { appEnvironment } from '../config/environment.js'
 import { MarketingLayout } from '../layouts/MarketingLayout.jsx'
@@ -16,6 +16,7 @@ import { EvidencePage } from '../pages/console/EvidencePage.jsx'
 import { SystemPage } from '../pages/console/SystemPage.jsx'
 import { StatusPage } from '../pages/status/StatusPage.jsx'
 import { NotFoundPage } from '../pages/NotFoundPage.jsx'
+import { useViewTransitionLinks } from '../motion/viewTransitions.js'
 
 const legacyHashes = {
   '#vision': '/protocol',
@@ -36,13 +37,15 @@ function SurfaceIndex() {
 function RouteEffects() {
   const location = useLocation()
   const navigate = useNavigate()
+  useViewTransitionLinks(navigate)
 
   useEffect(() => {
     const redirect = legacyHashes[window.location.hash]
     if (redirect) navigate(redirect, { replace: true })
   }, [navigate])
 
-  useEffect(() => {
+  // Runs during the commit so a view transition captures the new page at the top.
+  useLayoutEffect(() => {
     const titles = {
       '/': 'VAMS — Sovereign infrastructure for Web4',
       '/protocol': 'Protocol architecture | VAMS',
@@ -54,10 +57,13 @@ function RouteEffects() {
     }
     const leaf = location.pathname.split('/').filter(Boolean).pop() || 'Home'
     document.title = titles[location.pathname] || `${leaf.replaceAll('-', ' ')} | VAMS`
+    if (!location.hash) window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [location.pathname, location.hash])
+
+  useEffect(() => {
+    if (!location.hash) return undefined
     const frame = requestAnimationFrame(() => {
-      const anchor = location.hash ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null
-      if (anchor) anchor.scrollIntoView({ behavior: 'instant', block: 'start' })
-      else if (!location.hash) window.scrollTo({ top: 0, behavior: 'instant' })
+      document.getElementById(decodeURIComponent(location.hash.slice(1)))?.scrollIntoView({ behavior: 'instant', block: 'start' })
     })
     return () => cancelAnimationFrame(frame)
   }, [location.pathname, location.hash])

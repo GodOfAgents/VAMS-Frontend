@@ -1,10 +1,10 @@
 /*
  * VAMS design tokens.
  *
- * Light (warm paper) is the default document theme; dark (near-black canvas,
- * hairline borders, one azure signal accent) is the alternate theme. Any subtree
- * can opt into the dark stage with data-theme="dark". Status colors are reserved for
- * evidence and runtime states.
+ * Monochrome: ink, graphite, silver and warm paper. The document is light; a
+ * subtree opts into the dark stage with data-theme="dark" (the home hero), and a
+ * light island inside a dark one uses data-theme="light". Green, amber and red are
+ * reserved for evidence and runtime status.
  */
 :root,
 [data-theme="light"] {
@@ -26,15 +26,15 @@
   --line: rgba(20, 20, 19, 0.1);
   --line-strong: rgba(20, 20, 19, 0.18);
 
-  --accent: #0369a1;
-  --accent-strong: #075985;
-  --accent-soft: rgba(3, 105, 161, 0.09);
-  --accent-glow: rgba(3, 105, 161, 0.2);
+  --accent: #141413;
+  --accent-strong: #000000;
+  --accent-soft: rgba(20, 20, 19, 0.06);
+  --accent-glow: rgba(20, 20, 19, 0.12);
 
   --positive: #1d6b43;
   --warning: #875300;
   --critical: #9d2d2d;
-  --info: #255f82;
+  --info: #3a3935;
 
   --button-bg: #141413;
   --button-text: #f7f6f3;
@@ -74,15 +74,15 @@
   --line: rgba(255, 255, 255, 0.08);
   --line-strong: rgba(255, 255, 255, 0.13);
 
-  --accent: #57c4ff;
-  --accent-strong: #a8e0ff;
-  --accent-soft: rgba(87, 196, 255, 0.1);
-  --accent-glow: rgba(87, 196, 255, 0.3);
+  --accent: #ededec;
+  --accent-strong: #ffffff;
+  --accent-soft: rgba(255, 255, 255, 0.08);
+  --accent-glow: rgba(255, 255, 255, 0.18);
 
   --positive: #6ad19a;
   --warning: #e9be72;
   --critical: #f28b8b;
-  --info: #8bc8ec;
+  --info: #d4d4d2;
 
   --button-bg: #e6e6e6;
   --button-text: #0b0c0e;

@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react'
-import { useTheme } from '../../app/ThemeProvider.jsx'
 import { useResponsiveMotion } from '../../motion/ResponsiveMotionProvider.jsx'
 
 const vertexSource = `
@@ -9,9 +8,12 @@ void main() {
 }
 `
 
-// Converging silver slats with grainy, dissolving ends. Light flows down each
-// slat toward the horizon below the hero; the pointer brightens and bends the
-// slats it passes. The reading area is kept calm so text stays legible.
+// Converging silver slats with grainy, dissolving ends. Light flows along each
+// slat toward its vanishing point; the pointer brightens and bends the slats it
+// passes, and a focused call to action lights the slats around it. The reading
+// area is kept calm so text stays legible. The hero variant converges below the
+// frame so light pours down into the panel beneath it; the closer mirrors it,
+// converging above, so the page ends on the answering diagonal.
 const fragmentSource = `
 #ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
@@ -23,9 +25,15 @@ uniform vec2 uRes;
 uniform float uTime;
 uniform vec2 uPointer;
 uniform float uPointerAmt;
+uniform vec2 uFocus;
+uniform float uFocusAmt;
 uniform float uScroll;
-uniform float uTheme;
+uniform float uOpen;
 uniform vec4 uText;
+uniform float uVanishY;
+uniform float uDensity;
+uniform float uEnvelopeY;
+uniform float uPool;
 
 float hash11(float p) {
   p = fract(p * 0.1031);
@@ -44,18 +52,21 @@ void main() {
   vec2 frag = gl_FragCoord.xy;
   vec2 p = (frag - 0.5 * uRes) / uRes.y;
   vec2 pointer = (uPointer - 0.5 * uRes) / uRes.y;
+  vec2 focus = (uFocus - 0.5 * uRes) / uRes.y;
   float halfWidth = 0.5 * uRes.x / uRes.y;
 
-  // Slats are lines through a vanishing point below and to the right of the
-  // frame, so they read as Raycast-like diagonals that converge downward.
-  vec2 vanish = vec2(halfWidth * 0.4 + 2.2, -2.3);
+  // Slats are lines through a vanishing point outside the frame, so they read
+  // as Raycast-like diagonals that converge off screen.
+  vec2 vanish = vec2(halfWidth * 0.4 + 2.2, uVanishY);
   vec2 d = p - vanish;
   float angle = atan(d.y, d.x);
   float along = length(d);
 
   float pointerDistance = distance(p, pointer);
   float pointerField = exp(-pointerDistance * pointerDistance / 0.03) * uPointerAmt;
-  float slat = angle * 18.0 + pointerField * 0.55;
+  float focusDistance = distance(p, focus);
+  float focusField = exp(-focusDistance * focusDistance / 0.06) * uFocusAmt;
+  float slat = angle * uDensity + pointerField * 0.55;
 
   float id = floor(slat);
   float across = fract(slat);
@@ -68,7 +79,8 @@ void main() {
   float rim = smoothstep(0.12, 0.19, crossing) * (1.0 - smoothstep(0.19, 0.32, crossing));
 
   float lengthCoord = along + grain * 0.18;
-  float start = 2.35 + r1 * 0.3;
+  // Closed slats sit at the far edge; opening extends them toward the vanishing point.
+  float start = mix(3.6, 2.35, uOpen) + r1 * 0.3;
   float stop = 3.9 + r2 * 0.6;
   float lengthMask = smoothstep(start, start + 0.45, lengthCoord) * (1.0 - smoothstep(stop - 0.5, stop, lengthCoord));
 
@@ -77,19 +89,19 @@ void main() {
   float drift = 0.5 + 0.5 * sin(along * 1.3 + uTime * speed * 3.1 + r2 * 6.2831);
   float flow = pow(wave, 3.0) * 0.75 + drift * 0.35;
 
-  vec2 q = (p - vec2(0.04, -0.2 - uScroll * 0.1)) * vec2(0.74 / max(halfWidth, 0.6), 1.0);
+  vec2 q = (p - vec2(0.04, uEnvelopeY - uScroll * 0.1)) * vec2(0.74 / max(halfWidth, 0.6), 1.0);
   float envelope = 1.0 - smoothstep(0.26, 0.86, length(q) + grain * 0.05);
   float level = 0.5 + r2 * 0.5;
 
   float lum = body * lengthMask * envelope * level * (0.22 + 0.85 * flow);
   lum += rim * lengthMask * envelope * level * (0.14 + 0.85 * pow(wave, 4.0));
-  lum += pointerField * body * lengthMask * 0.45;
+  lum += (pointerField * 0.45 + focusField * 0.35) * body * lengthMask;
 
-  // Light pools where the slats pour into the horizon below the hero.
+  // Light pools where the hero slats pour into the panel below.
   float pool = exp(-(p.x * p.x * 2.6 + (p.y + 0.62) * (p.y + 0.62) * 16.0));
-  lum += pool * 0.16 * (0.7 + 0.3 * drift);
+  lum += pool * 0.16 * (0.7 + 0.3 * drift) * uPool;
 
-  // Keep an elliptical reading zone calm so the copy keeps its contrast.
+  // Keep a rounded reading zone calm so the copy keeps its contrast.
   vec2 textCenter = 0.5 * (uText.xy + uText.zw);
   vec2 textRadius = max(0.5 * (uText.zw - uText.xy), vec2(1.0)) * vec2(1.06, 1.1);
   vec2 textRel = abs(frag - textCenter) / textRadius;
@@ -100,13 +112,17 @@ void main() {
   lum += grain * 0.05 * smoothstep(0.02, 0.2, lum);
   lum = clamp(lum, 0.0, 1.0);
 
-  vec3 silver = mix(vec3(0.6, 0.64, 0.7), vec3(0.93, 0.95, 0.98), clamp(flow, 0.0, 1.0));
-  vec3 graphite = vec3(0.09, 0.1, 0.12);
-  vec3 color = mix(graphite, silver, uTheme);
-  float alpha = lum * mix(0.5, 1.0, uTheme);
-  gl_FragColor = vec4(color * alpha, alpha);
+  vec3 silver = mix(vec3(0.64), vec3(0.95), clamp(flow, 0.0, 1.0));
+  gl_FragColor = vec4(silver * lum, lum);
 }
 `
+
+const variants = {
+  hero: { density: 18, envelopeY: -0.2, pool: 1, text: '.hero__inner > *', vanishY: -2.3 },
+  closer: { density: 26, envelopeY: 0.12, pool: 0, text: '.destination__inner > *', vanishY: 2.3 },
+}
+
+const clamp01 = (value) => Math.min(1, Math.max(0, value))
 
 function compile(gl, type, source) {
   const shader = gl.createShader(type)
@@ -120,23 +136,19 @@ function compile(gl, type, source) {
 }
 
 /**
- * Decorative hero background: silver light slats rendered by one small
- * fragment shader. Falls back to a static CSS rendering when WebGL is
- * unavailable. Reduced motion renders a single still frame.
+ * Decorative background: silver light slats rendered by one small fragment
+ * shader. The `hero` variant pours light downward; the `closer` variant mirrors
+ * it and grows its slats as `progress` (a motion value) opens the panel. An
+ * element marked `data-slats-focus` lights the slats around it while hovered or
+ * focused. Falls back to a static CSS rendering when WebGL is unavailable.
+ * Reduced motion renders a single still frame.
  */
-export function LightSlats() {
+export function LightSlats({ progress = null, variant = 'hero' }) {
   const hostRef = useRef(null)
-  const themeRef = useRef(1)
-  const redrawRef = useRef(null)
-  const { theme } = useTheme()
   const { coarsePointer, isMobile, reducedMotion } = useResponsiveMotion()
 
   useEffect(() => {
-    themeRef.current = theme === 'dark' ? 1 : 0
-    redrawRef.current?.()
-  }, [theme])
-
-  useEffect(() => {
+    const settings = variants[variant] || variants.hero
     const host = hostRef.current
     const stage = host?.parentElement
     if (!host || !stage) return undefined
@@ -173,13 +185,19 @@ export function LightSlats() {
     gl.enableVertexAttribArray(position)
     gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0)
 
-    const uniforms = Object.fromEntries(['uRes', 'uTime', 'uPointer', 'uPointerAmt', 'uScroll', 'uTheme', 'uText']
+    const uniforms = Object.fromEntries(['uRes', 'uTime', 'uPointer', 'uPointerAmt', 'uFocus', 'uFocusAmt', 'uScroll', 'uOpen', 'uText', 'uVanishY', 'uDensity', 'uEnvelopeY', 'uPool']
       .map((name) => [name, gl.getUniformLocation(program, name)]))
+    gl.uniform1f(uniforms.uVanishY, settings.vanishY)
+    gl.uniform1f(uniforms.uDensity, settings.density)
+    gl.uniform1f(uniforms.uEnvelopeY, settings.envelopeY)
+    gl.uniform1f(uniforms.uPool, settings.pool)
 
     const renderScale = Math.min(window.devicePixelRatio || 1, 1) * (isMobile ? 0.55 : 0.75)
     const frameInterval = 1000 / (isMobile || coarsePointer ? 30 : 60)
+    const focusElement = stage.querySelector('[data-slats-focus]')
     const pointerTarget = { x: 0, y: 0, amount: 0 }
     const pointer = { x: 0, y: 0, amount: 0 }
+    const focus = { x: -9999, y: -9999, amount: 0, target: 0 }
     const text = [0, 0, 0, 0]
     let frame = null
     let lastFrame = 0
@@ -196,7 +214,7 @@ export function LightSlats() {
         canvas.height = height
         gl.viewport(0, 0, width, height)
       }
-      const blocks = [...stage.querySelectorAll('.hero__inner > *')].map((element) => element.getBoundingClientRect())
+      const blocks = [...stage.querySelectorAll(settings.text)].map((element) => element.getBoundingClientRect())
       if (blocks.length) {
         const left = Math.min(...blocks.map((rect) => rect.left))
         const right = Math.max(...blocks.map((rect) => rect.right))
@@ -207,6 +225,11 @@ export function LightSlats() {
         text[1] = (bounds.bottom - bottom) * renderScale
         text[3] = (bounds.bottom - top) * renderScale
       }
+      if (focusElement) {
+        const rect = focusElement.getBoundingClientRect()
+        focus.x = (rect.left + rect.width / 2 - bounds.left) * renderScale
+        focus.y = (bounds.bottom - rect.top - rect.height / 2) * renderScale
+      }
     }
 
     const draw = (now) => {
@@ -214,15 +237,19 @@ export function LightSlats() {
       pointer.x += (pointerTarget.x - pointer.x) * 0.08
       pointer.y += (pointerTarget.y - pointer.y) * 0.08
       pointer.amount += (pointerTarget.amount - pointer.amount) * 0.06
-      const heroHeight = stage.offsetHeight || 1
-      const scroll = reducedMotion ? 0 : Math.min(1, Math.max(0, window.scrollY / heroHeight))
+      focus.amount += (focus.target - focus.amount) * 0.08
+      const stageHeight = stage.offsetHeight || 1
+      const scroll = variant === 'hero' && !reducedMotion ? clamp01(window.scrollY / stageHeight) : 0
+      const open = variant === 'hero' || reducedMotion || !progress ? 1 : clamp01(progress.get())
 
       gl.uniform2f(uniforms.uRes, canvas.width, canvas.height)
       gl.uniform1f(uniforms.uTime, seconds)
       gl.uniform2f(uniforms.uPointer, pointer.x, pointer.y)
       gl.uniform1f(uniforms.uPointerAmt, pointer.amount)
+      gl.uniform2f(uniforms.uFocus, focus.x, focus.y)
+      gl.uniform1f(uniforms.uFocusAmt, focus.amount)
       gl.uniform1f(uniforms.uScroll, scroll)
-      gl.uniform1f(uniforms.uTheme, themeRef.current)
+      gl.uniform1f(uniforms.uOpen, open)
       gl.uniform4f(uniforms.uText, text[0], text[1], text[2], text[3])
       gl.clearColor(0, 0, 0, 0)
       gl.clear(gl.COLOR_BUFFER_BIT)
@@ -252,8 +279,6 @@ export function LightSlats() {
       if (frame === null && visible) frame = window.requestAnimationFrame(loop)
     }
 
-    redrawRef.current = () => draw(performance.now())
-
     const handleMove = (event) => {
       if (coarsePointer || reducedMotion) return
       const bounds = host.getBoundingClientRect()
@@ -269,6 +294,14 @@ export function LightSlats() {
 
     const handleLeave = () => {
       pointerTarget.amount = 0
+    }
+
+    const handleFocusOn = () => {
+      focus.target = 1
+    }
+
+    const handleFocusOff = () => {
+      focus.target = 0
     }
 
     const handleVisibility = () => start()
@@ -295,6 +328,10 @@ export function LightSlats() {
 
     stage.addEventListener('pointermove', handleMove, { passive: true })
     stage.addEventListener('pointerleave', handleLeave)
+    focusElement?.addEventListener('pointerenter', handleFocusOn)
+    focusElement?.addEventListener('pointerleave', handleFocusOff)
+    focusElement?.addEventListener('focus', handleFocusOn)
+    focusElement?.addEventListener('blur', handleFocusOff)
     document.addEventListener('visibilitychange', handleVisibility)
     canvas.addEventListener('webglcontextlost', handleContextLost)
 
@@ -307,9 +344,12 @@ export function LightSlats() {
       intersection.disconnect()
       stage.removeEventListener('pointermove', handleMove)
       stage.removeEventListener('pointerleave', handleLeave)
+      focusElement?.removeEventListener('pointerenter', handleFocusOn)
+      focusElement?.removeEventListener('pointerleave', handleFocusOff)
+      focusElement?.removeEventListener('focus', handleFocusOn)
+      focusElement?.removeEventListener('blur', handleFocusOff)
       document.removeEventListener('visibilitychange', handleVisibility)
       canvas.removeEventListener('webglcontextlost', handleContextLost)
-      redrawRef.current = null
       gl.deleteBuffer(buffer)
       gl.deleteProgram(program)
       gl.deleteShader(vertex)
@@ -317,10 +357,10 @@ export function LightSlats() {
       gl.getExtension('WEBGL_lose_context')?.loseContext()
       canvas.remove()
     }
-  }, [coarsePointer, isMobile, reducedMotion])
+  }, [coarsePointer, isMobile, progress, reducedMotion, variant])
 
   return (
-    <div className="slats" data-slats="loading" ref={hostRef} aria-hidden="true">
+    <div className={`slats slats--${variant}`} data-slats="loading" ref={hostRef} aria-hidden="true">
       <div className="slats__fallback" />
     </div>
   )

@@ -1,8 +1,9 @@
-import { Fragment, useCallback, useEffect, useRef } from 'react'
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, useInView, useMotionValue, useSpring } from 'motion/react'
 import * as m from 'motion/react-m'
 import { Link, useLocation } from 'react-router-dom'
 import { useResponsiveMotion } from './ResponsiveMotionProvider.jsx'
+import { isViewTransitionNavigation, supportsViewTransitions } from './viewTransitions.js'
 
 export const EASE_OUT = [0.16, 1, 0.3, 1]
 
@@ -165,6 +166,8 @@ function SmokeLine({ isActive, mode, motion, onFinalWordReveal, phrase, totalWor
  */
 export function SmokeText({ as = 'h1', className = '', delay = 0, mode = 'letters', onRevealComplete, phrases, triggerOnView = false, ...props }) {
   const motion = useResponsiveMotion()
+  // A title arriving through a view transition is the morph target: show it whole.
+  const [arrivedByTransition] = useState(() => !triggerOnView && isViewTransitionNavigation())
   const revealCompletedRef = useRef(false)
   const containerRef = useRef(null)
   const isInView = useInView(containerRef, {
@@ -194,7 +197,7 @@ export function SmokeText({ as = 'h1', className = '', delay = 0, mode = 'letter
     return () => window.clearTimeout(completionTimer)
   }, [delay, handleFinalWordReveal, mode, motion, onRevealComplete, totalWords])
 
-  if (motion.reducedMotion) {
+  if (motion.reducedMotion || arrivedByTransition) {
     return (
       <Tag ref={containerRef} className={`smoke-text ${className}`} aria-label={phrases.join(' ')} data-smoke-mode={mode} {...props}>
         {lines.map(({ phrase, wordOffset: lineWordOffset }) => (
@@ -287,9 +290,21 @@ export function PresenceRegion({ children, stateKey, className = '' }) {
   )
 }
 
+// With view transitions the browser animates between pages; the frame only fades
+// in on history navigations (back/forward), which do not start a transition.
+function RouteFrame({ children, historyEntry }) {
+  const motion = useResponsiveMotion()
+  const [entry] = useState(() => (historyEntry && !motion.reducedMotion && !isViewTransitionNavigation() ? 'fade' : undefined))
+  return <div className="route-motion" data-route-enter={entry}>{children}</div>
+}
+
 export function RouteMotion({ children }) {
   const location = useLocation()
   const motion = useResponsiveMotion()
+
+  if (supportsViewTransitions) {
+    return <RouteFrame historyEntry={location.key !== 'default'} key={location.pathname}>{children}</RouteFrame>
+  }
 
   return (
     <AnimatePresence initial={false} mode="sync">

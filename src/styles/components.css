@@ -908,3 +908,94 @@
   margin-top: 16px;
   color: var(--text-2);
 }
+
+/* ---------- Liquid glass ---------- */
+/* Elements marked data-glass refract the content behind their rim (Chromium; see
+   motion/liquidGlass.jsx) and carry a specular sheen that follows the pointer. */
+[data-glass] {
+  --glass-x: 50%;
+  --glass-y: 0%;
+  position: relative;
+}
+
+[data-glass]::after {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(140px 70px at var(--glass-x) var(--glass-y), var(--glass-sheen, rgba(255, 255, 255, 0.75)), transparent 72%);
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-slow) var(--ease-standard);
+}
+
+[data-theme="dark"] [data-glass],
+[data-glass][data-theme="dark"] {
+  --glass-sheen: rgba(255, 255, 255, 0.22);
+}
+
+[data-glass][data-glass-pointer="active"]::after {
+  opacity: 1;
+}
+
+.glass-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* ---------- Gooey cursor ---------- */
+html[data-cursor="custom"] {
+  cursor: none;
+}
+
+html[data-cursor="custom"] :is(input, textarea, select, [contenteditable="true"]) {
+  cursor: auto;
+}
+
+.cursor {
+  position: fixed;
+  z-index: 2000;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  filter: url(#cursor-goo);
+  mix-blend-mode: difference;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-base) var(--ease-standard);
+  will-change: transform;
+}
+
+.cursor[data-state="active"] {
+  opacity: 1;
+}
+
+.cursor__defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.cursor__dot,
+.cursor__drop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #fff;
+  will-change: transform;
+}
+
+.cursor__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 6px;
+}
+
+.cursor__drop {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+}

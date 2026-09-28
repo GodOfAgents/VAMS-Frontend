@@ -96,7 +96,7 @@ test('compact mobile keeps the first call to action in the initial viewport', as
   await page.goto('/', { waitUntil: 'networkidle' })
   await page.evaluate(() => document.fonts.ready)
 
-  const ctaBounds = await page.getByRole('link', { name: /Explore the network/ }).boundingBox()
+  const ctaBounds = await page.getByRole('link', { name: /Open read-only console/ }).boundingBox()
   expect(ctaBounds).not.toBeNull()
   expect(ctaBounds.y + ctaBounds.height).toBeLessThanOrEqual(568)
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0)

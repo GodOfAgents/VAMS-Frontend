@@ -1,5 +1,6 @@
 import { ArrowRight, CheckCircle2, CircleDashed, ExternalLink } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { ArchitectureDiagram } from '../../components/marketing/ArchitectureDiagram.jsx'
 import { PageHeader } from '../../components/ui/PageHeader.jsx'
 import { appEnvironment } from '../../config/environment.js'
 import { Reveal, StaggerGroup, StaggerItem } from '../../motion/primitives.jsx'
@@ -8,19 +9,19 @@ export { ResearchPage } from './ResearchPage.jsx'
 const content = {
   protocol: {
     eyebrow: 'Protocol',
-    title: 'Infrastructure whose authority and claims can be inspected.',
-    description: 'VAMS connects portable identity, durable state, governed execution, independent evidence, and economic responsibility without hiding their boundaries.',
+    title: 'Infrastructure you can inspect.',
+    description: 'Portable identity, durable state, governed execution, and visible evidence—with clear boundaries between them.',
     pillars: [
-      ['Immortal Execution', 'Supported services aim to recover authenticated state and authority beyond the life of one host.'],
-      ['Heart and Brain', 'Reasoning proposes and composes; consent, policy, and revocation remain independent authority boundaries.'],
-      ['Evidence and accountability', 'Claims, receipts, challenges, and settlement stay linked to explicit responsibilities.'],
-      ['Dual-host architecture', 'Polygon Amoy targets execution while Cardano Pre-Prod targets governance, identity, and insurance. Both remain deployment pending.'],
+      ['Immortal Execution', 'Recover service state and authority beyond the life of one host.'],
+      ['Heart and Brain', 'Reasoning proposes. Consent and policy decide.'],
+      ['Evidence', 'Keep claims, receipts, and responsibility connected.'],
+      ['Two-chain design', 'Polygon handles execution; Cardano targets governance. Deployment is pending.'],
     ],
   },
   network: {
     eyebrow: 'Network',
-    title: 'Replace providers without surrendering the service.',
-    description: 'VAMS treats compute, storage, networking, models, and verification as replaceable resources whose claims must remain inspectable.',
+    title: 'Change providers. Keep the service.',
+    description: 'Compute, storage, models, and verification become replaceable—without hiding their claims.',
     pillars: [
       ['Nodes', 'Availability, region, resources, skills, trust posture, and freshness.'],
       ['Service Blocks', 'Composable capabilities with integration and mock/live boundaries.'],
@@ -30,8 +31,8 @@ const content = {
   },
   build: {
     eyebrow: 'Build',
-    title: 'Move from Web2 toward portable services.',
-    description: 'Package existing capabilities, declare requirements, preserve state, and add independent providers incrementally without pretending migration is only a file transfer.',
+    title: 'Build services that can move.',
+    description: 'Declare what your service needs, preserve its state, and add independent providers one step at a time.',
     pillars: [
       ['Blueprints', 'Describe compute, data, trust, geography, cognition, and service requirements.'],
       ['Dry-run composition', 'A non-mutating simulation reuses scoring concepts while remaining visibly synthetic or Gateway-sourced.'],
@@ -41,8 +42,8 @@ const content = {
   },
   operate: {
     eyebrow: 'Operate',
-    title: 'Operational participation begins with evidence.',
-    description: 'The current public surface explains requirements and blockers. It does not register operators, authorize identities, or create economic expectations.',
+    title: 'Operate with evidence.',
+    description: 'Review requirements and blockers. Registration and economic actions are not live yet.',
     pillars: [
       ['Neuron requirements', 'Compute, telemetry, identity, heartbeat, trust, and service capabilities.'],
       ['Security posture', 'mTLS, DID authorization, strict request schemas, and fail-closed dependencies are release requirements.'],
@@ -92,8 +93,8 @@ function TopicComposition({ topic, page }) {
     <section className="migration-path" aria-label="Migration stages">
       <Reveal className="topic-section-intro">
         <p className="eyebrow eyebrow--signal">An incremental path</p>
-        <h2>Keep the service.<br /><span className="topic-muted">Expand its independence.</span></h2>
-        <p>Migration includes identity, permissions, application state, and recovery. Begin with one bounded capability.</p>
+        <h2>Keep the service.<br /><span className="topic-muted">Expand its freedom.</span></h2>
+        <p>Start with one capability. Preserve identity, permissions, state, and recovery.</p>
         <Link to="/blueprints" className="text-link">Inspect blueprints <ArrowRight size={16} aria-hidden="true" /></Link>
       </Reveal>
       <StaggerGroup as="ol" className="migration-steps">
@@ -114,11 +115,11 @@ function TopicComposition({ topic, page }) {
     <section className="operator-readiness" aria-label="Operator requirements and release gates">
       <Reveal className="operator-requirements">
         <p className="eyebrow eyebrow--signal">Prepare to participate</p>
-        <h2>Capabilities come with responsibilities.</h2>
+        <h2>Capability requires accountability.</h2>
         <div className="requirement-list">
           {page.pillars.slice(0, 2).map(([title, detail]) => <article className="requirement-row" key={title}><h3>{title}</h3><p>{detail}</p></article>)}
         </div>
-        <Link className="text-link" to="/nodes">Inspect node requirements <ArrowRight size={16} aria-hidden="true" /></Link>
+        <Link className="text-link" to="/nodes">Inspect node records <ArrowRight size={16} aria-hidden="true" /></Link>
       </Reveal>
       <Reveal className="release-gates" delay={0.1}>
         <p className="eyebrow eyebrow--signal">Before live participation</p>
@@ -148,11 +149,12 @@ function TopicPage({ topic }) {
         <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description} smoke>
           <span className="chip topic-lifecycle">Pre-testnet · {topic === 'research' ? 'Research agenda' : 'Architecture & requirements'}</span>
         </PageHeader>
+        {topic === 'protocol' && <Reveal as="section" className="topic-experience"><ArchitectureDiagram variant="authority" /></Reveal>}
         <TopicComposition topic={topic} page={page} />
         <Reveal as="section" className="topic-callout">
           <div>
             <p className="eyebrow eyebrow--signal">Current lifecycle boundary</p>
-            <h2>Inspection and explicit simulation only.</h2>
+            <h2>Explore safely. No live actions.</h2>
           </div>
           <ul>
             <li className="is-available"><CheckCircle2 aria-hidden="true" /> Read public protocol state</li>

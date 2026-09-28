@@ -13,7 +13,7 @@ describe('research snapshot', () => {
       expect(entry.id).toBeTruthy()
       expect(entry.sourceDocument).toBeTruthy()
       expect(entry.sourceAnchor).toBeTruthy()
-      expect(entry.lastVerified).toBeTruthy()
+      expect(entry.sourceDate).toBeTruthy()
       expect(entry.maturity).toBeTruthy()
       expect(entry.evidenceTier).toBeTruthy()
       expect(entry.caveat).toBeTruthy()

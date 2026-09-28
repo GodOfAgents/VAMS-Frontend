@@ -60,7 +60,7 @@ function ResearchCard({ anchorId, entry }) {
           <div><dt className="research-label">VAMS relevance</dt><dd>{entry.vamsRelevance}</dd></div>
           <div><dt className="research-label">Implementation surface</dt><dd className="research-code">{entry.implementationSurface}</dd></div>
           <div><dt className="research-label">Evidence tier</dt><dd><ResearchBadge tone="neutral">{label(entry.evidenceTier)}</ResearchBadge></dd></div>
-          <div><dt className="research-label">Source and verification</dt><dd><SourceLink path={entry.sourceDocument}>{entry.sourceAnchor}</SourceLink><small>Last verified {entry.lastVerified}</small></dd></div>
+          <div><dt className="research-label">Source record</dt><dd><SourceLink path={entry.sourceDocument}>{entry.sourceAnchor}</SourceLink><small>Source snapshot dated {entry.sourceDate}</small></dd></div>
         </dl>
         <p className="research-card__caveat"><CircleDashed aria-hidden="true" size={15} /> {entry.caveat}</p>
         {entry.externalUrl && <a className="text-link" href={entry.externalUrl} target="_blank" rel="noreferrer">Open canonical paper reference <ArrowUpRight aria-hidden="true" size={15} /></a>}
@@ -141,12 +141,21 @@ export function ResearchPage() {
   return (
     <div className="research-hub">
       <div className="wrap">
-        <PageHeader eyebrow="Research and evidence" title="Open questions, explicit evidence." description="A curated research snapshot connecting VAMS academic foundations, implementation surfaces, security posture, and current pre-testnet boundaries." smoke>
-          <span className="chip topic-lifecycle">{researchSnapshotMeta.architecture} · Snapshot {researchSnapshotMeta.lastVerified}</span>
+        <PageHeader eyebrow="Research and evidence" title="Questions. Sources. Proof." description="A clear view of what informs VAMS, what exists in code, and what remains unproven." smoke>
+          <span className="chip topic-lifecycle">{researchSnapshotMeta.architecture} · Snapshot {researchSnapshotMeta.snapshotDate}</span>
         </PageHeader>
 
-        <section className="research-block research-posture" aria-labelledby="research-posture-title">
-          <ResearchHeading eyebrow="Current research posture" id="research-posture-title" title="Research should sharpen the boundary between a promising design and a proven system.">VAMS keeps papers, architecture, code, verification, deployment, and live observation distinct. The cards below summarize the five active frontiers that shape the current stack.</ResearchHeading>
+        <nav className="research-contents" aria-label="Research page contents">
+          <span>On this page</span>
+          <a href="#posture">Posture</a>
+          <a href="#updates">Updates</a>
+          <a href="#ledger">Research ledger</a>
+          <a href="#implementation-map">Implementation map</a>
+          <a href="#sources">Sources</a>
+        </nav>
+
+        <section className="research-block research-posture" id="posture" aria-labelledby="research-posture-title">
+          <ResearchHeading eyebrow="Current research posture" id="research-posture-title" title="Promise is not proof.">These five research areas shape the current VAMS design.</ResearchHeading>
           <StaggerGroup className="research-frontiers">
             {postureFamilies.map((id) => {
               const familyData = researchFamilies.find((item) => item.id === id)
@@ -163,14 +172,14 @@ export function ResearchPage() {
         </section>
 
         <section className="research-block research-ledger-section" id="ledger" aria-labelledby="research-ledger-title">
-          <ResearchHeading eyebrow="Academic research ledger" id="research-ledger-title" title="Thirty-five references mapped to VAMS surfaces.">External references are linked for reading. Their presence here records research alignment, not implementation or deployment.</ResearchHeading>
+          <ResearchHeading eyebrow="Academic research ledger" id="research-ledger-title" title={`${researchReferences.length} references, mapped.`}>A citation shows influence—not implementation or deployment.</ResearchHeading>
           <ResearchFilters />
-          <div className="research-ledger-meta" aria-live="polite"><span>{filteredReferences.length} of {researchReferences.length} references</span><span>Snapshot last verified {researchSnapshotMeta.lastVerified}</span></div>
+          <div className="research-ledger-meta" aria-live="polite"><span>{filteredReferences.length} of {researchReferences.length} references</span><span>Bundled snapshot dated {researchSnapshotMeta.snapshotDate}</span></div>
           <ResearchLedger entries={filteredReferences} />
         </section>
 
         <section className="research-block" aria-labelledby="architecture-timeline-title">
-          <ResearchHeading eyebrow="Architecture evolution" id="architecture-timeline-title" title="An additive path from monolith to cognitive/composer architecture." />
+          <ResearchHeading eyebrow="Architecture evolution" id="architecture-timeline-title" title="How the architecture evolved." />
           <StaggerGroup as="ol" className="research-timeline">
             {architectureTimeline.map((item) => (
               <StaggerItem as="li" className={item.status.includes('current') ? 'is-current' : undefined} key={item.id}>
@@ -185,8 +194,8 @@ export function ResearchPage() {
           </StaggerGroup>
         </section>
 
-        <section className="research-block" aria-labelledby="implementation-map-title">
-          <ResearchHeading eyebrow="Research-to-implementation map" id="implementation-map-title" title="Every frontier has a named surface and an evidence state." />
+        <section className="research-block" id="implementation-map" aria-labelledby="implementation-map-title">
+          <ResearchHeading eyebrow="Research-to-implementation map" id="implementation-map-title" title="Implementation map" />
           <Reveal className="research-map" role="table" aria-label="Research to implementation map">
             <div className="research-map__row research-map__row--head" role="row"><span role="columnheader">Surface</span><span role="columnheader">Research</span><span role="columnheader">Maturity</span><span role="columnheader">Evidence</span></div>
             {implementationMap.map((item) => (
@@ -201,7 +210,7 @@ export function ResearchPage() {
         </section>
 
         <section className="research-block" aria-labelledby="audit-posture-title">
-          <ResearchHeading eyebrow="Audit and verification posture" id="audit-posture-title" title="Historical remediation is not current release evidence.">The historical audit baseline resolved 68 findings. The current candidate remains fail-closed until commit-bound CI, deployment, and independent evidence gates pass.</ResearchHeading>
+          <ResearchHeading eyebrow="Audit and verification posture" id="audit-posture-title" title="Past fixes do not prove release readiness.">The audit resolved 68 findings. CI, deployment, and independent evidence are still required.</ResearchHeading>
           <StaggerGroup className="research-audit">
             <StaggerItem as="article" className="research-audit__stat">
               <History aria-hidden="true" size={20} />
@@ -229,8 +238,8 @@ export function ResearchPage() {
           </div>
         </section>
 
-        <section className="research-block" aria-labelledby="updates-title">
-          <ResearchHeading eyebrow="Project updates" id="updates-title" title="A chronology of the research becoming architecture." />
+        <section className="research-block" id="updates" aria-labelledby="updates-title">
+          <ResearchHeading eyebrow="Project updates" id="updates-title" title="Documented project updates" />
           <StaggerGroup as="ol" className="research-updates">
             {projectUpdates.map((item) => (
               <StaggerItem as="li" key={item.id}>
@@ -246,7 +255,7 @@ export function ResearchPage() {
         </section>
 
         <section className="research-block" aria-labelledby="context-title">
-          <ResearchHeading eyebrow="Strategy and historical context" id="context-title" title="Useful context, kept separate from proof.">These documents describe direction, opportunity, and historical intent. They do not prove implementation, deployment, financial terms, or live integrations.</ResearchHeading>
+          <ResearchHeading eyebrow="Strategy and historical context" id="context-title" title="Context is not proof.">These documents explain direction and history. They do not prove delivery or deployment.</ResearchHeading>
           <StaggerGroup className="research-docs">
             {strategyDocuments.map((item) => (
               <StaggerItem as="article" className="research-doc" key={item.path}>
@@ -259,13 +268,13 @@ export function ResearchPage() {
           </StaggerGroup>
         </section>
 
-        <section className="research-block research-sources-section" aria-labelledby="sources-title">
-          <ResearchHeading eyebrow="Sources and methodology" id="sources-title" title="Read the source before extending the claim.">{researchSnapshotMeta.scope} Source dates are preserved as published. External paper links are references, not claims of VAMS implementation.</ResearchHeading>
+        <section className="research-block research-sources-section" id="sources" aria-labelledby="sources-title">
+          <ResearchHeading eyebrow="Sources and methodology" id="sources-title" title="Follow every claim to its source.">{researchSnapshotMeta.scope} Dates are preserved. Paper links show influence, not implementation.</ResearchHeading>
           <StaggerGroup className="research-docs research-docs--sources">
             {sourceDocuments.map((source) => (
               <StaggerItem as="article" className="research-doc" key={source.path}>
                 <GitBranch aria-hidden="true" size={18} />
-                <small>Last verified {source.date}</small>
+                <small>Source dated {source.date}</small>
                 <div className="research-doc__main"><h3>{source.title}</h3><p>{source.role}</p></div>
                 <SourceLink path={source.path}>Open source</SourceLink>
               </StaggerItem>

@@ -12,7 +12,7 @@ All notable frontend changes are documented here following Keep a Changelog.
 - The closing panel now mirrors the hero's slats, growing as it opens, and lights up around the primary action.
 - Page titles morph between routes through the View Transitions API, with a plain fade on history navigation and no animation under reduced motion.
 - Added liquid-glass refraction and a pointer sheen to the navigation capsule and ghost buttons (Chromium; other browsers keep blurred glass), and a gooey cursor that snaps onto controls on fine pointers.
-- All displayed copy, links, labels, and data are unchanged.
+- Merged `main`: the refreshed copy, per-route metadata (`routeMetadata.js`), the research page contents bar, and the continuity and authority diagrams are carried into the new components; the diagrams render as ruled flows rather than tiles.
 
 ### Frontend redesign
 

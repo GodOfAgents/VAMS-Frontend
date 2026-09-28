@@ -17,6 +17,7 @@ import { SystemPage } from '../pages/console/SystemPage.jsx'
 import { StatusPage } from '../pages/status/StatusPage.jsx'
 import { NotFoundPage } from '../pages/NotFoundPage.jsx'
 import { useViewTransitionLinks } from '../motion/viewTransitions.js'
+import { applyRouteMetadata } from './routeMetadata.js'
 
 const legacyHashes = {
   '#vision': '/protocol',
@@ -46,17 +47,7 @@ function RouteEffects() {
 
   // Runs during the commit so a view transition captures the new page at the top.
   useLayoutEffect(() => {
-    const titles = {
-      '/': 'VAMS — Sovereign infrastructure for Web4',
-      '/protocol': 'Protocol architecture | VAMS',
-      '/network': 'Independent providers | VAMS',
-      '/build': 'Build portable services | VAMS',
-      '/operate': 'Operator requirements | VAMS',
-      '/research': 'Research and evidence | VAMS',
-      '/status': 'Verification status | VAMS',
-    }
-    const leaf = location.pathname.split('/').filter(Boolean).pop() || 'Home'
-    document.title = titles[location.pathname] || `${leaf.replaceAll('-', ' ')} | VAMS`
+    applyRouteMetadata(location.pathname)
     if (!location.hash) window.scrollTo({ top: 0, behavior: 'instant' })
   }, [location.pathname, location.hash])
 

@@ -410,3 +410,10 @@
     width: 100%;
   }
 }
+
+/* Authority diagram on the Protocol page. */
+.topic-experience {
+  margin-top: clamp(8px, 2vw, 24px);
+  padding: clamp(40px, 5vw, 64px) 0;
+  border-bottom: 1px solid var(--line-soft);
+}

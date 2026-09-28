@@ -1,8 +1,9 @@
-import { ArrowDown, ArrowRight, ArrowUpRight, Boxes, Braces, Cpu, FileCheck2, Globe2, ShieldCheck } from 'lucide-react'
+import { ArrowDown, ArrowRight, Boxes, Braces, Cpu, FileCheck2, Globe2, ShieldCheck } from 'lucide-react'
 import { useRef } from 'react'
 import { useMotionValue, useTransform } from 'motion/react'
 import * as m from 'motion/react-m'
 import { Link } from 'react-router-dom'
+import { ArchitectureDiagram } from '../../components/marketing/ArchitectureDiagram.jsx'
 import { ArchitectureOrbit } from '../../components/marketing/ArchitectureOrbit.jsx'
 import { LifecycleTimeline } from '../../components/marketing/LifecycleTimeline.jsx'
 import { LightSlats } from '../../components/marketing/LightSlats.jsx'
@@ -14,22 +15,22 @@ import { MagneticLink, Reveal, SmokeText, StaggerGroup, StaggerItem } from '../.
 import { ExpandingPanel, TiltIn, useStageProgress } from '../../motion/scroll.jsx'
 
 const lifecycle = [
-  ['01', 'Express intent', 'A person, organization, application, or agent requests an outcome with relevant authority.'],
-  ['02', 'Constrain before effect', 'Heart evaluates consent, permissions, policy, revocation, and protected boundaries.'],
-  ['03', 'Compose resources', 'Brain selects eligible Service Blocks, infrastructure, data, and execution routes.'],
-  ['04', 'Execute and preserve state', 'The runtime records supported progress and isolates irreversible effects behind explicit controls.'],
-  ['05', 'Produce evidence', 'Sentinel and protocol verifiers assess the claims needed for acceptance or recovery.'],
-  ['06', 'Settle responsibility', 'Payments, bonds, insurance, reputation, and governance respond to accepted work.'],
-  ['07', 'Recover or migrate', 'An eligible replacement resumes authenticated state under the same authority and obligations.'],
+  ['01', 'Express intent', 'Request an outcome with clear authority.'],
+  ['02', 'Set boundaries', 'Apply consent, policy, permissions, and revocation first.'],
+  ['03', 'Compose resources', 'Select the capabilities and providers the service needs.'],
+  ['04', 'Execute safely', 'Preserve progress while controlling irreversible effects.'],
+  ['05', 'Produce evidence', 'Record what happened and what can be verified.'],
+  ['06', 'Settle responsibility', 'Connect accepted work to payment and accountability.'],
+  ['07', 'Recover or migrate', 'Resume on an eligible provider without losing authority.'],
 ]
 
 const architecture = [
-  [ShieldCheck, 'Heart', 'Consent, authority, policy, revocation, and pre-effect boundaries'],
-  [Braces, 'Brain', 'Reasoning, planning, discovery, and coordination within permitted bounds'],
-  [Boxes, 'Service Blocks', 'Replaceable capabilities with declared requirements and evidence obligations'],
-  [FileCheck2, 'Sentinel', 'Independent observations, challenges, provenance, and bounded trust signals'],
-  [Cpu, 'Durable runtime', 'Authenticated progress, memory, authority, and recovery information'],
-  [Globe2, 'Portable infrastructure', 'Compute, storage, networking, models, and verification across providers'],
+  [ShieldCheck, 'Heart', 'Consent, policy, authority, and revocation'],
+  [Braces, 'Brain', 'Planning and coordination within those boundaries'],
+  [Boxes, 'Service Blocks', 'Replaceable capabilities with declared requirements'],
+  [FileCheck2, 'Sentinel', 'Independent observations and challenge signals'],
+  [Cpu, 'Durable runtime', 'Authenticated state, memory, and recovery'],
+  [Globe2, 'Portable infrastructure', 'Compute, storage, models, and verification'],
 ]
 
 function Hero() {
@@ -46,10 +47,10 @@ function Hero() {
           phrases={['Sovereign', 'infrastructure for', 'enduring services.']}
         />
         <Reveal delay={0.46}>
-          <p className="hero__lede">VAMS is building a sovereign Web4 protocol for services whose identity, authority, state, and legitimate work can continue across independent infrastructure.</p>
+          <p className="hero__lede">VAMS helps digital services keep their identity, authority, and state—even when infrastructure changes.</p>
         </Reveal>
         <Reveal className="hero__actions" delay={0.56}>
-          <MagneticLink className="button" to="/overview">Explore the network <ArrowRight aria-hidden="true" size={16} /></MagneticLink>
+          <MagneticLink className="button" to="/overview">Open read-only console <ArrowRight aria-hidden="true" size={16} /></MagneticLink>
           <MagneticLink className="button button--ghost" data-glass="true" to="/protocol">Understand VAMS</MagneticLink>
         </Reveal>
       </div>
@@ -60,8 +61,8 @@ function Hero() {
 const protocolFacts = [
   ['Architecture', 'v0.8.0'],
   ['Lifecycle', 'Hardened pre-testnet'],
-  ['Current mode', 'Active research and development'],
-  ['Public surface', 'Read-only and evidence-led'],
+  ['Current mode', 'Research and development'],
+  ['Public surface', 'Read-only'],
 ]
 
 // Scroll choreography for the pinned chrome stage (fractions of the stage scroll).
@@ -122,6 +123,17 @@ function ChromeStage() {
   )
 }
 
+// The continuity model: a service changes vehicles (providers), not identity.
+function ContinuitySection() {
+  return (
+    <Reveal as="section" className="home-section continuity-section">
+      <div className="wrap">
+        <ArchitectureDiagram variant="continuity" />
+      </div>
+    </Reveal>
+  )
+}
+
 function LifecycleSection() {
   return (
     <section className="home-section lifecycle-section">
@@ -129,8 +141,8 @@ function LifecycleSection() {
         <div className="lifecycle-section__intro">
           <SectionHeading
             eyebrow="The execution lifecycle"
-            title={['From human intent to accountable continuity.']}
-            aside="VAMS links authority, execution, evidence, economics, and recovery into one inspectable service lifecycle."
+            title={['From intent to continuity.']}
+            aside="One visible path from request to recovery."
           />
         </div>
         <LifecycleTimeline steps={lifecycle} />
@@ -145,7 +157,7 @@ function ArchitectureSection() {
       <div className="wrap">
         <SectionHeading
           eyebrow="Architecture boundaries"
-          title={['One service lifecycle.', 'Explicit authority boundaries.']}
+          title={['Clear roles.', 'Clear boundaries.']}
           tone="split"
         />
         <ArchitectureOrbit items={architecture} />
@@ -161,8 +173,8 @@ function EvidenceSection() {
         <div className="evidence-section__intro">
           <SectionHeading
             eyebrow="Trust and evidence"
-            title={['Every important claim should carry its proof state.']}
-            aside="Implementation, local verification, CI verification, deployment verification, independent review, and live observation remain distinct."
+            title={['Know what is proven.']}
+            aside="Built, tested, deployed, and observed are different proof states."
           >
             <Link className="text-link" to="/status">Inspect verification status <ArrowRight aria-hidden="true" size={15} /></Link>
           </SectionHeading>
@@ -186,10 +198,10 @@ function JourneySection() {
       <div className="wrap journey-section__grid">
         <Reveal><p className="eyebrow journey-section__title">Choose your entry point</p></Reveal>
         <StaggerGroup className="journey-list">
-          <StaggerItem><Link className="journey-row" to="/build"><span>01</span><h3 data-morph-title>Application team</h3><p>Explore portable services, blueprints, and composition.</p><ArrowUpRight aria-hidden="true" className="journey-row__arrow" size={18} /></Link></StaggerItem>
-          <StaggerItem><Link className="journey-row" to="/operate"><span>02</span><h3 data-morph-title>Infrastructure operator</h3><p>Review participation requirements and release gates.</p><ArrowUpRight aria-hidden="true" className="journey-row__arrow" size={18} /></Link></StaggerItem>
-          <StaggerItem><Link className="journey-row" to="/protocol"><span>03</span><h3 data-morph-title>Enterprise or institution</h3><p>Inspect continuity, sovereignty, and accountability boundaries.</p><ArrowUpRight aria-hidden="true" className="journey-row__arrow" size={18} /></Link></StaggerItem>
-          <StaggerItem><Link className="journey-row" to="/research"><span>04</span><h3 data-morph-title>Researcher or auditor</h3><p>Trace ambitious claims to specifications and evidence.</p><ArrowUpRight aria-hidden="true" className="journey-row__arrow" size={18} /></Link></StaggerItem>
+          <StaggerItem><Link className="journey-row" to="/build"><span className="journey-row__index">01</span><h3 data-morph-title>Builders</h3><p>Explore blueprints and portable services.</p><span className="journey-row__cta">Build the future <ArrowRight aria-hidden="true" size={15} /></span></Link></StaggerItem>
+          <StaggerItem><Link className="journey-row" to="/operate"><span className="journey-row__index">02</span><h3 data-morph-title>Operators</h3><p>Review requirements and release gates.</p><span className="journey-row__cta">Operate the future <ArrowRight aria-hidden="true" size={15} /></span></Link></StaggerItem>
+          <StaggerItem><Link className="journey-row" to="/protocol"><span className="journey-row__index">03</span><h3 data-morph-title>Organizations</h3><p>Understand continuity and accountability.</p><span className="journey-row__cta">Shape future Web <ArrowRight aria-hidden="true" size={15} /></span></Link></StaggerItem>
+          <StaggerItem><Link className="journey-row" to="/research"><span className="journey-row__index">04</span><h3 data-morph-title>Researchers</h3><p>Trace claims to sources and evidence.</p><span className="journey-row__cta">Research future Web <ArrowRight aria-hidden="true" size={15} /></span></Link></StaggerItem>
         </StaggerGroup>
       </div>
     </section>
@@ -206,7 +218,7 @@ function DestinationSection() {
       <LightSlats progress={opening} variant="closer" />
       <div className="destination__inner wrap">
         <Reveal><p className="eyebrow eyebrow--signal">The destination</p></Reveal>
-        <SmokeText as="h2" className="destination__title" mode="words" triggerOnView phrases={['A web where our work can endure, our intelligence can evolve, and our sovereignty remains our own.']} />
+        <SmokeText as="h2" className="destination__title" mode="words" triggerOnView phrases={['Services that outlive their infrastructure.']} />
         <Reveal className="destination__actions" delay={0.2}>
           <MagneticLink className="button" data-slats-focus="true" to="/overview">Open console</MagneticLink>
           <Link className="button button--ghost" data-glass="true" to="/research">Inspect research</Link>
@@ -223,6 +235,7 @@ export function HomePage() {
         <Hero />
         <ChromeStage />
       </div>
+      <ContinuitySection />
       <LifecycleSection />
       <ArchitectureSection />
       <EvidenceSection />

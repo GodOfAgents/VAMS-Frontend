@@ -1086,7 +1086,7 @@
 
 .journey-row {
   display: grid;
-  grid-template-columns: 44px minmax(0, 0.85fr) minmax(0, 1.15fr) 22px;
+  grid-template-columns: 44px minmax(0, 0.8fr) minmax(0, 1fr) auto;
   align-items: center;
   gap: 20px;
   padding: 26px 12px 26px 4px;
@@ -1094,7 +1094,7 @@
   transition: background-color var(--dur-base) var(--ease-standard);
 }
 
-.journey-row span {
+.journey-row__index {
   color: var(--text-3);
   font-family: var(--font-mono);
   font-size: 0.75rem;
@@ -1110,9 +1110,21 @@
   font-size: var(--fs-sm);
 }
 
-.journey-row__arrow {
+.journey-row__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   color: var(--text-3);
-  transition: transform var(--dur-slow) var(--ease-quint), color var(--dur-base) var(--ease-standard);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color var(--dur-base) var(--ease-standard);
+}
+
+.journey-row__cta svg {
+  transition: transform var(--dur-slow) var(--ease-quint);
 }
 
 .journey-row:hover,
@@ -1125,10 +1137,145 @@
   transform: translateX(4px);
 }
 
-.journey-row:hover .journey-row__arrow,
-.journey-row:focus-visible .journey-row__arrow {
-  color: var(--accent);
-  transform: translate(3px, -3px);
+.journey-row:hover .journey-row__cta,
+.journey-row:focus-visible .journey-row__cta {
+  color: var(--text);
+}
+
+.journey-row:hover .journey-row__cta svg,
+.journey-row:focus-visible .journey-row__cta svg {
+  transform: translateX(4px);
+}
+
+/* ---------- Architecture diagrams: continuity (home) and authority (protocol) ---------- */
+/* A ruled flow: one rail, a marker per stage, labels beneath. No tiles. */
+.continuity-section {
+  border-top: 1px solid var(--line-soft);
+}
+
+.architecture-diagram {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  align-items: start;
+  gap: clamp(32px, 6vw, 104px);
+  margin: 0;
+}
+
+.architecture-diagram figcaption .eyebrow {
+  margin: 0;
+}
+
+.architecture-diagram figcaption h3 {
+  max-width: 14ch;
+  margin: 18px 0 16px;
+  font-size: var(--fs-h2);
+  font-weight: 540;
+  line-height: 1.05;
+  letter-spacing: var(--tracking-heading);
+}
+
+.architecture-diagram figcaption > p:last-child {
+  max-width: 42ch;
+  margin: 0;
+  color: var(--text-2);
+  font-size: var(--fs-lede);
+  line-height: 1.55;
+}
+
+.architecture-diagram__canvas {
+  position: relative;
+  padding-top: 10px;
+}
+
+.architecture-diagram__flow {
+  --architecture-stages: 4;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--architecture-stages), minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.architecture-diagram__flow::before {
+  position: absolute;
+  top: 5px;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--line-strong), var(--text) 50%, var(--line-strong));
+  content: "";
+}
+
+.architecture-diagram__node {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  padding: 30px 20px 0 0;
+}
+
+.architecture-diagram__node::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 11px;
+  height: 11px;
+  border: 1px solid var(--text);
+  border-radius: 50%;
+  background: var(--bg);
+  content: "";
+}
+
+.architecture-diagram__node--state::before,
+.architecture-diagram__node--brain::before {
+  background: var(--text);
+  box-shadow: 0 0 0 4px var(--bg), 0 0 0 5px var(--line-strong);
+}
+
+.architecture-diagram__step {
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: var(--tracking-label);
+}
+
+.architecture-diagram__node strong {
+  font-size: 1.1875rem;
+  font-weight: 560;
+  letter-spacing: var(--tracking-title);
+  line-height: 1.2;
+}
+
+.architecture-diagram__node small {
+  color: var(--text-2);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.architecture-diagram--authority .architecture-diagram__flow {
+  --architecture-stages: 3;
+}
+
+.architecture-diagram__legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 28px 0 0;
+  color: var(--text-3);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+}
+
+.architecture-diagram__legend::before {
+  width: 22px;
+  height: 1px;
+  background: currentColor;
+  content: "";
 }
 
 /* Destination */
@@ -1325,18 +1472,24 @@
   }
 
   .journey-row {
-    grid-template-columns: 32px minmax(0, 1fr) 20px;
+    grid-template-columns: 32px minmax(0, 1fr);
     grid-template-areas:
-      "index title arrow"
-      ". detail detail";
+      "index title"
+      ". detail"
+      ". cta";
     gap: 6px 14px;
     padding: 22px 4px;
   }
 
-  .journey-row span { grid-area: index; }
+  .journey-row__index { grid-area: index; }
   .journey-row h3 { grid-area: title; }
   .journey-row p { grid-area: detail; }
-  .journey-row__arrow { grid-area: arrow; }
+  .journey-row__cta { grid-area: cta; margin-top: 6px; }
+
+  .architecture-diagram {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
 
   .destination__actions {
     width: 100%;
@@ -1347,6 +1500,34 @@
   .destination__actions .magnetic-link,
   .destination__actions .button {
     width: 100%;
+  }
+}
+
+@media (max-width: 639px) {
+  /* Stages stack with a vertical rail. */
+  .architecture-diagram__flow {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+    padding-left: 28px;
+  }
+
+  .architecture-diagram__flow::before {
+    top: 0;
+    right: auto;
+    bottom: 0;
+    left: 5px;
+    width: 1px;
+    height: auto;
+    background: linear-gradient(180deg, var(--line-strong), var(--text) 50%, var(--line-strong));
+  }
+
+  .architecture-diagram__node {
+    padding: 0 0 0 0;
+  }
+
+  .architecture-diagram__node::before {
+    top: 4px;
+    left: -28px;
   }
 }
 

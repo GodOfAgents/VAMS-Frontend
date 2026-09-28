@@ -38,4 +38,4 @@ Explorer responses are schema validated and must use the common `/v1/explorer` e
 
 ## Architecture
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for routing, data provenance, capability intersection, responsive container roles, motion ownership, Three.js isolation, and release boundaries.
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for routing, data provenance, capability intersection, responsive container roles, motion ownership, the visual system, and release boundaries.

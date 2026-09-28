@@ -4,7 +4,7 @@
 
 VAMS uses one React/Vite source tree with three logically separate surfaces:
 
-- `MarketingLayout`: editorial protocol routes and one lazy neural topography visual
+- `MarketingLayout`: editorial protocol routes with the shader-drawn homepage scenes (light slats, liquid-chrome wordmark)
 - `ConsoleLayout`: read-only protocol entity inspection
 - `StatusLayout`: operational observations and release-readiness evidence
 
@@ -70,43 +70,35 @@ AND Gateway support
 
 The explorer is always read-only.
 
-## Neural renderer boundary
+## Visual system boundary
 
-`three` is imported only by `components/marketing/NeuralField.jsx`. The component is dynamically imported, rendered only on the marketing home page, skipped when reduced motion is requested, and emitted as `three-marketing` in production builds.
+The interface is built from one token layer (`styles/tokens.css`) and three shared layers: `base.css`, `components.css`, and a stylesheet per surface (`marketing.css`, `topics.css`, `research.css`, `console.css`, `status.css`). The palette is monochrome (ink, graphite, silver, warm paper) with green, amber, and red reserved for status. The document is light; a subtree opts into the dark stage with `data-theme="dark"` (the home hero and the closing panel), a light island inside it uses `data-theme="light"`, and the marketing header adopts the theme of whatever section sits beneath it. There is no theme switch.
 
-This renderer is a decorative, interactive neural background. It is not a protocol map, entity graph, or representation of protocol topology.
+Content is presented on hairlines, rules, and whitespace rather than card grids. Decorative scenes (`LightSlats`, `LiquidChrome`, `ArchitectureOrbit`) are small raw-WebGL shaders with CSS fallbacks or inline SVG; they carry no text or data and are hidden from assistive technology. They are not protocol maps or entity graphs. `motion/liquidGlass.jsx` adds per-element refraction maps to `data-glass` surfaces, and `motion/GooCursor.jsx` supplies the fine-pointer cursor.
 
-Console and evidence routes do not import or execute Three.js at runtime.
-
-The marketing hero renders a deterministic shader-displaced neural topography:
-
-- `wide`, `desktop`, `tablet`, and `mobile` profiles independently cap geometry and device pixel ratio;
-- widths below `360px`, reduced-motion clients, low-power devices, and WebGL failures use the complete CSS topology;
-- pointer proof waves are available only to fine pointers;
-- rendering pauses when the hero or browser document is not visible;
-- geometry, materials, renderer state, observers, and the canvas are disposed on teardown.
+No WebGL renderer ships with any surface. The console and status surfaces do not mount homepage visuals.
 
 ## Responsive composition boundary
 
 Four layout measures prevent viewport-width and scrollbar coupling:
 
-- hero: `1440px`
-- editorial: `1280px`
+- header capsule: `1320px`
+- editorial: `1200px`
 - console/data: `1180px`
-- reading measure: `60–72ch`
+- reading measure: `44–62ch`
 
-Page gutters, section rhythm, and heading gaps change at the `360px`, `480px`, `768px`, `1200px`, and `1600px` boundaries. Component grids also use container queries where panel width is more important than viewport width.
+Gutters, section rhythm, and type sizes are fluid (`clamp()`), with layout changes at the `360px`, `480px`, `640px`, `768px`, `960px`, and `1100px` boundaries. Panels use container queries where their own width matters more than the viewport.
 
 ## Motion ownership
 
-`ResponsiveMotionProvider` is the single source of motion capability, entrance distance, pointer type, and hero quality.
+`ResponsiveMotionProvider` is the single source of motion capability, entrance distance, and pointer type. Motion for React (`motion/react`, `domMax` features) is the only animation library.
 
-- CSS/WAAPI owns focus, hover, borders, table rows, and CHC bar entrances.
-- Motion React owns route presence, in-view reveals, stagger groups, smoke text, magnetic links, drawers, and data-state transitions.
-- GSAP ScrollTrigger is dynamically imported only for the desktop marketing lifecycle.
-- Three.js owns only the marketing-home neural topography.
+- CSS owns focus, hover, press feedback, borders, and the decorative drawing states.
+- Motion owns route presence, in-view reveals, stagger groups, heading word reveals, magnetic links, the navigation indicators (shared layout), research-ledger filtering (layout animations), and data-state transitions.
+- Scroll-linked choreography uses `useScroll`/`useTransform` (`motion/scroll.jsx`): the pinned homepage chrome stage, the tilt-in evidence window, the expanding destination panel (which also drives the closing slats), and the lifecycle rail. Route changes use the View Transitions API (`motion/viewTransitions.js`) so page titles morph between routes.
+- Active lifecycle steps and architecture boundaries are tracked with one `IntersectionObserver` each.
 
-A component is never transformed by Motion React and GSAP simultaneously. Reduced motion removes blur, transform distance, parallax, scrubbing, magnetic response, and looping cues while retaining the complete static composition.
+Reduced motion (system setting or the in-page pause control) removes pinning, scrubbing, transforms, and looping cues while retaining the complete static composition.
 
 ## Release boundary
 

@@ -15,8 +15,6 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           manualChunks(id) {
-            if (id.includes('node_modules/three')) return 'three-marketing'
-            if (id.includes('node_modules/gsap')) return 'gsap-marketing'
             if (id.includes('node_modules/motion')) return 'motion-ui'
             if (id.includes('node_modules/react')) return 'react-vendor'
           },

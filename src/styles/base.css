@@ -1,0 +1,269 @@
+/* Base layer: document defaults shared by every surface. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-padding-top: var(--nav-offset);
+  scrollbar-color: var(--surface-3) transparent;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  font-weight: 400;
+  line-height: var(--lh-body);
+  letter-spacing: var(--tracking-body);
+  font-optical-sizing: auto;
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--dur-slow) var(--ease-standard), color var(--dur-slow) var(--ease-standard);
+}
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-weight: var(--weight-heading);
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--fs-h1);
+  font-weight: var(--weight-display);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tracking-display);
+}
+
+h2 {
+  font-size: var(--fs-h2);
+  font-weight: var(--weight-display);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tracking-heading);
+}
+
+h3,
+h4 {
+  font-size: var(--fs-h3);
+  line-height: var(--lh-title);
+  letter-spacing: var(--tracking-title);
+}
+
+p,
+ol,
+ul,
+dl,
+dd,
+figure {
+  margin: 0;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+input,
+select,
+textarea {
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+code,
+pre,
+kbd {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+
+::selection {
+  background: var(--accent-glow);
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: var(--radius-pill);
+  background: var(--surface-3) padding-box;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: var(--z-skip);
+  top: 12px;
+  left: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--text);
+  color: var(--bg);
+  font-size: var(--fs-xs);
+  font-weight: 550;
+  transform: translateY(-160%);
+  transition: transform var(--dur-base) var(--ease-out);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.container {
+  width: var(--page);
+  margin-inline: auto;
+}
+
+.route-motion,
+.data-boundary-presence {
+  min-width: 0;
+}
+
+/* Reduced motion: keep the complete static composition, remove movement. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+:root[data-motion="reduced"] *,
+:root[data-motion="reduced"] *::before,
+:root[data-motion="reduced"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* ---------- Route transitions (View Transitions API) ---------- */
+.vt-title {
+  view-transition-name: page-title;
+}
+
+.site-header {
+  view-transition-name: site-header;
+}
+
+.route-motion[data-route-enter="fade"] {
+  animation: route-enter 380ms var(--ease-out) backwards;
+}
+
+@keyframes route-enter {
+  from { opacity: 0; }
+}
+
+::view-transition-old(root) {
+  animation: vt-page-out 300ms var(--ease-standard) both;
+}
+
+::view-transition-new(root) {
+  animation: vt-page-in 620ms var(--ease-out) 60ms both;
+}
+
+::view-transition-group(page-title) {
+  animation-duration: 720ms;
+  animation-timing-function: var(--ease-out);
+}
+
+::view-transition-old(page-title),
+::view-transition-new(page-title) {
+  animation-duration: 720ms;
+  animation-timing-function: var(--ease-out);
+}
+
+::view-transition-group(site-header) {
+  animation-duration: 420ms;
+}
+
+@keyframes vt-page-out {
+  to { opacity: 0; filter: blur(6px); transform: scale(0.985); }
+}
+
+@keyframes vt-page-in {
+  from { opacity: 0; filter: blur(8px); transform: translateY(24px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+
+  .route-motion[data-route-enter="fade"] {
+    animation: none;
+  }
+}

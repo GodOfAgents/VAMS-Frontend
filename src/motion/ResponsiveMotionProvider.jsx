@@ -1,11 +1,9 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { LazyMotion, MotionConfig, domAnimation } from 'motion/react'
-import { describeHeroQuality } from './heroQuality.js'
+import { LazyMotion, MotionConfig, domMax } from 'motion/react'
 
 const ResponsiveMotionContext = createContext({
   coarsePointer: true,
   distance: 0,
-  heroQuality: describeHeroQuality({ coarsePointer: true, reducedMotion: true, viewportWidth: 320 }),
   isDesktop: false,
   isMobile: true,
   reducedMotion: true,
@@ -40,8 +38,7 @@ function describeMotionEnvironment(environment) {
   const isDesktop = viewportWidth >= 1200
   return {
     coarsePointer,
-    distance: reducedMotion ? 0 : isDesktop ? 24 : isMobile ? 8 : 12,
-    heroQuality: describeHeroQuality(environment),
+    distance: reducedMotion ? 0 : isDesktop ? 20 : isMobile ? 10 : 14,
     isDesktop,
     isMobile,
     reducedMotion,
@@ -81,10 +78,8 @@ export function ResponsiveMotionProvider({ children }) {
     }
   }, [])
 
-  const value = useMemo(() => ({
-    ...describeMotionEnvironment(environment),
-    systemReducedMotion: environment.reducedMotion,
-  }), [environment])
+  // Motion follows the device's reduced-motion setting only.
+  const value = useMemo(() => describeMotionEnvironment(environment), [environment])
 
   useEffect(() => {
     document.documentElement.dataset.motion = value.reducedMotion ? 'reduced' : 'full'
@@ -94,7 +89,7 @@ export function ResponsiveMotionProvider({ children }) {
   return (
     <ResponsiveMotionContext.Provider value={value}>
       <MotionConfig reducedMotion="user">
-        <LazyMotion features={domAnimation} strict>
+        <LazyMotion features={domMax} strict>
           {children}
         </LazyMotion>
       </MotionConfig>
@@ -104,8 +99,4 @@ export function ResponsiveMotionProvider({ children }) {
 
 export function useResponsiveMotion() {
   return useContext(ResponsiveMotionContext)
-}
-
-export function useHeroQuality() {
-  return useResponsiveMotion().heroQuality
 }

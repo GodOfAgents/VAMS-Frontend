@@ -1,100 +1,125 @@
 import { expect, test } from '@playwright/test'
 
-test('one adaptive neural scene carries the homepage topology from hero through CTA', async ({ page }) => {
+async function scrollToSelector(page, selector, offset = 0) {
+  await page.locator(selector).first().evaluate((element, extra) => {
+    window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY + extra, behavior: 'instant' })
+  }, offset)
+}
+
+test('the hero light slats render and pause off screen without leaking into other routes', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
-  await page.goto('/', { waitUntil: 'commit' })
+  await page.goto('/', { waitUntil: 'networkidle' })
+  const slats = page.locator('.hero .slats')
+  await expect(slats).toHaveAttribute('data-slats', /^(ready|fallback)$/)
+  await expect(slats).toHaveAttribute('aria-hidden', 'true')
+
+  await page.goto('/protocol', { waitUntil: 'networkidle' })
+  await expect(page.locator('.slats')).toHaveCount(0)
+  await expect(page.locator('canvas')).toHaveCount(0)
+})
+
+test('the horizon panel starts narrow with the wordmark in view and grows to full bleed', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('/', { waitUntil: 'networkidle' })
   await page.evaluate(() => document.fonts.ready)
 
-  const scene = page.locator('[data-marketing-scene]')
-  await expect(scene).toHaveAttribute('data-hero-renderer', /^(ready|fallback)$/)
-  if (await scene.getAttribute('data-hero-renderer') === 'fallback') {
-    await expect(page.locator('.neural-field--static')).toBeVisible()
-    await expect(page.locator('[data-marketing-three] canvas')).toHaveCount(0)
-    return
-  }
-
-  await expect(scene).toHaveAttribute('data-scene-active', 'intro')
-  await expect(page.locator('.scene-progress')).toBeVisible()
-  await expect(page.locator('.scene-progress__ticks i')).toHaveCount(6)
-  await expect(page.locator('[data-marketing-three] canvas')).toHaveCount(1)
-  await page.locator('.hero').hover({ position: { x: 960, y: 280 } })
-  await expect(scene).toHaveCSS('--scene-pointer-opacity', '1')
-  await expect(scene).not.toHaveCSS('--scene-pointer-nx', '0')
-
-  for (const chapter of ['lifecycle', 'architecture', 'evidence', 'journey', 'cta']) {
-    await page.locator(`[data-scene-chapter="${chapter}"]`).evaluate((element) => {
-      window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY, behavior: 'instant' })
-    })
-    await expect(scene).toHaveAttribute('data-scene-active', chapter)
-    await page.mouse.move(1060, 420)
-    await expect(scene).toHaveCSS('--scene-pointer-opacity', '1')
-    expect(await page.locator('[data-marketing-three] canvas').count()).toBeLessThanOrEqual(1)
-    await expect.poll(() => scene.evaluate((element) => element.getBoundingClientRect().top)).toBe(0)
-  }
+  const wordmark = page.locator('.stage__wordmark')
+  await expect(wordmark).toBeVisible()
+  const initial = await page.locator('.stage__card').evaluate((element) => getComputedStyle(element).clipPath)
+  expect(initial).toMatch(/inset\(0% (1[0-4]|[5-9])\.?\d*%/)
+  const wordTop = await wordmark.evaluate((element) => element.getBoundingClientRect().top)
+  expect(wordTop).toBeLessThan(900)
 })
 
-test('homepage remains dark across every scene chapter', async ({ page }) => {
+test('the horizon stage pins, opens to full bleed, and reveals every protocol readout', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
-  await page.goto('/', { waitUntil: 'commit' })
+  await page.goto('/', { waitUntil: 'networkidle' })
+  await page.evaluate(() => document.fonts.ready)
 
-  const scene = page.locator('[data-marketing-scene]')
-  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
-  await expect(scene).toHaveCSS('position', 'fixed')
-  await expect(scene).toHaveAttribute('data-scene-active', 'intro')
-  await expect.poll(() => scene.evaluate((element) => element.style.getPropertyValue('--scene-theme-mix'))).toBe('1.000')
+  const stage = page.locator('.stage')
+  await expect(stage).toHaveClass(/stage--animated/)
+  await expect(page.locator('.stage__sticky')).toHaveCSS('position', 'sticky')
 
-  await page.locator('[data-scene-chapter="lifecycle"]').evaluate((element) => {
-    window.scrollTo({ top: element.getBoundingClientRect().top + window.scrollY, behavior: 'instant' })
+  const readouts = page.locator('.protocol-strip > div')
+  await expect(readouts).toHaveCount(4)
+  await expect(readouts.first()).toHaveCSS('opacity', '0')
+
+  await stage.evaluate((element) => {
+    const end = element.getBoundingClientRect().top + window.scrollY + element.offsetHeight - window.innerHeight
+    window.scrollTo({ top: end - 40, behavior: 'instant' })
   })
-  await expect(scene).toHaveAttribute('data-scene-active', 'lifecycle')
-  await expect.poll(() => scene.evaluate((element) => element.style.getPropertyValue('--scene-theme-mix'))).toBe('1.000')
+
+  for (let index = 0; index < 4; index += 1) {
+    await expect.poll(() => readouts.nth(index).evaluate((element) => Number(getComputedStyle(element).opacity))).toBeGreaterThan(0.98)
+  }
+  await expect.poll(() => page.locator('.stage__card').evaluate((element) => getComputedStyle(element).clipPath)).toMatch(/inset\(0(px|%)?\)|inset\(0% 0% 0% 0% round 0px\)|none/)
 })
 
-test('compact mobile uses the low-quality neural scene and keeps the first CTA in view', async ({ page }) => {
-  await page.setViewportSize({ width: 320, height: 568 })
-  await page.goto('/', { waitUntil: 'commit' })
+test('the architecture orbit lights the boundary whose description is in view', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('/', { waitUntil: 'networkidle' })
 
-  const scene = page.locator('[data-marketing-scene]')
-  await expect(scene).toHaveAttribute('data-hero-renderer', /^(ready|fallback)$/)
-  await expect(page.locator('[data-marketing-scene]')).toHaveAttribute('data-hero-quality', 'low')
-  if (await scene.getAttribute('data-hero-renderer') === 'ready') {
-    await expect(page.locator('[data-marketing-three] canvas')).toHaveCount(1)
-  } else {
-    await expect(page.locator('[data-marketing-three] canvas')).toHaveCount(0)
-    await expect(page.locator('.neural-field--static')).toBeVisible()
-  }
-  await expect(page.locator('.scene-progress')).toBeHidden()
+  const orbit = page.locator('.orbit')
+  await scrollToSelector(page, '[data-orbit-index="2"]', -380)
+  await expect(orbit).toHaveAttribute('data-active', '2')
+  await expect(page.locator('.orbit__ring[data-ring="blocks"]')).toHaveClass(/is-active/)
+  await expect(page.locator('[data-orbit-index="2"]')).toHaveClass(/is-active/)
+
+  await page.locator('[data-orbit-index="5"]').hover()
+  await expect(orbit).toHaveAttribute('data-active', '5')
+  await expect(page.locator('.orbit__ring[data-ring="portable"]')).toHaveClass(/is-active/)
+})
+
+test('the lifecycle timeline marks the step crossing the viewport centre', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('/', { waitUntil: 'networkidle' })
+
+  await scrollToSelector(page, '[data-lifecycle-step="04"]', -420)
+  await expect.poll(async () => page.locator('.lifecycle-step.is-active').count()).toBe(1)
+  await expect(page.locator('.lifecycle-timeline')).not.toHaveAttribute('data-active-step', '-1')
+})
+
+test('reduced motion renders the complete static homepage without pinning', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await page.goto('/', { waitUntil: 'networkidle' })
+
+  await expect(page.locator('.stage')).not.toHaveClass(/stage--animated/)
+  await expect(page.locator('.stage__sticky')).not.toHaveCSS('position', 'sticky')
+  const opacities = await page.locator('.protocol-strip > div').evaluateAll((items) => items.map((item) => getComputedStyle(item).opacity))
+  expect(opacities).toEqual(['1', '1', '1', '1'])
+  await expect(page.locator('.lifecycle-step.is-active')).toHaveCount(0)
+})
+
+test('compact mobile keeps the first call to action in the initial viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 568 })
+  await page.goto('/', { waitUntil: 'networkidle' })
+  await page.evaluate(() => document.fonts.ready)
+
   const ctaBounds = await page.getByRole('link', { name: /Open read-only console/ }).boundingBox()
   expect(ctaBounds).not.toBeNull()
   expect(ctaBounds.y + ctaBounds.height).toBeLessThanOrEqual(568)
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0)
 })
 
-test('leaving home disposes the neural scene and topic routes exclude Three.js', async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 })
-  const requestedAssets = []
-  page.on('request', (request) => requestedAssets.push(request.url()))
+test('the mobile menu opens and closes with Escape', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/protocol', { waitUntil: 'networkidle' })
 
-  await page.goto('/protocol', { waitUntil: 'commit' })
-  await page.evaluate(() => document.fonts.ready)
-  await expect(page.locator('[data-marketing-scene]')).toHaveCount(0)
-  expect(requestedAssets.some((url) => url.includes('three-marketing'))).toBe(false)
-  await page.goto('/', { waitUntil: 'commit' })
-  await expect(page.locator('[data-marketing-three] canvas')).toHaveCount(1)
-  await page.goto('/protocol', { waitUntil: 'commit' })
-  await expect(page.locator('[data-marketing-scene]')).toHaveCount(0)
-  await expect(page.locator('[data-marketing-three] canvas')).toHaveCount(0)
+  const menu = page.getByRole('button', { name: 'Open navigation' })
+  await menu.click()
+  const navigation = page.locator('#primary-navigation')
+  await expect(navigation).toHaveClass(/is-open/)
+  await expect(navigation.getByRole('link', { name: 'Research' })).toBeVisible()
+  await page.keyboard.press('Escape')
+  await expect(navigation).not.toHaveClass(/is-open/)
+  await expect(page.getByRole('button', { name: 'Open navigation' })).toBeFocused()
 })
 
-test('public surfaces share fluid hover treatment without mounting a protocol scene', async ({ page }) => {
+test('topic routes do not mount the homepage stage', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
-  await page.goto('/protocol', { waitUntil: 'commit' })
-  const principle = page.locator('.topic-principles article').first()
-  await expect(principle).toBeVisible()
-  await expect(principle).toHaveCSS('transition-property', /transform/)
-  await expect(page.locator('[data-marketing-scene]')).toHaveCount(0)
-
-  await page.goto('/build', { waitUntil: 'commit' })
-  const migrationStep = page.locator('.migration-path li').first()
-  await expect(migrationStep).toHaveCSS('transition-property', /padding-left/)
+  await page.goto('/protocol', { waitUntil: 'networkidle' })
+  await expect(page.locator('.stage')).toHaveCount(0)
+  await expect(page.locator('.topic-principles .principle-row')).toHaveCount(4)
+  await expect(page.locator('canvas')).toHaveCount(0)
 })

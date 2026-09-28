@@ -31,7 +31,7 @@ export function SystemPage() {
         {(data, envelope) => (
           <section className="panel system-response">
             <p className="eyebrow">Gateway metadata</p><h2>{data.gateway_status}</h2>
-            <pre>{JSON.stringify(data, null, 2)}</pre>
+            <pre tabIndex={0}>{JSON.stringify(data, null, 2)}</pre>
             <Provenance envelope={envelope} />
           </section>
         )}

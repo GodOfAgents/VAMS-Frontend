@@ -10,6 +10,7 @@ import { StatusBadge } from '../components/ui/StatusBadge.jsx'
 import { useProtocol } from '../features/protocol/ProtocolProvider.jsx'
 import { useResource } from '../features/protocol/useResource.js'
 import { RouteMotion } from '../motion/primitives.jsx'
+import '../styles/console.css'
 
 const groups = [
   ['Mission control', [['/overview', 'Overview', LayoutDashboard]]],
@@ -27,7 +28,7 @@ function ConsoleNavigation({ onNavigate }) {
           <p>{label}</p>
           {items.map(([to, name, Icon]) => (
             <NavLink key={to} to={to} onClick={onNavigate}>
-              <Icon aria-hidden="true" size={17} /> {name}
+              <Icon aria-hidden="true" size={16} /> {name}
             </NavLink>
           ))}
         </div>
@@ -42,7 +43,7 @@ export function ConsoleLayout() {
   const meta = useResource('meta')
 
   return (
-    <div className="console-shell">
+    <div className={`console-shell${mobileOpen ? ' is-drawer-open' : ''}`}>
       <a className="skip-link" href="#console-content">Skip to console content</a>
       <SimulationBanner />
       <aside className={`console-sidebar ${mobileOpen ? 'is-open' : ''}`}>
@@ -56,10 +57,11 @@ export function ConsoleLayout() {
         </div>
         <ConsoleNavigation onNavigate={() => setMobileOpen(false)} />
         <div className="console-sidebar__footer">
-          <ShieldCheck aria-hidden="true" size={17} />
+          <ShieldCheck aria-hidden="true" size={16} />
           <span>No wallet or economic controls</span>
         </div>
       </aside>
+      <div className="console-scrim" aria-hidden="true" onClick={() => setMobileOpen(false)} />
 
       <div className="console-main">
         <header className="console-header">

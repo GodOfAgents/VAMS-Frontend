@@ -1,139 +1,189 @@
-:root {
-  color-scheme: dark;
-  --canvas: #050505;
-  --canvas-elevated: #0c0c0c;
-  --canvas-muted: #121212;
-  --ink: #f2f2ed;
-  --ink-muted: #a5a59f;
-  --line: rgba(255, 255, 255, 0.14);
-  --line-strong: rgba(255, 255, 255, 0.38);
-  --positive: #79c69b;
-  --warning: #e2b86e;
-  --critical: #ee8a8a;
-  --info: #9fc7de;
-  --shadow: 0 28px 90px rgba(0, 0, 0, 0.42);
-  --glass-subtle-bg: rgba(255, 255, 255, 0.035);
-  --glass-panel-bg: rgba(28, 28, 28, 0.8);
-  --glass-strong-bg: rgba(5, 5, 5, 0.82);
-  --glass-border: rgba(255, 255, 255, 0.18);
-  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  --glass-shadow-subtle: 0 12px 40px rgba(0, 0, 0, 0.18);
-  --glass-shadow-panel: 0 26px 78px rgba(0, 0, 0, 0.32);
-  --glass-blur-subtle: 2px;
-  --glass-blur-panel: 8px;
-  --glass-blur-strong: 18px;
-  --glass-hover-bg: rgba(255, 255, 255, 0.68);
-  --glass-hover-border: rgba(9, 9, 9, 0.25);
-  --glass-hover-shadow: 0 18px 48px rgba(9, 9, 9, 0.12);
-  /* Research-lab type system: one display face, one reading face, one instrument face. */
-  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
-  --font-body: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-ui: var(--font-body);
-  --font-label: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
-  --font-sans: var(--font-body);
-  --font-serif: var(--font-display);
-  --font-mono: var(--font-label);
-  /* Shared type roles: use these roles even when page-specific sizing varies. */
-  --type-display: clamp(2.9rem, 6.7vw, 6.25rem);
-  --type-page: clamp(2.6rem, 5.4vw, 5rem);
-  --type-section: clamp(2.1rem, 4.1vw, 3.9rem);
-  --type-card: clamp(1.25rem, 2vw, 1.75rem);
-  --type-console-page: clamp(2.1rem, 4vw, 4rem);
-  --leading-display: 0.96;
-  --leading-section: 1.08;
-  --leading-card: 1.16;
-  --leading-body: 1.65;
-  --radius-sm: 2px;
-  --radius-md: 8px;
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-5: 1.5rem;
-  --space-6: 2rem;
-  --space-7: 3rem;
-  --space-8: 5rem;
-  --page-gutter: 24px;
-  --section-space: 88px;
-  --heading-gap: 44px;
-  --container-hero: 1440px;
-  --container-editorial: 1280px;
-  --container-data: 1180px;
-  --reading-measure: 62ch;
-  --page: min(var(--container-editorial), calc(100% - (var(--page-gutter) * 2)));
+/*
+ * VAMS design tokens.
+ *
+ * Monochrome: ink, graphite, silver and warm paper. The document is light; a
+ * subtree opts into the dark stage with data-theme="dark" (the home hero), and a
+ * light island inside a dark one uses data-theme="light". Green, amber and red are
+ * reserved for evidence and runtime status.
+ */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  --bg: #f7f6f3;
+  --bg-sunken: #efede8;
+  --surface-1: #ffffff;
+  --surface-2: #f0efea;
+  --surface-3: #e7e5df;
+  --overlay: rgba(247, 246, 243, 0.8);
+
+  --text: #141413;
+  --text-2: #5c5b56;
+  --text-3: #66645e;
+  --text-inverse: #f7f6f3;
+
+  --line-soft: rgba(20, 20, 19, 0.06);
+  --line: rgba(20, 20, 19, 0.1);
+  --line-strong: rgba(20, 20, 19, 0.18);
+
+  --accent: #141413;
+  --accent-strong: #000000;
+  --accent-soft: rgba(20, 20, 19, 0.06);
+  --accent-glow: rgba(20, 20, 19, 0.12);
+
+  --positive: #1d6b43;
+  --warning: #875300;
+  --critical: #9d2d2d;
+  --info: #3a3935;
+
+  --button-bg: #141413;
+  --button-text: #f7f6f3;
+  --button-hover: #2a2a28;
+  --button-shadow:
+    rgba(20, 20, 19, 0.08) 0 0 0 1px,
+    rgba(255, 255, 255, 0.14) 0 1px 0 0 inset,
+    0 6px 16px -8px rgba(20, 20, 19, 0.45);
+  --button-shadow-hover:
+    rgba(20, 20, 19, 0.08) 0 0 0 1px,
+    rgba(255, 255, 255, 0.16) 0 1px 0 0 inset,
+    0 10px 22px -10px rgba(20, 20, 19, 0.5);
+
+  --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  --shadow-sm: 0 1px 2px rgba(20, 20, 19, 0.05);
+  --shadow-md: 0 14px 34px -18px rgba(20, 20, 19, 0.22);
+  --shadow-lg: 0 34px 80px -34px rgba(20, 20, 19, 0.3);
+  --card-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 42%);
 }
 
 [data-theme="dark"] {
   color-scheme: dark;
-  --canvas: #050505;
-  --canvas-elevated: #0c0c0c;
-  --canvas-muted: #121212;
-  --ink: #f2f2ed;
-  --ink-muted: #a5a59f;
-  --line: rgba(255, 255, 255, 0.14);
-  --line-strong: rgba(255, 255, 255, 0.38);
-  --positive: #79c69b;
-  --warning: #e2b86e;
-  --critical: #ee8a8a;
-  --info: #9fc7de;
-  --shadow: 0 28px 90px rgba(0, 0, 0, 0.42);
-  --glass-subtle-bg: rgba(255, 255, 255, 0.035);
-  --glass-panel-bg: rgba(28, 28, 28, 0.8);
-  --glass-strong-bg: rgba(5, 5, 5, 0.82);
-  --glass-border: rgba(255, 255, 255, 0.18);
-  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  --glass-shadow-subtle: 0 12px 40px rgba(0, 0, 0, 0.18);
-  --glass-shadow-panel: 0 26px 78px rgba(0, 0, 0, 0.32);
-  --glass-hover-bg: rgba(255, 255, 255, 0.055);
-  --glass-hover-border: rgba(255, 255, 255, 0.42);
-  --glass-hover-shadow: 0 18px 54px rgba(0, 0, 0, 0.3), 0 0 30px rgba(255, 255, 255, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+
+  --bg: #08090a;
+  --bg-sunken: #050506;
+  --surface-1: #0e0f11;
+  --surface-2: #141518;
+  --surface-3: #1c1d21;
+  --overlay: rgba(8, 9, 10, 0.72);
+
+  --text: #f7f8f8;
+  --text-2: #8a8f98;
+  --text-3: #767b84;
+  --text-inverse: #08090a;
+
+  --line-soft: rgba(255, 255, 255, 0.05);
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.13);
+
+  --accent: #ededec;
+  --accent-strong: #ffffff;
+  --accent-soft: rgba(255, 255, 255, 0.08);
+  --accent-glow: rgba(255, 255, 255, 0.18);
+
+  --positive: #6ad19a;
+  --warning: #e9be72;
+  --critical: #f28b8b;
+  --info: #d4d4d2;
+
+  --button-bg: #e6e6e6;
+  --button-text: #0b0c0e;
+  --button-hover: #f4f4f5;
+  --button-shadow:
+    rgba(0, 0, 0, 0.5) 0 0 0 2px,
+    rgba(255, 255, 255, 0.16) 0 0 14px 0,
+    rgba(0, 0, 0, 0.2) 0 -1px 0.4px 0 inset,
+    #fff 0 1px 0.4px 0 inset;
+  --button-shadow-hover:
+    rgba(0, 0, 0, 0.5) 0 0 0 2px,
+    rgba(255, 255, 255, 0.28) 0 0 20px 0,
+    rgba(0, 0, 0, 0.2) 0 -1px 0.4px 0 inset,
+    #fff 0 1px 0.4px 0 inset;
+
+  --highlight: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 16px 36px -16px rgba(0, 0, 0, 0.8);
+  --shadow-lg: 0 40px 100px -30px rgba(0, 0, 0, 0.9);
+  --card-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0) 42%);
 }
 
-@media (max-width: 359px) {
-  :root {
-    --page-gutter: 16px;
-    --section-space: 56px;
-    --heading-gap: 28px;
-    --type-display: 2.48rem;
-  }
+:root {
+  --font-sans: "Inter", "Inter Variable", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --fs-display: clamp(2.25rem, 1.3rem + 4.5vw, 4.75rem);
+  --fs-h1: clamp(2.25rem, 1.5rem + 3vw, 4rem);
+  --fs-h2: clamp(1.875rem, 1.35rem + 2.2vw, 3rem);
+  --fs-h3: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  --fs-lede: clamp(1.0625rem, 0.98rem + 0.4vw, 1.25rem);
+  --fs-body: 1rem;
+  --fs-sm: 0.9375rem;
+  --fs-xs: 0.8125rem;
+  --fs-label: 0.75rem;
+
+  --lh-display: 1;
+  --lh-heading: 1.05;
+  --lh-title: 1.3;
+  --lh-body: 1.6;
+
+  --tracking-display: -0.028em;
+  --tracking-heading: -0.022em;
+  --tracking-title: -0.012em;
+  --tracking-body: -0.011em;
+  --tracking-label: 0.06em;
+
+  --weight-display: 540;
+  --weight-heading: 560;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-7: 2rem;
+  --space-8: 2.5rem;
+  --space-9: 3rem;
+  --space-10: 4rem;
+  --space-11: 5rem;
+  --space-12: 6rem;
+
+  --gutter: clamp(1rem, 0.55rem + 2.2vw, 3rem);
+  --section-y: clamp(4.5rem, 2.8rem + 6.4vw, 8rem);
+  --heading-gap: clamp(2.25rem, 1.6rem + 2.6vw, 4rem);
+  --container: 1200px;
+  --container-wide: 1320px;
+  --container-data: 1180px;
+  --measure: 62ch;
+  --page: min(var(--container), 100% - (var(--gutter) * 2));
+  --nav-height: 56px;
+  --nav-offset: calc(var(--nav-height) + 32px);
+
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-quint: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-standard: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 400ms;
+  --dur-reveal: 700ms;
+
+  --z-scene: 0;
+  --z-content: 1;
+  --z-nav: 90;
+  --z-banner: 120;
+  --z-skip: 1000;
 }
 
-@media (min-width: 360px) and (max-width: 479px) {
+@media (max-width: 767px) {
   :root {
-    --page-gutter: 20px;
-    --section-space: 72px;
-    --heading-gap: 36px;
-  }
-}
-
-@media (min-width: 480px) and (max-width: 767px) {
-  :root {
-    --page-gutter: 24px;
-    --section-space: 80px;
-    --heading-gap: 40px;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 1199px) {
-  :root {
-    --page-gutter: 32px;
-    --section-space: 104px;
-    --heading-gap: 52px;
-  }
-}
-
-@media (min-width: 1200px) and (max-width: 1599px) {
-  :root {
-    --page-gutter: 48px;
-    --section-space: 120px;
-    --heading-gap: 56px;
-  }
-}
-
-@media (min-width: 1600px) {
-  :root {
-    --page-gutter: 64px;
-    --section-space: 132px;
-    --heading-gap: 64px;
+    --nav-height: 52px;
+    --nav-offset: calc(var(--nav-height) + 24px);
   }
 }

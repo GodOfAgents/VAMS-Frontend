@@ -4,6 +4,26 @@ All notable frontend changes are documented here following Keep a Changelog.
 
 ## Unreleased
 
+### Monochrome light theme and flagship motion
+
+- The site is now one light, monochrome theme (ink, graphite, silver, warm paper); the blue signal accent is gone and green, amber, and red remain only for status. The theme toggle, the pre-paint theme script, and the animation pause toggle were removed; motion follows the device's reduced-motion setting.
+- The home hero is a dark island: the silver light slats stay, and the floating navigation capsule adopts the theme of whatever section sits beneath it.
+- The planet horizon was replaced by a liquid-chrome stage: a light panel opens beneath the hero and the VAMS wordmark pours together from mercury droplets as it grows (WebGL2, with a CSS chrome fallback), with the protocol readouts following.
+- The closing panel now mirrors the hero's slats, growing as it opens, and lights up around the primary action.
+- Page titles morph between routes through the View Transitions API, with a plain fade on history navigation and no animation under reduced motion.
+- Added liquid-glass refraction and a pointer sheen to the navigation capsule and ghost buttons (Chromium; other browsers keep blurred glass), and a gooey cursor that snaps onto controls on fine pointers.
+- Merged `main`: the refreshed copy, per-route metadata (`routeMetadata.js`), the research page contents bar, and the continuity and authority diagrams are carried into the new components; the diagrams render as ruled flows rather than tiles.
+
+### Frontend redesign
+
+- Replaced the visual layer across the marketing, console, and status surfaces with a new token-driven design system: Inter and Geist Mono typography, a near-black primary theme with a warm-paper light theme, hairline structure, and a single azure signal accent.
+- Rebuilt the homepage around scroll-driven storytelling: a centred hero, a pinned horizon stage that opens to full bleed and reveals the protocol readouts, a lifecycle timeline that tracks the step in view, an orbital architecture diagram synchronised with a ruled component list, a tilt-in evidence window, editorial entry-point rows, and an expanding destination panel.
+- Recomposed topic pages, the research hub, the status register, and the console as editorial rows, timelines, and open sections; card and cell grids were removed.
+- Added a floating navigation capsule with shared-layout hover and active indicators, a compact mobile sheet, and a scrim-backed console drawer.
+- Removed the Three.js neural field and GSAP timeline, and their dependencies; Motion for React is now the only animation library.
+- Added a pre-paint theme script, focusable scrollable regions, and colour-contrast fixes; browser tests and screenshot baselines were updated for the new layouts.
+- All displayed copy, links, labels, and data are unchanged.
+
 ### Added
 
 - Distinct Protocol, Network, Build, Operate, and Research public-page compositions with clearer builder and operator pathways.

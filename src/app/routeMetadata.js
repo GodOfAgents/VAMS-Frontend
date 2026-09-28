@@ -13,8 +13,8 @@ const routeMetadata = {
     description: 'Explore VAMS architecture, authority boundaries, composition, execution, evidence, recovery, and source-backed Gateway examples. Pre-testnet; deployment pending.',
   },
   '/network': {
-    title: 'Independent infrastructure network | VAMS',
-    description: 'See how VAMS composes independent compute, storage, data availability, verification, and network providers.',
+    title: 'Network architecture & provider guide | VAMS',
+    description: 'Understand VAMS nodes, Service Blocks, provider selection, data availability evidence, and source-backed read-only Gateway routes. Pre-testnet; deployment pending.',
   },
   '/build': {
     title: 'Build portable services | VAMS',

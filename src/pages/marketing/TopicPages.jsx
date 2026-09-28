@@ -5,19 +5,9 @@ import { appEnvironment } from '../../config/environment.js'
 import { Reveal } from '../../motion/primitives.jsx'
 export { ResearchPage } from './ResearchPage.jsx'
 export { ProtocolPage } from './ProtocolPage.jsx'
+export { NetworkPage } from './NetworkPage.jsx'
 
 const content = {
-  network: {
-    eyebrow: 'Network',
-    title: 'Change providers. Keep the service.',
-    description: 'Compute, storage, models, and verification become replaceable—without hiding their claims.',
-    pillars: [
-      ['Nodes', 'Availability, region, resources, skills, trust posture, and freshness.'],
-      ['Service Blocks', 'Composable capabilities with integration and mock/live boundaries.'],
-      ['Data availability', 'Provider implementation and operational readiness remain distinct.'],
-      ['Network state', 'No response is silently replaced with synthetic activity.'],
-    ],
-  },
   build: {
     eyebrow: 'Build',
     title: 'Build services that can move.',
@@ -61,11 +51,6 @@ const migrationSteps = [
 ]
 
 function TopicComposition({ topic, page }) {
-  if (topic === 'network') return (
-    <div className="topic-principles">
-      {page.pillars.map(([title, detail], index) => <Reveal as="article" key={title}><span className="topic-number">0{index + 1}</span><h2>{title}</h2><p>{detail}</p></Reveal>)}
-    </div>
-  )
   if (topic === 'build') return (
     <section className="migration-path" aria-label="Migration stages">
       <div className="topic-section-intro"><p className="eyebrow">An incremental path</p><h2>Keep the service.<br />Expand its freedom.</h2><p>Start with one capability. Preserve identity, permissions, state, and recovery.</p><Link to="/blueprints" className="text-link">Inspect blueprints <ArrowRight size={16} aria-hidden="true" /></Link></div>
@@ -114,6 +99,5 @@ function TopicPage({ topic }) {
   )
 }
 
-export const NetworkPage = () => <TopicPage topic="network" />
 export const BuildPage = () => <TopicPage topic="build" />
 export const OperatePage = () => <TopicPage topic="operate" />

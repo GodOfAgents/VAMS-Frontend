@@ -1220,18 +1220,6 @@
   .site-nav__link.active {
     background: color-mix(in srgb, var(--text) 7%, transparent);
   }
-
-  .site-nav__tools {
-    display: flex;
-    gap: 6px;
-    margin-top: 6px;
-    padding: 10px 6px 2px;
-    border-top: 1px solid var(--line);
-  }
-
-  .site-nav__tools .icon-button {
-    border-color: var(--line);
-  }
 }
 
 @media (max-width: 419px) {

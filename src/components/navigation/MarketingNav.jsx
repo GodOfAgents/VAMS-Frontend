@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import * as m from 'motion/react-m'
 import { Brand } from './Brand.jsx'
-import { MotionToggle } from '../ui/MotionToggle.jsx'
 import { appEnvironment } from '../../config/environment.js'
 import { useResponsiveMotion } from '../../motion/ResponsiveMotionProvider.jsx'
 
@@ -17,7 +16,6 @@ const links = [
 ]
 
 const INLINE_NAVIGATION_MIN_WIDTH = 1100
-const COMPACT_BAR_MAX_WIDTH = 640
 const indicatorSpring = { type: 'spring', stiffness: 520, damping: 42, mass: 0.7 }
 const SURFACE_COLORS = { dark: '#08090a', light: '#f7f6f3' }
 
@@ -104,8 +102,6 @@ export function MarketingNav() {
   const inline = motion.viewportWidth >= INLINE_NAVIGATION_MIN_WIDTH
   const open = menuOpen && !inline
   const expandedNavigation = inline || open
-  // On narrow screens the preference toggles move into the menu sheet so the bar never overflows.
-  const compactBar = motion.viewportWidth < COMPACT_BAR_MAX_WIDTH
 
   useEffect(() => {
     if (!open) return undefined
@@ -186,14 +182,8 @@ export function MarketingNav() {
             {inline && hovered === 'docs' && <m.span className="site-nav__hover" layoutId="site-nav-hover" transition={indicatorSpring} aria-hidden="true" />}
             <m.span className="site-nav__label" variants={itemVariants}>Read docs <ExternalLink aria-hidden="true" size={13} /></m.span>
           </a>
-          {compactBar && (
-            <m.div className="site-nav__tools" variants={itemVariants}>
-              <MotionToggle />
-            </m.div>
-          )}
         </m.nav>
         <div className="site-header__actions">
-          {!compactBar && <MotionToggle />}
           <Link className="button button--small site-header__cta" to="/overview">Open console</Link>
           <button
             aria-controls="primary-navigation"

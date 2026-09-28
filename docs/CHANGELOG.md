@@ -6,7 +6,7 @@ All notable frontend changes are documented here following Keep a Changelog.
 
 ### Monochrome light theme and flagship motion
 
-- The site is now one light, monochrome theme (ink, graphite, silver, warm paper); the blue signal accent is gone and green, amber, and red remain only for status. The theme toggle and pre-paint theme script were removed.
+- The site is now one light, monochrome theme (ink, graphite, silver, warm paper); the blue signal accent is gone and green, amber, and red remain only for status. The theme toggle, the pre-paint theme script, and the animation pause toggle were removed; motion follows the device's reduced-motion setting.
 - The home hero is a dark island: the silver light slats stay, and the floating navigation capsule adopts the theme of whatever section sits beneath it.
 - The planet horizon was replaced by a liquid-chrome stage: a light panel opens beneath the hero and the VAMS wordmark pours together from mercury droplets as it grows (WebGL2, with a CSS chrome fallback), with the protocol readouts following.
 - The closing panel now mirrors the hero's slats, growing as it opens, and lights up around the primary action.

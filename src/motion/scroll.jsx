@@ -33,8 +33,10 @@ export function TiltIn({ as = 'div', children, className = '', ...props }) {
 }
 
 /**
- * Inset rounded card that opens to full-bleed as it scrolls into view. Pass a
- * motion value as `progressValue` to receive the eased 0–1 opening progress.
+ * Inset rounded card that opens to full-bleed as it scrolls into view. The card
+ * starts clearly smaller than the viewport so the growth reads at a glance, and
+ * exposes `--panel-open` (0–1) to its children. Pass a motion value as
+ * `progressValue` to receive the same eased progress.
  */
 export function ExpandingPanel({ as = 'section', children, className = '', offset = ['start end', 'start 20%'], progressValue, ...props }) {
   const ref = useRef(null)
@@ -42,15 +44,15 @@ export function ExpandingPanel({ as = 'section', children, className = '', offse
   const { scrollYProgress } = useScroll({ target: ref, offset })
   const progress = useSpring(scrollYProgress, settle)
   useMotionValueEvent(progress, 'change', (value) => progressValue?.set(value))
-  const inset = motion.isMobile ? 3 : 4.5
-  const clipPath = useTransform(progress, [0, 1], [`inset(0% ${inset}% 0% ${inset}% round 28px)`, 'inset(0% 0% 0% 0% round 0px)'])
+  const inset = motion.isMobile ? 7 : 13
+  const clipPath = useTransform(progress, [0, 1], [`inset(6% ${inset}% 0% ${inset}% round 44px)`, 'inset(0% 0% 0% 0% round 0px)'])
   const Component = m[as] || m.section
 
   return (
     <Component
       className={className}
       ref={ref}
-      style={motion.reducedMotion ? undefined : { clipPath }}
+      style={motion.reducedMotion ? undefined : { clipPath, '--panel-open': progress }}
       {...props}
     >
       {children}

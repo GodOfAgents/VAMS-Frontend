@@ -1152,6 +1152,9 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* The copy settles into place as the panel opens. */
+  transform: scale(calc(0.9 + 0.1 * var(--panel-open, 1))) translateY(calc((1 - var(--panel-open, 1)) * 28px));
+  transform-origin: 50% 60%;
 }
 
 .destination__title {

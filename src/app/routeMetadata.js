@@ -9,8 +9,8 @@ const routeMetadata = {
     description: 'Explore VAMS: portable identity, governed execution, independent evidence, recoverable state, and accountable infrastructure.',
   },
   '/protocol': {
-    title: 'Protocol architecture | VAMS',
-    description: 'Understand the VAMS protocol architecture for portable authority, durable execution, verifiable evidence, and service recovery.',
+    title: 'Protocol architecture & developer guide | VAMS',
+    description: 'Explore VAMS architecture, authority boundaries, composition, execution, evidence, recovery, and source-backed Gateway examples. Pre-testnet; deployment pending.',
   },
   '/network': {
     title: 'Independent infrastructure network | VAMS',

@@ -1,23 +1,12 @@
 import { ArrowRight, CheckCircle2, CircleDashed, ExternalLink } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { PageHeader } from '../../components/ui/PageHeader.jsx'
-import { ArchitectureDiagram } from '../../components/marketing/ArchitectureDiagram.jsx'
 import { appEnvironment } from '../../config/environment.js'
 import { Reveal } from '../../motion/primitives.jsx'
 export { ResearchPage } from './ResearchPage.jsx'
+export { ProtocolPage } from './ProtocolPage.jsx'
 
 const content = {
-  protocol: {
-    eyebrow: 'Protocol',
-    title: 'Infrastructure you can inspect.',
-    description: 'Portable identity, durable state, governed execution, and visible evidence—with clear boundaries between them.',
-    pillars: [
-      ['Immortal Execution', 'Recover service state and authority beyond the life of one host.'],
-      ['Heart and Brain', 'Reasoning proposes. Consent and policy decide.'],
-      ['Evidence', 'Keep claims, receipts, and responsibility connected.'],
-      ['Two-chain design', 'Polygon handles execution; Cardano targets governance. Deployment is pending.'],
-    ],
-  },
   network: {
     eyebrow: 'Network',
     title: 'Change providers. Keep the service.',
@@ -72,7 +61,7 @@ const migrationSteps = [
 ]
 
 function TopicComposition({ topic, page }) {
-  if (topic === 'protocol' || topic === 'network') return (
+  if (topic === 'network') return (
     <div className="topic-principles">
       {page.pillars.map(([title, detail], index) => <Reveal as="article" key={title}><span className="topic-number">0{index + 1}</span><h2>{title}</h2><p>{detail}</p></Reveal>)}
     </div>
@@ -104,7 +93,6 @@ function TopicPage({ topic }) {
       <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description} smoke>
         <span className="topic-lifecycle">Pre-testnet · {topic === 'research' ? 'Research agenda' : 'Architecture & requirements'}</span>
       </PageHeader>
-      {topic === 'protocol' && <Reveal as="section" className="topic-experience"><ArchitectureDiagram variant="authority" /></Reveal>}
       <TopicComposition topic={topic} page={page} />
       <Reveal as="section" className="topic-callout">
         <div>
@@ -126,7 +114,6 @@ function TopicPage({ topic }) {
   )
 }
 
-export const ProtocolPage = () => <TopicPage topic="protocol" />
 export const NetworkPage = () => <TopicPage topic="network" />
 export const BuildPage = () => <TopicPage topic="build" />
 export const OperatePage = () => <TopicPage topic="operate" />

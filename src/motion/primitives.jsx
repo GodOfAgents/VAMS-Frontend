@@ -157,7 +157,7 @@ function SmokeLine({ isActive, mode, motion, onFinalWordReveal, phrase, phraseIn
   )
 }
 
-export function SmokeText({ as = 'h1', className = '', mode = 'letters', onRevealComplete, phrases, triggerOnView = false }) {
+export function SmokeText({ as = 'h1', className = '', id, mode = 'letters', onRevealComplete, phrases, triggerOnView = false }) {
   const motion = useResponsiveMotion()
   const revealCompletedRef = useRef(false)
   const containerRef = useRef(null)
@@ -191,7 +191,7 @@ export function SmokeText({ as = 'h1', className = '', mode = 'letters', onRevea
 
   if (motion.reducedMotion) {
     return (
-      <Tag ref={containerRef} className={`smoke-text ${className}`} aria-label={phrases.join(' ')} data-smoke-mode={mode}>
+      <Tag ref={containerRef} id={id} className={`smoke-text ${className}`} aria-label={phrases.join(' ')} data-smoke-mode={mode}>
         {lines.map(({ phrase, wordOffset: lineWordOffset }) => (
           <span className="smoke-text__line" aria-hidden="true" key={phrase}>
             {phrase.split(' ').map((word, wordIndex) => (
@@ -204,7 +204,7 @@ export function SmokeText({ as = 'h1', className = '', mode = 'letters', onRevea
   }
 
   return (
-    <Tag ref={containerRef} className={`smoke-text ${className}`} aria-label={phrases.join(' ')} data-smoke-mode={mode}>
+    <Tag ref={containerRef} id={id} className={`smoke-text ${className}`} aria-label={phrases.join(' ')} data-smoke-mode={mode}>
       {lines.map(({ phrase, phraseIndex, wordOffset: lineWordOffset }) => (
         <SmokeLine
           mode={mode}

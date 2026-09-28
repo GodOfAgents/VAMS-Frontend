@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-test('one adaptive neural scene carries the homepage topology from hero through CTA', async ({ page }) => {
+test('one adaptive neural scene carries the homepage topology from hero through CTA', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('/', { waitUntil: 'commit' })
   await page.evaluate(() => document.fonts.ready)
@@ -20,6 +20,7 @@ test('one adaptive neural scene carries the homepage topology from hero through 
   await page.locator('.hero').hover({ position: { x: 960, y: 280 } })
   await expect(scene).toHaveCSS('--scene-pointer-opacity', '1')
   await expect(scene).not.toHaveCSS('--scene-pointer-nx', '0')
+  await page.screenshot({ path: testInfo.outputPath('desktop-neural-hover.png'), animations: 'disabled' })
 
   for (const chapter of ['lifecycle', 'architecture', 'evidence', 'journey', 'cta']) {
     await page.locator(`[data-scene-chapter="${chapter}"]`).evaluate((element) => {
@@ -70,6 +71,24 @@ test('compact mobile uses the low-quality neural scene and keeps the first CTA i
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0)
 })
 
+test('touch excites the mobile neural field and releases after a short afterglow', async ({ browser }, testInfo) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 3 })
+  try {
+    const page = await context.newPage()
+    await page.goto('/', { waitUntil: 'domcontentloaded' })
+    const scene = page.locator('[data-marketing-scene]')
+    await expect(scene).toHaveAttribute('data-hero-renderer', /^(ready|fallback)$/)
+    test.skip(await scene.getAttribute('data-hero-renderer') === 'fallback', 'WebGL unavailable in this browser')
+
+    await page.touchscreen.tap(300, 610)
+    await expect(scene).toHaveCSS('--scene-pointer-opacity', '1')
+    await page.screenshot({ path: testInfo.outputPath('mobile-neural-touch.png'), animations: 'disabled' })
+    await expect.poll(() => scene.evaluate((element) => element.style.getPropertyValue('--scene-pointer-opacity')), { timeout: 3000 }).toBe('0')
+  } finally {
+    await context.close()
+  }
+})
+
 test('leaving home disposes the neural scene and topic routes exclude Three.js', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
   const requestedAssets = []
@@ -89,12 +108,12 @@ test('leaving home disposes the neural scene and topic routes exclude Three.js',
 test('public surfaces share fluid hover treatment without mounting a protocol scene', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 })
   await page.goto('/protocol', { waitUntil: 'commit' })
-  const principle = page.locator('.topic-principles article').first()
-  await expect(principle).toBeVisible()
-  await expect(principle).toHaveCSS('transition-property', /transform/)
+  const component = page.locator('.protocol-glass-card').first()
+  await expect(component).toBeVisible()
+  await expect(component).toHaveCSS('transition-property', /transform/)
   await expect(page.locator('[data-marketing-scene]')).toHaveCount(0)
 
   await page.goto('/build', { waitUntil: 'commit' })
   const migrationStep = page.locator('.migration-path li').first()
-  await expect(migrationStep).toHaveCSS('transition-property', /padding-left/)
+  await expect(migrationStep).toHaveCSS('transition-property', /transform/)
 })

@@ -6,6 +6,7 @@ import {
   getViewportHeroTier,
   HERO_QUALITY_ORDER,
 } from '../../motion/heroQuality.js'
+import { createTerrainPointerProjector } from '../../motion/neuralPointer.js'
 
 const qualityProfiles = {
   low: {
@@ -125,7 +126,6 @@ const terrainVertexShader = `
       * smoothstep(uPointerRadius * 1.35, 0.0, pointerDistance) * uPointerStrength * 0.14;
     float pointerEcho = sin(pointerDistance * 2.8 - uTime * 0.72)
       * smoothstep(uPointerRadius * 1.7, 0.0, pointerDistance) * uPointerStrength * 0.07;
-    float pointerField = smoothstep(uPointerRadius * 1.15, 0.0, pointerDistance) * uPointerStrength;
     float proofPath = uv.x * 0.76 + (1.0 - uv.y) * 0.24;
     float proofDistance = proofPath - uProofProgress;
     float proofWave = exp(-pow(proofDistance * 18.0, 2.0))
@@ -142,10 +142,11 @@ const terrainVertexShader = `
     vProof = proofWave;
     vShade = aShade;
     vVisible = step(aDensity, uPointDensity);
-    vPointer = pointerField;
+    vPointer = clamp(pointerLift / 2.35, 0.0, 1.0);
     vUv = uv;
     gl_Position = projectionMatrix * viewPosition;
-    gl_PointSize = max(1.0, uPointScale * uPixelRatio * (14.0 / max(3.5, -viewPosition.z)) * vVisible);
+    gl_PointSize = max(1.0, uPointScale * uPixelRatio * (14.0 / max(3.5, -viewPosition.z))
+      * (1.0 + vPointer * 0.85) * vVisible);
   }
 `
 
@@ -172,7 +173,9 @@ const pointFragmentShader = `
     float elevationLight = clamp(0.72 + vElevation * 0.12, 0.42, 1.0);
     float elevatedNode = smoothstep(-0.12, 0.82, vElevation);
     float shimmer = 0.72 + 0.28 * sin(uTime * 5.2 + vUv.x * 14.0 + vUv.y * 9.0);
-    float bioluminescence = clamp(elevatedNode * shimmer + vProof * 0.72, 0.0, 1.0);
+    // Light is emitted by the nodes that were lifted, not by a cursor sprite.
+    float bioluminescence = clamp(elevatedNode * shimmer + vProof * 0.72
+      + vPointer * (0.78 + shimmer * 0.34), 0.0, 1.0);
     float shade = clamp(vShade * elevationLight + vProof * 0.34 + bioluminescence * 0.32, 0.18, 1.0);
     vec3 lightPoint = vec3(0.88) * shade;
     vec3 darkPoint = vec3(0.08 + (1.0 - shade) * 0.18);
@@ -193,11 +196,12 @@ const lineFragmentShader = `
   varying float vElevation;
   varying float vProof;
   varying float vShade;
+  varying float vPointer;
 
   void main() {
     float topography = smoothstep(-0.12, 0.82, vElevation);
     float fog = 1.0 - smoothstep(0.2, 1.0, vDepth);
-    float signal = clamp(topography * 0.62 + vProof * 0.72, 0.0, 1.0);
+    float signal = clamp(topography * 0.62 + vProof * 0.72 + vPointer * 0.58, 0.0, 1.0);
     vec3 quietLine = mix(vec3(0.08, 0.12, 0.16), vec3(0.42), uThemeMix);
     vec3 activeLine = vec3(0.06, 0.5, 0.72);
     vec3 lineColor = mix(quietLine, activeLine, signal * 0.78 + vShade * 0.08);
@@ -355,6 +359,7 @@ export default function NeuralField({
 
     const frameBudget = createFrameBudgetController({ thresholdMs: profile.budgetMs })
     const pointerTarget = new THREE.Vector2(0, 0)
+    const projectPointer = createTerrainPointerProjector(camera, terrain)
     const minimumFrameInterval = quality.targetFps ? 1000 / quality.targetFps : 0
     let degradeRequested = false
     let lastAnimationAt = null
@@ -466,6 +471,10 @@ export default function NeuralField({
         clearPointer()
         return
       }
+      if (!projectPointer(event.clientX, event.clientY, bounds, pointerTarget)) {
+        clearPointer()
+        return
+      }
       uniforms.uPointerRadius.value = event.pointerType === 'touch'
         ? profile.pointerRadius * 1.9
         : profile.pointerRadius
@@ -476,10 +485,6 @@ export default function NeuralField({
       sceneElement?.style.setProperty('--scene-pointer-nx', normalizedX.toFixed(3))
       sceneElement?.style.setProperty('--scene-pointer-ny', normalizedY.toFixed(3))
       sceneElement?.style.setProperty('--scene-pointer-opacity', '1')
-      pointerTarget.set(
-        ((event.clientX - bounds.left) / bounds.width - 0.5) * profile.width * 0.72,
-        (0.48 - (event.clientY - bounds.top) / bounds.height) * profile.height * 0.68,
-      )
       // A finger covers more of the field than a cursor. Increase the lift so
       // the response remains legible on a small, high-density display.
       targetStrength = event.pointerType === 'touch' ? 1.28 : 1
@@ -511,13 +516,12 @@ export default function NeuralField({
       if (touchResetTimer !== null) window.clearTimeout(touchResetTimer)
       // Let a tap remain visible briefly after the finger leaves the glass.
       touchResetTimer = window.setTimeout(() => {
-        targetStrength = 0
-        uniforms.uPointerRadius.value = profile.pointerRadius
-        touchResetTimer = null
+        clearPointer()
       }, 720)
     }
 
     const handlePointerOut = (event) => {
+      if (event.pointerType === 'touch') return
       if (!event.relatedTarget) clearPointer()
     }
 

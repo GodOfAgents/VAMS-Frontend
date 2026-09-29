@@ -56,7 +56,7 @@
 .network-mechanics h3 { margin: 28px 0 16px; font-size: clamp(1.5rem, 2.3vw, 2.15rem); }
 .network-mechanics p { margin: 0; color: var(--network-muted); font-size: .92rem; }
 .network-evidence-tiers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 24px 0 0; }
-.network-evidence-tiers > div { padding: 20px; border: 1px solid var(--network-line); background: rgba(255,255,255,.035); }
+.network-evidence-tiers > div { padding: 20px; border: 1px solid var(--glass-border); background: var(--glass-panel-bg); box-shadow: var(--glass-highlight), var(--glass-shadow-subtle); -webkit-backdrop-filter: blur(var(--glass-blur-panel)) saturate(105%); backdrop-filter: blur(var(--glass-blur-panel)) saturate(105%); }
 .network-evidence-tiers dt { font: .7rem/1.5 var(--font-mono); letter-spacing: .05em; text-transform: uppercase; }
 .network-evidence-tiers dd { margin: 10px 0 0; color: var(--network-muted); font-size: .86rem; line-height: var(--leading-body); }
 .network-steps { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--network-line); }
@@ -93,6 +93,7 @@
 .network-faq summary span { flex: 0 0 auto; font: 1.25rem var(--font-mono); transition: transform 180ms ease; }
 .network-faq details[open] summary span { transform: rotate(45deg); }
 .network-faq details > p { max-width: 65ch; margin: 0; padding: 0 32px 24px 0; color: var(--network-muted); font-size: .92rem; }
+.network-mechanics article, .network-steps li, .network-faq details { background: var(--glass-panel-bg); }
 .network-resources { padding: clamp(22px, 3vw, 36px); }
 .network-resources h3 { margin: 12px 0 25px; font-size: clamp(1.65rem, 2.5vw, 2.35rem); }
 .network-resources ul { list-style: none; padding: 0; margin: 0 0 24px; }

@@ -1,6 +1,6 @@
 import { ExternalLink, Github, Menu, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import { Link, NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import * as m from 'motion/react-m'
 import { Brand } from '../components/navigation/Brand.jsx'
 import { SimulationBanner } from '../components/disclosures/SimulationBanner.jsx'
@@ -9,6 +9,7 @@ import { NoiseOverlay } from '../components/ui/NoiseOverlay.jsx'
 import { appEnvironment } from '../config/environment.js'
 import { useResponsiveMotion } from '../motion/ResponsiveMotionProvider.jsx'
 import { Reveal, RouteMotion } from '../motion/primitives.jsx'
+import { canMorphRoutes, useMarketingViewTransitions } from '../motion/viewTransitions.js'
 
 const links = [
   ['/protocol', 'Protocol'],
@@ -26,6 +27,8 @@ export function MarketingLayout() {
   const menuButton = useRef(null)
   const header = useRef(null)
   const motion = useResponsiveMotion()
+  const navigate = useNavigate()
+  useMarketingViewTransitions(navigate, canMorphRoutes(motion))
   const expandedNavigation = motion.viewportWidth > 1050 || open
 
   useEffect(() => {

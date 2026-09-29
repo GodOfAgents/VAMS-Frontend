@@ -2,6 +2,7 @@ import { ArrowUpRight, BookOpen, CheckCircle2, CircleDashed, GitBranch, History,
 import { useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { PageHeader } from '../../components/ui/PageHeader.jsx'
+import { CampaignBridge } from '../../components/marketing/CampaignBridge.jsx'
 import { Reveal, StaggerGroup, StaggerItem } from '../../motion/primitives.jsx'
 import {
   architectureTimeline,
@@ -96,6 +97,8 @@ export function ResearchPage() {
       <PageHeader eyebrow="Research and evidence" title="Questions. Sources. Proof." description="A clear view of what informs VAMS, what exists in code, and what remains unproven." smoke>
         <span className="topic-lifecycle">{researchSnapshotMeta.architecture} · Snapshot {researchSnapshotMeta.snapshotDate}</span>
       </PageHeader>
+
+      <CampaignBridge number="05 / Research" question="What counts as proof?" answer="Keep research, implementation, verification, deployment, and live observation distinct when evaluating continuity claims." terms={['Question', 'Source', 'Evidence']} to="/status" action="Inspect verification status" />
 
       <nav className="research-contents" aria-label="Research page contents">
         <span>On this page</span>

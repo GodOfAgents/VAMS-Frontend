@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { SmokeText } from '../../motion/primitives.jsx'
 import { ArrowRight, Check, Copy, ExternalLink } from 'lucide-react'
+import { CampaignBridge } from '../../components/marketing/CampaignBridge.jsx'
 import './ProtocolPage.css'
 
 const sourceRoot = 'https://github.com/GodOfAgents/VAMS/blob/main/'
@@ -121,6 +122,8 @@ export function ProtocolPage() {
       <div className="protocol-hero__copy"><p className="protocol-kicker">VAMS / protocol / v0.8.0</p><SmokeText mode="words" phrases={['Protocol', 'architecture.']} triggerOnView /><p className="protocol-hero__lead">A developer’s map of authority, composition, execution, evidence, and recovery across independent infrastructure.</p><div className="protocol-hero__actions"><a href="#architecture" className="protocol-primary-link">Explore the architecture <ArrowRight size={17} aria-hidden="true" /></a><Link to="/status" className="protocol-secondary-link">Check readiness</Link></div></div>
       <aside className="protocol-hero__status" aria-label="Protocol lifecycle"><span className="protocol-status-dot" aria-hidden="true" /><div><strong>Hardened pre-testnet candidate</strong><p>No public deployment is claimed. Source implementation, verification, and live observation are distinct evidence states.</p><SourceLink source={sources.status}>Status source · verified {sources.status.verified}</SourceLink></div></aside>
     </header>
+
+    <CampaignBridge number="01 / Authority" question="What stays authorized?" answer="A change of host must preserve the service's current authority and recoverable state before work resumes." terms={['Authority', 'State', 'Recovery']} to="/status" action="Review readiness" />
 
     <nav className="protocol-contents" aria-label="On this page"><span>On this page</span><a href="#architecture">Architecture</a><a href="#components">Components</a><a href="#mechanics">Core mechanics</a><a href="#integration">Integration</a><a href="#examples">API examples</a><a href="#faq">FAQ & resources</a></nav>
 

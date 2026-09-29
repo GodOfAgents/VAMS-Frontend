@@ -65,7 +65,7 @@ test('compact mobile uses the low-quality neural scene and keeps the first CTA i
     await expect(page.locator('.neural-field--static')).toBeVisible()
   }
   await expect(page.locator('.scene-progress')).toBeHidden()
-  const ctaBounds = await page.getByRole('link', { name: /Open read-only console/ }).boundingBox()
+  const ctaBounds = await page.getByRole('link', { name: /Inspect the architecture/ }).boundingBox()
   expect(ctaBounds).not.toBeNull()
   expect(ctaBounds.y + ctaBounds.height).toBeLessThanOrEqual(568)
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(0)
@@ -80,7 +80,7 @@ test('touch excites the mobile neural field and releases after a short afterglow
     await expect(scene).toHaveAttribute('data-hero-renderer', /^(ready|fallback)$/)
     test.skip(await scene.getAttribute('data-hero-renderer') === 'fallback', 'WebGL unavailable in this browser')
 
-    await page.touchscreen.tap(300, 610)
+    await page.touchscreen.tap(300, 650)
     await expect(scene).toHaveCSS('--scene-pointer-opacity', '1')
     await page.screenshot({ path: testInfo.outputPath('mobile-neural-touch.png'), animations: 'disabled' })
     await expect.poll(() => scene.evaluate((element) => element.style.getPropertyValue('--scene-pointer-opacity')), { timeout: 3000 }).toBe('0')

@@ -28,6 +28,8 @@ All notable frontend changes are documented here following Keep a Changelog.
 
 ### Changed
 
+- Art-directed the public homepage around the “Design the Exit” continuity question, a conceptual provider-change model, evidence-first calls to action, and clearer audience routes. The model explicitly labels deployment as pending and makes no live handoff claim.
+- Carried the exit-test campaign through Protocol, Network, Build, Operate, and Research with a shared responsive motif and page-specific questions, requirements, and verification links.
 - Reframed the homepage around one fluid neural-topography experience with scroll chapters, pointer lift, and evidence-aware explanatory content.
 - Added a restrained pointer light and copy-depth parallax layer that follows the same neural field while respecting reduced-motion preferences.
 - Added localized neural-point luminance and echo ripples around the pointer signal without adding geometry or draw calls.

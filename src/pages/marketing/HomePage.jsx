@@ -4,9 +4,11 @@ import { Link } from 'react-router-dom'
 import { LifecycleEnhancer } from '../../components/marketing/LifecycleEnhancer.jsx'
 import { MarketingVisual } from '../../components/marketing/MarketingVisual.jsx'
 import { ArchitectureDiagram } from '../../components/marketing/ArchitectureDiagram.jsx'
+import { ArchitectureFocus } from '../../components/marketing/ArchitectureFocus.jsx'
 import { ClaimStatus } from '../../components/ui/ClaimStatus.jsx'
 import { StatusBadge } from '../../components/ui/StatusBadge.jsx'
 import { MagneticLink, Reveal, SmokeText, StaggerGroup, StaggerItem } from '../../motion/primitives.jsx'
+import { ExpandingChapter } from '../../motion/ExpandingChapter.jsx'
 
 const lifecycle = [
   ['01', 'Express intent', 'Request an outcome with clear authority.'],
@@ -29,6 +31,7 @@ const architecture = [
 
 export function HomePage() {
   const lifecycleRef = useRef(null)
+  const architectureRef = useRef(null)
   const [proofSignal, setProofSignal] = useState(0)
   const triggerProofWave = useCallback(() => setProofSignal(1), [])
 
@@ -44,18 +47,18 @@ export function HomePage() {
               mode="words"
               triggerOnView
               onRevealComplete={triggerProofWave}
-              phrases={['Sovereign', 'infrastructure for', 'enduring services.']}
+              phrases={['Web 4.0 for', 'services that', 'outlive their host.']}
             />
             <Reveal delay={0.5}>
-              <p className="hero__lede">VAMS helps digital services keep their identity, authority, and state—even when infrastructure changes.</p>
+              <p className="hero__lede">VAMS is active research and development for a sovereign, agent-capable Web 4.0, where applications, services, and agents can carry identity, authority, and legitimate work across infrastructure changes.</p>
             </Reveal>
             <Reveal className="hero__actions" delay={0.58}>
-              <MagneticLink className="button" to="/overview">Open read-only console <ArrowRight aria-hidden="true" size={17} /></MagneticLink>
-              <MagneticLink className="button button--ghost" to="/protocol">Understand VAMS</MagneticLink>
+              <MagneticLink className="button" to="/protocol">Inspect the architecture <ArrowRight aria-hidden="true" size={17} /></MagneticLink>
+              <MagneticLink className="button button--ghost" to="/status">Review the evidence</MagneticLink>
             </Reveal>
           </div>
         </div>
-        <div className="hero__scroll"><ArrowDown aria-hidden="true" /> Inspect the stack</div>
+        <div className="hero__scroll"><ArrowDown aria-hidden="true" /> Explore the exit test</div>
       </section>
 
       <StaggerGroup as="section" className="protocol-strip" aria-label="Protocol lifecycle state">
@@ -65,9 +68,9 @@ export function HomePage() {
         <StaggerItem><span>Public surface</span><strong>Read-only</strong></StaggerItem>
       </StaggerGroup>
 
-      <Reveal as="section" className="editorial-section continuity-section">
+      <ExpandingChapter className="editorial-section continuity-section">
         <ArchitectureDiagram variant="continuity" />
-      </Reveal>
+      </ExpandingChapter>
 
       <section className="editorial-section lifecycle-section" data-scene-chapter="lifecycle" ref={lifecycleRef}>
         <Reveal className="section-heading">
@@ -86,7 +89,7 @@ export function HomePage() {
         <LifecycleEnhancer scopeRef={lifecycleRef} />
       </section>
 
-      <section className="editorial-section editorial-section--bordered" data-scene-chapter="architecture">
+      <section className="editorial-section editorial-section--bordered" data-scene-chapter="architecture" ref={architectureRef}>
         <Reveal className="section-heading">
           <p className="eyebrow">Architecture boundaries</p>
           <SmokeText as="h2" className="smoke-text--heading" mode="words" triggerOnView phrases={['Clear roles. Clear boundaries.']} />
@@ -96,13 +99,14 @@ export function HomePage() {
             <StaggerItem as="article" key={title}><Icon aria-hidden="true" /><h3>{title}</h3><p>{detail}</p></StaggerItem>
           ))}
         </StaggerGroup>
+        <ArchitectureFocus scopeRef={architectureRef} />
       </section>
 
       <section className="evidence-feature" data-scene-chapter="evidence">
         <Reveal className="evidence-feature__intro">
-          <p className="eyebrow">Trust and evidence</p>
+          <p className="eyebrow">Trust, evidence, and research</p>
           <SmokeText as="h2" className="smoke-text--heading" mode="words" triggerOnView phrases={['Know what is proven.']} />
-          <p>Built, tested, deployed, and observed are different proof states.</p>
+          <p>Built, tested, deployed, and observed are different proof states. Research includes post-quantum cryptographic migration for long-lived identities and history; this remains work in progress, not a delivered security guarantee.</p>
           <Link className="text-link" to="/status">Inspect verification status <ArrowRight aria-hidden="true" size={15} /></Link>
         </Reveal>
         <StaggerGroup className="claim-stack">
@@ -115,10 +119,10 @@ export function HomePage() {
       <section className="journey-section" data-scene-chapter="journey">
         <Reveal><p className="eyebrow">Choose your entry point</p></Reveal>
         <StaggerGroup className="journey-grid">
-          <StaggerItem><Link to="/build"><span className="journey-grid__index">01</span><h3>Builders</h3><p>Explore blueprints and portable services.</p><span className="journey-grid__cta">Build the future <ArrowRight aria-hidden="true" size={15} /></span></Link></StaggerItem>
-          <StaggerItem><Link to="/operate"><span className="journey-grid__index">02</span><h3>Operators</h3><p>Review requirements and release gates.</p><span className="journey-grid__cta">Operate the future <ArrowRight aria-hidden="true" size={15} /></span></Link></StaggerItem>
-          <StaggerItem><Link to="/protocol"><span className="journey-grid__index">03</span><h3>Organizations</h3><p>Understand continuity and accountability.</p><span className="journey-grid__cta">Shape future Web <ArrowRight aria-hidden="true" size={15} /></span></Link></StaggerItem>
-          <StaggerItem><Link to="/research"><span className="journey-grid__index">04</span><h3>Researchers</h3><p>Trace claims to sources and evidence.</p><span className="journey-grid__cta">Research future Web <ArrowRight aria-hidden="true" size={15} /></span></Link></StaggerItem>
+          <StaggerItem><Link to="/build"><span className="journey-grid__index">01</span><h3>Builders</h3><p>Create reusable capabilities and portable services.</p><span className="journey-grid__cta">Build the future <ArrowRight aria-hidden="true" size={15} /></span></Link></StaggerItem>
+          <StaggerItem><Link to="/operate"><span className="journey-grid__index">02</span><h3>Operators</h3><p>Explore independent infrastructure and accountable service commitments.</p><span className="journey-grid__cta">Operate the future <ArrowRight aria-hidden="true" size={15} /></span></Link></StaggerItem>
+          <StaggerItem><Link to="/protocol"><span className="journey-grid__index">03</span><h3>Organizations</h3><p>Understand continuity, authority, and choice across providers.</p><span className="journey-grid__cta">Shape the future web <ArrowRight aria-hidden="true" size={15} /></span></Link></StaggerItem>
+          <StaggerItem><Link to="/research"><span className="journey-grid__index">04</span><h3>Researchers</h3><p>Trace claims, challenge assumptions, and follow open research.</p><span className="journey-grid__cta">Contribute to future Web4 <ArrowRight aria-hidden="true" size={15} /></span></Link></StaggerItem>
         </StaggerGroup>
       </section>
 

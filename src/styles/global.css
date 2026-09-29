@@ -3087,7 +3087,12 @@ body {
 }
 
 /* Monochrome glass treatment for content tiles. */
-:is(.protocol-strip > div, .lifecycle-list li, .architecture-grid article, .claim-stack .claim-card, .journey-grid a, .topic-principles article, .migration-path li, .operator-requirements article, .release-gates, .research-frontier, .research-card summary, .research-context-grid article, .research-sources-grid article, .architecture-diagram__node, .metric-card, .panel, .route-grid > div, .da-grid article, .data-state, .detail-metrics, .evidence-ladder li, .status-column) {
+:is(.research-questions details, .research-timeline > li, .research-updates > li, .research-gates > div) {
+  background-color: var(--glass-panel-bg);
+  background-image: none;
+}
+
+:is(.protocol-strip > div, .lifecycle-list li, .architecture-grid article, .claim-card, .journey-grid a, .topic-grid article, .topic-principles article, .migration-path li, .operator-requirements article, .release-gates, .research-frontier, .research-card summary, .research-card__grid > div, .research-audit-card, .research-context-grid article, .research-sources-grid article, .architecture-diagram__node, .exit-model__host, .exit-model__core, .environment-panel, .metric-card, .panel, .route-grid > div, .da-grid article, .data-state, .table-scroll, .detail-metrics, .evidence-ladder li, .status-column, .site-footer__grid) {
   border-color: var(--glass-border);
   background-color: var(--glass-panel-bg);
   background-image: none;
@@ -3249,7 +3254,7 @@ body {
 
 @media (max-height: 520px) and (min-width: 561px) and (max-width: 1199px) {
   .hero__content {
-    padding-top: 26px;
+    padding-top: 18px;
     padding-bottom: 64px;
   }
 }

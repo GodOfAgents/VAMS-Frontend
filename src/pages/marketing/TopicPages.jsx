@@ -1,6 +1,7 @@
 import { ArrowRight, CheckCircle2, CircleDashed, ExternalLink } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { PageHeader } from '../../components/ui/PageHeader.jsx'
+import { CampaignBridge } from '../../components/marketing/CampaignBridge.jsx'
 import { appEnvironment } from '../../config/environment.js'
 import { Reveal } from '../../motion/primitives.jsx'
 export { ResearchPage } from './ResearchPage.jsx'
@@ -43,6 +44,11 @@ const content = {
   },
 }
 
+const campaignQuestions = {
+  build: { number: '03 / Build', question: 'What must your service carry?', answer: 'Map identity, permissions, state, and irreversible effects before composing providers.', terms: ['Identity', 'Permissions', 'State'], to: '/protocol', action: 'Inspect the architecture' },
+  operate: { number: '04 / Operate', question: 'What must a provider prove?', answer: 'Declared capabilities and telemetry are only the start; live readiness remains gated by evidence.', terms: ['Capabilities', 'Telemetry', 'Proof'], to: '/status', action: 'Review readiness' },
+}
+
 const migrationSteps = [
   ['Map the service', 'Identify application state, owners, permissions, dependencies, and irreversible external effects.', 'Start with what must survive a provider change.'],
   ['Declare requirements', 'Describe compute, data, trust, geography, cognition, and service requirements in a blueprint.', 'Make capability and authority boundaries inspectable.'],
@@ -78,6 +84,7 @@ function TopicPage({ topic }) {
       <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description} smoke>
         <span className="topic-lifecycle">Pre-testnet · {topic === 'research' ? 'Research agenda' : 'Architecture & requirements'}</span>
       </PageHeader>
+      {campaignQuestions[topic] && <CampaignBridge {...campaignQuestions[topic]} />}
       <TopicComposition topic={topic} page={page} />
       <Reveal as="section" className="topic-callout">
         <div>

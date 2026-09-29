@@ -3,6 +3,7 @@ import { AnimatePresence, useInView, useMotionValue, useSpring } from 'motion/re
 import * as m from 'motion/react-m'
 import { Link, useLocation } from 'react-router-dom'
 import { useResponsiveMotion } from './ResponsiveMotionProvider.jsx'
+import { canMorphRoutes, isMotionRouteTransition } from './viewTransitions.js'
 
 const motionElements = {
   article: m.article,
@@ -159,6 +160,7 @@ function SmokeLine({ isActive, mode, motion, onFinalWordReveal, phrase, phraseIn
 
 export function SmokeText({ as = 'h1', className = '', id, mode = 'letters', onRevealComplete, phrases, triggerOnView = false }) {
   const motion = useResponsiveMotion()
+  const instantForRoute = as === 'h1' && isMotionRouteTransition()
   const revealCompletedRef = useRef(false)
   const containerRef = useRef(null)
   const isInView = useInView(containerRef, {
@@ -189,7 +191,7 @@ export function SmokeText({ as = 'h1', className = '', id, mode = 'letters', onR
     return () => window.clearTimeout(completionTimer)
   }, [handleFinalWordReveal, mode, motion.isMobile, motion.reducedMotion, onRevealComplete, totalWords])
 
-  if (motion.reducedMotion) {
+  if (motion.reducedMotion || instantForRoute) {
     return (
       <Tag ref={containerRef} id={id} className={`smoke-text ${className}`} aria-label={phrases.join(' ')} data-smoke-mode={mode}>
         {lines.map(({ phrase, wordOffset: lineWordOffset }) => (
@@ -284,6 +286,10 @@ export function PresenceRegion({ children, stateKey, className = '' }) {
 export function RouteMotion({ children }) {
   const location = useLocation()
   const motion = useResponsiveMotion()
+
+  if (canMorphRoutes(motion)) {
+    return <div className="route-motion" key={location.pathname}>{children}</div>
+  }
 
   return (
     <AnimatePresence initial={false} mode="sync">

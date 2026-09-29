@@ -5,8 +5,8 @@ const DEFAULT_METADATA = {
 
 const routeMetadata = {
   '/': {
-    title: 'VAMS — Sovereign infrastructure for Web4',
-    description: 'Explore VAMS: portable identity, governed execution, independent evidence, recoverable state, and accountable infrastructure.',
+    title: 'What survives when the host changes? | VAMS',
+    description: 'Explore VAMS architecture for portable identity, authority, and state across infrastructure changes. Pre-testnet; inspect current evidence and deployment status.',
   },
   '/protocol': {
     title: 'Protocol architecture & developer guide | VAMS',

@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Check, Copy, ExternalLink } from 'lucide-react'
 import { SmokeText } from '../../motion/primitives.jsx'
+import { CampaignBridge } from '../../components/marketing/CampaignBridge.jsx'
 import './NetworkPage.css'
 
 const sourceRoot = 'https://github.com/GodOfAgents/VAMS/blob/main/'
@@ -118,6 +119,8 @@ export function NetworkPage() {
       <div><p className="network-kicker">VAMS / network / pre-testnet</p><SmokeText mode="words" phrases={['Independent', 'infrastructure.']} triggerOnView /><p className="network-hero__lead">A map of the resources behind a portable service—and the evidence needed before any provider can be trusted in operation.</p><div className="network-hero__actions"><a className="network-primary-link" href="#architecture">Explore the network <ArrowRight size={17} aria-hidden="true" /></a><Link className="network-secondary-link" to="/nodes">Inspect node records</Link></div></div>
       <aside className="network-hero__status" aria-label="Network lifecycle"><span className="network-status-dot" aria-hidden="true" /><div><strong>Hardened pre-testnet candidate</strong><p>No public deployment is claimed. Source implementation, local checks, and independently observed live operation are different evidence states.</p><SourceLink source={sources.status}>Status report · verified {sources.status.verified}</SourceLink></div></aside>
     </header>
+
+    <CampaignBridge number="02 / Network" question="Can the next host be trusted?" answer="A candidate's declared capabilities need eligibility checks and current evidence before a provider change can be relied on." terms={['Requirements', 'Eligibility', 'Evidence']} to="/status" action="Review release gates" />
 
     <nav className="network-contents" aria-label="On this page"><span>On this page</span>{navigation.map(([id, label]) => <a key={id} href={`#${id}`}>{label}</a>)}</nav>
 

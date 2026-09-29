@@ -1,0 +1,89 @@
+/* Motion borrowed as a behavior, while the site's existing dark tokens and CTAs remain authoritative. */
+.site-shell #main-content h1 {
+  view-transition-name: vams-page-title;
+}
+
+@keyframes vams-page-out {
+  to { opacity: 0; transform: translateY(-4px); }
+}
+
+@keyframes vams-page-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+::view-transition-old(root) {
+  animation: 95ms ease-in both vams-page-out;
+}
+
+::view-transition-new(root) {
+  animation: 195ms 95ms cubic-bezier(.16, 1, .3, 1) both vams-page-in;
+}
+
+::view-transition-old(vams-page-title) {
+  animation-duration: 130ms;
+}
+
+::view-transition-new(vams-page-title) {
+  animation-duration: 230ms;
+}
+
+.motion-chapter {
+  border: 1px solid var(--line);
+  background: rgba(14, 14, 14, .82);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 25px 70px rgba(0, 0, 0, .23);
+}
+
+.architecture-grid article.is-reading {
+  border-color: var(--line-strong);
+  background: rgba(255, 255, 255, .065);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .11);
+}
+
+.architecture-grid article.is-reading svg,
+.architecture-grid article.is-reading h3 {
+  color: var(--ink);
+}
+
+html[data-goo-cursor="active"] :not(input):not(textarea):not(select):not([contenteditable="true"]) {
+  cursor: none !important;
+}
+
+.goo-cursor {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: difference;
+  filter: url(#vams-cursor-goo);
+  transition: opacity 120ms ease;
+}
+
+.goo-cursor[data-state="active"] { opacity: 1; }
+.goo-cursor svg { position: absolute; }
+.goo-cursor__dot,
+.goo-cursor__tail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: #fff;
+}
+.goo-cursor__dot { width: 12px; height: 12px; border-radius: 50%; }
+.goo-cursor__tail { width: 8px; height: 8px; border-radius: 50%; }
+
+@media (max-width: 767px), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .site-shell #main-content h1 { view-transition-name: none; }
+  .motion-chapter { clip-path: none !important; }
+  .goo-cursor { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-old(vams-page-title),
+  ::view-transition-new(vams-page-title) { animation-duration: 1ms !important; }
+}

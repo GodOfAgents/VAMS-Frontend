@@ -5,16 +5,16 @@ const DEFAULT_METADATA = {
 
 const routeMetadata = {
   '/': {
-    title: 'VAMS — Sovereign infrastructure for Web4',
-    description: 'Explore VAMS: portable identity, governed execution, independent evidence, recoverable state, and accountable infrastructure.',
+    title: 'What survives when the host changes? | VAMS',
+    description: 'Explore VAMS architecture for portable identity, authority, and state across infrastructure changes. Pre-testnet; inspect current evidence and deployment status.',
   },
   '/protocol': {
-    title: 'Protocol architecture | VAMS',
-    description: 'Understand the VAMS protocol architecture for portable authority, durable execution, verifiable evidence, and service recovery.',
+    title: 'Protocol architecture & developer guide | VAMS',
+    description: 'Explore VAMS architecture, authority boundaries, composition, execution, evidence, recovery, and source-backed Gateway examples. Pre-testnet; deployment pending.',
   },
   '/network': {
-    title: 'Independent infrastructure network | VAMS',
-    description: 'See how VAMS composes independent compute, storage, data availability, verification, and network providers.',
+    title: 'Network architecture & provider guide | VAMS',
+    description: 'Understand VAMS nodes, Service Blocks, provider selection, data availability evidence, and source-backed read-only Gateway routes. Pre-testnet; deployment pending.',
   },
   '/build': {
     title: 'Build portable services | VAMS',

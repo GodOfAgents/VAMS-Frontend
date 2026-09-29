@@ -75,7 +75,7 @@ test('motion and neural topography activate only for the capable marketing profi
 
   const wordIndexes = await page.locator('.hero [data-smoke-mode="words"] .smoke-text__word--animated')
     .evaluateAll((words) => words.map((word) => Number(word.dataset.smokeIndex)))
-  expect(wordIndexes).toEqual([0, 1, 2, 3, 4])
+  expect(wordIndexes).toEqual([0, 1, 2, 3, 4, 5])
 
   const heroGlass = await page.locator('.protocol-strip > div').first().evaluate((surface) => {
     const style = getComputedStyle(surface)
@@ -127,7 +127,7 @@ test('WebGL failure retains the complete static hero', async ({ page }) => {
   await expect(page.locator('[data-hero-renderer="fallback"]')).toBeVisible()
   await expect(page.locator('.neural-field--static')).toBeVisible()
   await expect(page.locator('[data-marketing-three]')).toHaveCount(0)
-  await expect(page.locator('.hero h1')).toHaveAccessibleName('Sovereign infrastructure for enduring services.')
+  await expect(page.locator('.hero h1')).toHaveAccessibleName('What survives when the host changes?')
 })
 
 test('reduced motion uses the complete static hero without loading cinematic bundles', async ({ page }) => {
@@ -141,7 +141,7 @@ test('reduced motion uses the complete static hero without loading cinematic bun
 
   await expect(page.locator('.hero-visual--static')).toBeVisible()
   await expect(page.locator('[data-marketing-three]')).toHaveCount(0)
-  await expect(page.locator('.hero [data-smoke-mode="words"] .smoke-text__word')).toHaveCount(5)
+  await expect(page.locator('.hero [data-smoke-mode="words"] .smoke-text__word')).toHaveCount(6)
   await expect(page.locator('.smoke-text__word--animated')).toHaveCount(0)
   expect(requestedAssets.some((url) => /three-marketing|gsap-marketing/.test(url))).toBe(false)
 })

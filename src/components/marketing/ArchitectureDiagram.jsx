@@ -1,15 +1,8 @@
 const diagrams = {
   continuity: {
-    eyebrow: 'Continuity model',
-    title: 'The service changes vehicles, not identity.',
-    description: 'Think of infrastructure as a vehicle: authority and durable state travel with the service when execution moves.',
-    nodes: [
-      ['authority', '01', 'Passport', 'Authority · consent'],
-      ['provider-a', '02', 'Current vehicle', 'Provider A · current host'],
-      ['state', '03', 'Service core', 'Identity · progress · recovery'],
-      ['provider-b', '04', 'Next vehicle', 'Provider B · eligible host'],
-    ],
-    legend: 'Verified handoff path',
+    eyebrow: 'Web 4.0 · continuity',
+    title: 'Toward Immortal Execution in a Truly Decentralized Agentic Economy.',
+    description: 'People, organizations, applications, agents, builders, operators, and verifiers coordinate useful work. VAMS researches the portable identity, bounded authority, checkable evidence, and responsibility-linked compensation needed to sustain that cooperation.',
   },
   authority: {
     eyebrow: 'Authority model',
@@ -34,18 +27,31 @@ export function ArchitectureDiagram({ variant = 'continuity' }) {
         <h3>{diagram.title}</h3>
         <p>{diagram.description}</p>
       </figcaption>
-      <div className="architecture-diagram__canvas">
-        <ol className="architecture-diagram__flow" aria-label={`${diagram.title} ${diagram.description}`}>
-          {diagram.nodes.map(([id, step, label, detail]) => (
-            <li className={`architecture-diagram__node architecture-diagram__node--${id}`} key={id}>
-              <span className="architecture-diagram__step">{step}</span>
-              <strong>{label}</strong>
-              <small>{detail}</small>
-            </li>
-          ))}
-        </ol>
-        <p className="architecture-diagram__legend">{diagram.legend}</p>
-      </div>
+      {variant === 'continuity' ? (
+        <div className="architecture-diagram__canvas exit-model" role="img" aria-label="Conceptual architecture: a service carries identity, authority, and state as its execution host changes from provider A to an eligible provider B. Deployment is pending.">
+          <div className="exit-model__heading"><span>Service continuity model</span><span>Deployment pending</span></div>
+          <div className="exit-model__host"><span>01 / Current host</span><strong>Provider A</strong><small>Replaceable execution layer</small></div>
+          <div className="exit-model__core">
+            <span className="exit-model__rail-label">The service carries forward</span>
+            <div className="exit-model__terms"><strong>Identity</strong><strong>Authority</strong><strong>State</strong></div>
+          </div>
+          <div className="exit-model__host exit-model__host--next"><span>02 / Eligible next host</span><strong>Provider B</strong><small>Subject to policy and evidence</small></div>
+          <p className="architecture-diagram__legend">Conceptual path · no live handoff claimed</p>
+        </div>
+      ) : (
+        <div className="architecture-diagram__canvas">
+          <ol className="architecture-diagram__flow" aria-label={`${diagram.title} ${diagram.description}`}>
+            {diagram.nodes.map(([id, step, label, detail]) => (
+              <li className={`architecture-diagram__node architecture-diagram__node--${id}`} key={id}>
+                <span className="architecture-diagram__step">{step}</span>
+                <strong>{label}</strong>
+                <small>{detail}</small>
+              </li>
+            ))}
+          </ol>
+          <p className="architecture-diagram__legend">{diagram.legend}</p>
+        </div>
+      )}
     </figure>
   )
 }

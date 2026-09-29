@@ -1,34 +1,14 @@
 import { ArrowRight, CheckCircle2, CircleDashed, ExternalLink } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { PageHeader } from '../../components/ui/PageHeader.jsx'
-import { ArchitectureDiagram } from '../../components/marketing/ArchitectureDiagram.jsx'
+import { CampaignBridge } from '../../components/marketing/CampaignBridge.jsx'
 import { appEnvironment } from '../../config/environment.js'
 import { Reveal } from '../../motion/primitives.jsx'
 export { ResearchPage } from './ResearchPage.jsx'
+export { ProtocolPage } from './ProtocolPage.jsx'
+export { NetworkPage } from './NetworkPage.jsx'
 
 const content = {
-  protocol: {
-    eyebrow: 'Protocol',
-    title: 'Infrastructure you can inspect.',
-    description: 'Portable identity, durable state, governed execution, and visible evidence—with clear boundaries between them.',
-    pillars: [
-      ['Immortal Execution', 'Recover service state and authority beyond the life of one host.'],
-      ['Heart and Brain', 'Reasoning proposes. Consent and policy decide.'],
-      ['Evidence', 'Keep claims, receipts, and responsibility connected.'],
-      ['Two-chain design', 'Polygon handles execution; Cardano targets governance. Deployment is pending.'],
-    ],
-  },
-  network: {
-    eyebrow: 'Network',
-    title: 'Change providers. Keep the service.',
-    description: 'Compute, storage, models, and verification become replaceable—without hiding their claims.',
-    pillars: [
-      ['Nodes', 'Availability, region, resources, skills, trust posture, and freshness.'],
-      ['Service Blocks', 'Composable capabilities with integration and mock/live boundaries.'],
-      ['Data availability', 'Provider implementation and operational readiness remain distinct.'],
-      ['Network state', 'No response is silently replaced with synthetic activity.'],
-    ],
-  },
   build: {
     eyebrow: 'Build',
     title: 'Build services that can move.',
@@ -64,6 +44,11 @@ const content = {
   },
 }
 
+const campaignQuestions = {
+  build: { number: '03 / Build', question: 'What must your service carry?', answer: 'Map identity, permissions, state, and irreversible effects before composing providers.', terms: ['Identity', 'Permissions', 'State'], to: '/protocol', action: 'Inspect the architecture' },
+  operate: { number: '04 / Operate', question: 'What must a provider prove?', answer: 'Declared capabilities and telemetry are only the start; live readiness remains gated by evidence.', terms: ['Capabilities', 'Telemetry', 'Proof'], to: '/status', action: 'Review readiness' },
+}
+
 const migrationSteps = [
   ['Map the service', 'Identify application state, owners, permissions, dependencies, and irreversible external effects.', 'Start with what must survive a provider change.'],
   ['Declare requirements', 'Describe compute, data, trust, geography, cognition, and service requirements in a blueprint.', 'Make capability and authority boundaries inspectable.'],
@@ -72,11 +57,6 @@ const migrationSteps = [
 ]
 
 function TopicComposition({ topic, page }) {
-  if (topic === 'protocol' || topic === 'network') return (
-    <div className="topic-principles">
-      {page.pillars.map(([title, detail], index) => <Reveal as="article" key={title}><span className="topic-number">0{index + 1}</span><h2>{title}</h2><p>{detail}</p></Reveal>)}
-    </div>
-  )
   if (topic === 'build') return (
     <section className="migration-path" aria-label="Migration stages">
       <div className="topic-section-intro"><p className="eyebrow">An incremental path</p><h2>Keep the service.<br />Expand its freedom.</h2><p>Start with one capability. Preserve identity, permissions, state, and recovery.</p><Link to="/blueprints" className="text-link">Inspect blueprints <ArrowRight size={16} aria-hidden="true" /></Link></div>
@@ -104,7 +84,7 @@ function TopicPage({ topic }) {
       <PageHeader eyebrow={page.eyebrow} title={page.title} description={page.description} smoke>
         <span className="topic-lifecycle">Pre-testnet · {topic === 'research' ? 'Research agenda' : 'Architecture & requirements'}</span>
       </PageHeader>
-      {topic === 'protocol' && <Reveal as="section" className="topic-experience"><ArchitectureDiagram variant="authority" /></Reveal>}
+      {campaignQuestions[topic] && <CampaignBridge {...campaignQuestions[topic]} />}
       <TopicComposition topic={topic} page={page} />
       <Reveal as="section" className="topic-callout">
         <div>
@@ -126,7 +106,5 @@ function TopicPage({ topic }) {
   )
 }
 
-export const ProtocolPage = () => <TopicPage topic="protocol" />
-export const NetworkPage = () => <TopicPage topic="network" />
 export const BuildPage = () => <TopicPage topic="build" />
 export const OperatePage = () => <TopicPage topic="operate" />

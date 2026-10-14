@@ -8,7 +8,7 @@ import { ArchitectureFocus } from '../../components/marketing/ArchitectureFocus.
 import { ClaimStatus } from '../../components/ui/ClaimStatus.jsx'
 import { StatusBadge } from '../../components/ui/StatusBadge.jsx'
 import { MagneticLink, Reveal, SmokeText, StaggerGroup, StaggerItem } from '../../motion/primitives.jsx'
-import { ExpandingChapter } from '../../motion/ExpandingChapter.jsx'
+import { ContinuityChapter } from '../../motion/ContinuityChapter.jsx'
 
 const lifecycle = [
   ['01', 'Express intent', 'Request an outcome with clear authority.'],
@@ -68,9 +68,9 @@ export function HomePage() {
         <StaggerItem><span>Public surface</span><strong>Read-only</strong></StaggerItem>
       </StaggerGroup>
 
-      <ExpandingChapter className="editorial-section continuity-section">
+      <ContinuityChapter className="editorial-section continuity-section">
         <ArchitectureDiagram variant="continuity" />
-      </ExpandingChapter>
+      </ContinuityChapter>
 
       <section className="editorial-section lifecycle-section" data-scene-chapter="lifecycle" ref={lifecycleRef}>
         <Reveal className="section-heading">

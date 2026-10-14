@@ -47,10 +47,12 @@
 .protocol-glass-card:hover { background: rgba(39,39,39,.86); border-color: rgba(255,255,255,.35); transform: translateY(-2px); }
 .protocol-glass-card h3 { margin: 37px 0 11px; font-size: clamp(1.55rem, 2.4vw, 2.45rem); line-height: var(--heading-card-leading); }
 .protocol-glass-card p { max-width: 54ch; margin: 0; color: var(--protocol-muted); font-size: .91rem; }
-.protocol-mechanics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 44px; border-top: 1px solid var(--protocol-line); }
-.protocol-mechanics article { padding: 28px 0 30px; border-bottom: 1px solid var(--protocol-line); }
-.protocol-mechanics h3 { margin: 18px 0 10px; font-size: clamp(1.55rem, 2.6vw, 2.5rem); line-height: var(--heading-card-leading); }
-.protocol-mechanics p { max-width: 54ch; margin: 0; color: var(--protocol-muted); font-size: .95rem; }
+.protocol-mechanics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); overflow: hidden; border: 1px solid var(--glass-border); border-radius: var(--radius-md); background: var(--glass-panel-bg); box-shadow: var(--glass-highlight), var(--glass-shadow-subtle); -webkit-backdrop-filter: blur(var(--glass-blur-panel)) saturate(108%); backdrop-filter: blur(var(--glass-blur-panel)) saturate(108%); }
+.protocol-mechanics article { min-width: 0; padding: clamp(22px, 2.6vw, 34px); }
+.protocol-mechanics article:nth-child(odd) { border-right: 1px solid var(--protocol-line); }
+.protocol-mechanics article:nth-child(-n + 2) { border-bottom: 1px solid var(--protocol-line); }
+.protocol-mechanics h3 { margin: 22px 0 10px; font-size: clamp(1.45rem, 2.25vw, 2.2rem); line-height: var(--heading-card-leading); }
+.protocol-mechanics p { max-width: 54ch; margin: 0; color: var(--protocol-muted); font-size: .92rem; }
 .protocol-steps { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--protocol-line); }
 .protocol-steps li { display: grid; grid-template-columns: 65px minmax(0, 1fr); gap: 16px; padding: 23px 0; border-bottom: 1px solid var(--protocol-line); }
 .protocol-steps h3 { margin: 0 0 8px; font-size: clamp(1.25rem, 2vw, 1.85rem); line-height: var(--heading-card-leading); }
@@ -82,7 +84,7 @@
 .protocol-faq summary > span { color: var(--protocol-muted); font-family: var(--font-mono); font-size: 1.4rem; transition: transform 180ms ease; }
 .protocol-faq details[open] summary > span { transform: rotate(45deg); }
 .protocol-faq details p { max-width: 72ch; padding: 0 36px 22px 0; margin: 0; color: var(--protocol-muted); font-size: .91rem; }
-.protocol-mechanics article, .protocol-steps li, .protocol-faq details { background: var(--glass-panel-bg); }
+.protocol-steps li, .protocol-faq details { background: var(--glass-panel-bg); }
 .protocol-resources { padding: 28px; }
 .protocol-resources h3 { margin: 11px 0 24px; font-size: clamp(1.4rem, 2.4vw, 2rem); line-height: var(--heading-card-leading); }
 .protocol-resources ul { margin: 0 0 24px; padding: 0; list-style: none; }
@@ -90,7 +92,8 @@
 .protocol-resources small { color: var(--protocol-muted); font-family: var(--font-mono); font-size: .64rem; }
 .protocol-resources > a { display: inline-flex; min-height: 44px; align-items: center; gap: 8px; border-bottom: 1px solid var(--protocol-line); font-family: var(--font-mono); font-size: .73rem; }
 .protocol-guide :is(a, button, select, summary, [role="tabpanel"]):focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
-@supports not (backdrop-filter: blur(8px)) { .protocol-hero__status, .protocol-glass-card, .protocol-flow-panel, .protocol-code-card, .protocol-resources { background: #191919; } }
+@supports not (backdrop-filter: blur(8px)) { .protocol-hero__status, .protocol-glass-card, .protocol-flow-panel, .protocol-mechanics, .protocol-code-card, .protocol-resources { background: #191919; } }
 @media (max-width: 900px) { .protocol-hero { grid-template-columns: 1fr; } .protocol-hero__status { max-width: 520px; } .protocol-bottom-grid { grid-template-columns: 1fr; } .protocol-resources { max-width: 600px; } }
-@media (max-width: 650px) { .protocol-guide { padding-bottom: 72px; } .protocol-hero { padding-top: 54px; padding-bottom: 38px; } .protocol-hero h1 { font-size: clamp(3rem, 12vw, 5rem); } .protocol-contents { top: 67px; } .protocol-contents > span { display: none; } .protocol-section { padding-top: 68px; } .protocol-section-heading { grid-template-columns: 1fr; gap: 2px; margin-bottom: 26px; } .protocol-section-heading .protocol-index { padding: 0; } .protocol-flow { grid-template-columns: 1fr; } .protocol-flow li { min-height: auto; padding: 22px; } .protocol-flow h3 { margin-top: 10px; } .protocol-component-grid, .protocol-mechanics, .protocol-code-card__intro { grid-template-columns: 1fr; } .protocol-glass-card { min-height: auto; } .protocol-glass-card h3 { margin-top: 22px; } .protocol-steps li { grid-template-columns: 36px 1fr; } .protocol-code-card pre { padding: 22px; } }
+@media (max-width: 800px) { .protocol-mechanics { grid-template-columns: 1fr; } .protocol-mechanics article:nth-child(odd) { border-right: 0; } .protocol-mechanics article:not(:last-child) { border-bottom: 1px solid var(--protocol-line); } }
+@media (max-width: 650px) { .protocol-guide { padding-bottom: 72px; } .protocol-hero { padding-top: 54px; padding-bottom: 38px; } .protocol-hero h1 { font-size: clamp(3rem, 12vw, 5rem); } .protocol-contents { top: 67px; } .protocol-contents > span { display: none; } .protocol-section { padding-top: 68px; } .protocol-section-heading { grid-template-columns: 1fr; gap: 2px; margin-bottom: 26px; } .protocol-section-heading .protocol-index { padding: 0; } .protocol-flow { grid-template-columns: 1fr; } .protocol-flow li { min-height: auto; padding: 22px; } .protocol-flow h3 { margin-top: 10px; } .protocol-component-grid, .protocol-code-card__intro { grid-template-columns: 1fr; } .protocol-glass-card { min-height: auto; } .protocol-glass-card h3 { margin-top: 22px; } .protocol-steps li { grid-template-columns: 36px 1fr; } .protocol-code-card pre { padding: 22px; } }
 @media (prefers-reduced-motion: reduce) { .protocol-guide *, .protocol-guide *::before, .protocol-guide *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; } }

@@ -25,6 +25,7 @@
   "dependencies": {
     "autoprefixer": "^10.4.23",
     "gsap": "^3.15.0",
+    "liquid-gl": "3.0.0",
     "lucide-react": "^0.563.0",
     "motion": "^12.42.2",
     "react": "^19.2.0",

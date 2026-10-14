@@ -51,6 +51,32 @@ test('homepage remains dark across every scene chapter', async ({ page }) => {
   await expect.poll(() => scene.evaluate((element) => element.style.getPropertyValue('--scene-theme-mix'))).toBe('1.000')
 })
 
+test('continuity chapter draws its handoff path without an outer frame', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.goto('/', { waitUntil: 'domcontentloaded' })
+  const chapter = page.locator('.continuity-section')
+  const connectorScale = () => page.locator('.exit-model__core').evaluate((element) => {
+    const transform = getComputedStyle(element, '::before').transform
+    const values = transform.match(/^matrix\(([^)]+)\)$/)?.[1].split(',').map(Number)
+    return values?.[3] ?? 1
+  })
+
+  await expect(chapter).toHaveCSS('border-top-width', '0px')
+  await expect(chapter).toHaveCSS('border-left-width', '0px')
+  await expect(chapter).toHaveCSS('clip-path', 'none')
+  await expect.poll(connectorScale).toBeLessThan(0.05)
+
+  await chapter.evaluate((element) => {
+    const top = element.getBoundingClientRect().top + window.scrollY
+    window.scrollTo({ top: top - window.innerHeight * 0.28, behavior: 'instant' })
+  })
+  await expect.poll(connectorScale, { timeout: 6000 }).toBeGreaterThan(0.95)
+
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+  await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduced')
+  await expect.poll(connectorScale).toBeGreaterThan(0.95)
+})
+
 test('compact mobile uses the low-quality neural scene and keeps the first CTA in view', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 })
   await page.goto('/', { waitUntil: 'commit' })

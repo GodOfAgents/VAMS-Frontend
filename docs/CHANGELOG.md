@@ -28,6 +28,7 @@ All notable frontend changes are documented here following Keep a Changelog.
 
 ### Changed
 
+- Reworked the public navigation as a restrained, refraction-enhanced glass capsule on capable desktops, with CSS glass surfaces and performance, pointer, and reduced-motion fallbacks across marketing pages.
 - Art-directed the public homepage around the “Design the Exit” continuity question, a conceptual provider-change model, evidence-first calls to action, and clearer audience routes. The model explicitly labels deployment as pending and makes no live handoff claim.
 - Carried the exit-test campaign through Protocol, Network, Build, Operate, and Research with a shared responsive motif and page-specific questions, requirements, and verification links.
 - Reframed the homepage around one fluid neural-topography experience with scroll chapters, pointer lift, and evidence-aware explanatory content.

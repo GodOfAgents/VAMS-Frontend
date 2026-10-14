@@ -3254,8 +3254,16 @@ body {
 
 @media (max-height: 520px) and (min-width: 561px) and (max-width: 1199px) {
   .hero__content {
-    padding-top: 18px;
+    padding-top: 0;
     padding-bottom: 64px;
+  }
+
+  .hero__kicker {
+    margin: 4px 0 2px;
+  }
+
+  .hero__lede {
+    margin: 14px 0 12px;
   }
 }
 

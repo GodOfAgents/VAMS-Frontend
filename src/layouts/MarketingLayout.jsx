@@ -10,6 +10,7 @@ import { appEnvironment } from '../config/environment.js'
 import { useResponsiveMotion } from '../motion/ResponsiveMotionProvider.jsx'
 import { Reveal, RouteMotion } from '../motion/primitives.jsx'
 import { canMorphRoutes, useMarketingViewTransitions } from '../motion/viewTransitions.js'
+import { LiquidGlassLens, useLiquidGlassEligibility } from '../components/marketing/LiquidGlass.jsx'
 
 const links = [
   ['/protocol', 'Protocol'],
@@ -30,6 +31,7 @@ export function MarketingLayout() {
   const navigate = useNavigate()
   useMarketingViewTransitions(navigate, canMorphRoutes(motion))
   const expandedNavigation = motion.viewportWidth > 1050 || open
+  const glassEligible = useLiquidGlassEligibility(motion)
 
   useEffect(() => {
     if (!open) return
@@ -51,8 +53,9 @@ export function MarketingLayout() {
     <div className="site-shell">
       <a className="skip-link" href="#main-content">Skip to content</a>
       <SimulationBanner />
-      <header className="marketing-nav" ref={header}>
-        <div className="marketing-nav__inner">
+      <header className="marketing-nav" data-glass-eligibility={glassEligible ? 'eligible' : 'css'} ref={header}>
+        <div className="marketing-nav__backdrop-source" aria-hidden="true" />
+        <LiquidGlassLens enabled={glassEligible}>
           <Brand />
           <MotionNav
             animate={expandedNavigation ? 'open' : 'closed'}
@@ -80,7 +83,7 @@ export function MarketingLayout() {
               {open ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
             </button>
           </div>
-        </div>
+        </LiquidGlassLens>
       </header>
       <main id="main-content"><RouteMotion><Outlet /></RouteMotion></main>
       <footer className="site-footer">

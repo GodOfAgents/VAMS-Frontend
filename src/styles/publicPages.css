@@ -187,7 +187,7 @@
 .research-sources-grid small { display: block; margin-bottom: 10px; color: var(--ink-muted); font: .68rem var(--font-mono); }
 
 /* Code-native editorial diagrams */
-.continuity-section { padding-top: clamp(72px, 8vw, 108px); border-top: 1px solid var(--line); }
+.continuity-section { padding-top: clamp(72px, 8vw, 108px); border-top: 0; }
 .architecture-diagram { display: grid; grid-template-columns: minmax(240px, .72fr) minmax(0, 1.4fr); gap: clamp(36px, 7vw, 110px); align-items: center; margin: 0; }
 .architecture-diagram figcaption h3 { max-width: 15ch; margin: 10px 0 18px; font-size: clamp(2rem, 4vw, 4.2rem); line-height: 1; }
 .architecture-diagram figcaption > p:last-child { max-width: 47ch; margin: 0; color: var(--ink-muted); line-height: 1.7; }
@@ -212,9 +212,9 @@
 .exit-model__host small { color: var(--ink-muted); font: .69rem/1.45 var(--font-mono); }
 .exit-model__host--next { border-style: dashed; }
 .exit-model__core { position: relative; display: grid; gap: 14px; padding: 22px; border: 1px solid rgba(242, 242, 237, .65); background: rgba(242, 242, 237, .08); box-shadow: 0 0 0 6px rgba(242, 242, 237, .025); }
-.exit-model__core::before, .exit-model__core::after { position: absolute; left: 50%; width: 1px; height: 14px; background: var(--ink); content: ''; transform: translateX(-50%); }
-.exit-model__core::before { top: -15px; }
-.exit-model__core::after { bottom: -15px; }
+.exit-model__core::before, .exit-model__core::after { position: absolute; left: 50%; width: 1px; height: 14px; background: var(--ink); content: ''; transform: translateX(-50%) scaleY(var(--handoff-progress, 1)); }
+.exit-model__core::before { top: -15px; transform-origin: center bottom; }
+.exit-model__core::after { bottom: -15px; transform-origin: center top; }
 .exit-model__rail-label { color: var(--ink-muted); font: .67rem var(--font-mono); letter-spacing: .07em; text-transform: uppercase; }
 .exit-model__terms { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .exit-model__terms strong { min-width: 0; padding: 13px 8px; border: 1px solid var(--line-strong); color: var(--ink); font: clamp(.85rem, 1.5vw, 1.15rem)/1.2 var(--font-display); text-align: center; overflow-wrap: anywhere; }

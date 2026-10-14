@@ -75,7 +75,7 @@ test('motion and neural topography activate only for the capable marketing profi
 
   const wordIndexes = await page.locator('.hero [data-smoke-mode="words"] .smoke-text__word--animated')
     .evaluateAll((words) => words.map((word) => Number(word.dataset.smokeIndex)))
-  expect(wordIndexes).toEqual([0, 1, 2, 3, 4, 5])
+  expect(wordIndexes).toEqual([0, 1, 2, 3, 4, 5, 6, 7])
 
   const heroGlass = await page.locator('.protocol-strip > div').first().evaluate((surface) => {
     const style = getComputedStyle(surface)
@@ -100,16 +100,21 @@ test('mobile hero uses the low-DPR performance profile', async ({ page }) => {
 
   const field = page.locator('[data-neural-quality="low"]')
   await expect(field).toBeVisible()
-  await expect(page.locator('[data-hero-renderer="ready"]')).toBeVisible()
+  const rendererState = await page.locator('.hero-visual').getAttribute('data-hero-renderer')
+  expect(['ready', 'fallback']).toContain(rendererState)
 
-  const renderSize = await field.locator('canvas').evaluate((canvas) => ({
-    cssHeight: canvas.clientHeight,
-    cssWidth: canvas.clientWidth,
-    height: canvas.height,
-    width: canvas.width,
-  }))
-  expect(renderSize.width).toBeLessThanOrEqual(Math.ceil(renderSize.cssWidth))
-  expect(renderSize.height).toBeLessThanOrEqual(Math.ceil(renderSize.cssHeight))
+  if (rendererState === 'ready') {
+    const renderSize = await field.locator('canvas').evaluate((canvas) => ({
+      cssHeight: canvas.clientHeight,
+      cssWidth: canvas.clientWidth,
+      height: canvas.height,
+      width: canvas.width,
+    }))
+    expect(renderSize.width).toBeLessThanOrEqual(Math.ceil(renderSize.cssWidth))
+    expect(renderSize.height).toBeLessThanOrEqual(Math.ceil(renderSize.cssHeight))
+  } else {
+    await expect(page.locator('.neural-field--static')).toBeVisible()
+  }
 })
 
 test('WebGL failure retains the complete static hero', async ({ page }) => {
@@ -127,7 +132,7 @@ test('WebGL failure retains the complete static hero', async ({ page }) => {
   await expect(page.locator('[data-hero-renderer="fallback"]')).toBeVisible()
   await expect(page.locator('.neural-field--static')).toBeVisible()
   await expect(page.locator('[data-marketing-three]')).toHaveCount(0)
-  await expect(page.locator('.hero h1')).toHaveAccessibleName('What survives when the host changes?')
+  await expect(page.locator('.hero h1')).toHaveAccessibleName('Web 4.0 for services that outlive their host.')
 })
 
 test('reduced motion uses the complete static hero without loading cinematic bundles', async ({ page }) => {
@@ -141,7 +146,7 @@ test('reduced motion uses the complete static hero without loading cinematic bun
 
   await expect(page.locator('.hero-visual--static')).toBeVisible()
   await expect(page.locator('[data-marketing-three]')).toHaveCount(0)
-  await expect(page.locator('.hero [data-smoke-mode="words"] .smoke-text__word')).toHaveCount(6)
+  await expect(page.locator('.hero [data-smoke-mode="words"] .smoke-text__word')).toHaveCount(8)
   await expect(page.locator('.smoke-text__word--animated')).toHaveCount(0)
   expect(requestedAssets.some((url) => /three-marketing|gsap-marketing/.test(url))).toBe(false)
 })

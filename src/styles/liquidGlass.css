@@ -1,0 +1,243 @@
+/* Glass stays a material for real content surfaces, with CSS available everywhere. */
+.site-shell {
+  --marketing-radius-card: 18px;
+  --marketing-radius-control: 999px;
+  --marketing-glass-fill: rgba(12, 12, 12, 0.76);
+  --marketing-glass-line: rgba(255, 255, 255, 0.2);
+  --marketing-glass-edge: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.site-shell .marketing-nav {
+  top: 0;
+  padding: 8px 0;
+  border-bottom: 0;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.site-shell .marketing-nav__inner {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  min-height: 58px;
+  padding-inline: clamp(12px, 1.8vw, 22px);
+  overflow: visible;
+  border: 1px solid var(--marketing-glass-line);
+  border-radius: var(--marketing-radius-control);
+  background: var(--marketing-glass-fill);
+  box-shadow: var(--marketing-glass-edge), 0 14px 40px rgba(0, 0, 0, 0.3);
+  -webkit-backdrop-filter: blur(18px) saturate(115%);
+  backdrop-filter: blur(18px) saturate(115%);
+  isolation: isolate;
+}
+
+.site-shell .marketing-nav__inner[data-glass-renderer="ready"] {
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.site-shell .marketing-nav__backdrop-source {
+  position: absolute;
+  top: 8px;
+  right: 0;
+  left: 0;
+  width: var(--page);
+  height: 60px;
+  box-sizing: border-box;
+  margin-inline: auto;
+  pointer-events: none;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--marketing-radius-control);
+  background:
+    radial-gradient(ellipse at 71% 65%, rgba(216, 231, 238, 0.15), transparent 44%),
+    radial-gradient(circle, rgba(225, 225, 219, 0.46) 0 0.75px, transparent 1.1px) 0 0 / 18px 16px,
+    #090a0c;
+}
+
+.site-shell .marketing-nav__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  min-height: inherit;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+}
+
+.site-shell .marketing-nav__glass {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: block;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.site-shell .marketing-nav__links,
+.site-shell .marketing-nav__actions,
+.site-shell .marketing-nav__content > .brand {
+  position: relative;
+  z-index: 1;
+}
+
+.site-shell .marketing-nav__links a {
+  min-height: 40px;
+  padding-inline: 12px;
+  border: 1px solid transparent;
+  border-radius: var(--marketing-radius-control);
+  text-decoration: none;
+  transition: color 180ms ease, background-color 180ms ease, border-color 180ms ease;
+}
+
+.site-shell .marketing-nav__links a.active {
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  text-decoration: none;
+}
+
+.site-shell .marketing-nav__links a:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.site-shell .marketing-nav__links a:focus-visible,
+.site-shell .marketing-nav__actions .button:focus-visible,
+.site-shell .marketing-nav__actions .icon-button:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.site-shell .marketing-nav__actions .button,
+.site-shell .button,
+.site-shell :is(.protocol-primary-link, .protocol-secondary-link, .network-primary-link, .network-secondary-link) {
+  border-radius: var(--marketing-radius-control);
+}
+
+.site-shell .marketing-nav__actions .button {
+  min-height: 42px;
+  padding-inline: 17px;
+  background: #f2f2ed;
+  color: #080808;
+}
+
+.site-shell .icon-button {
+  border-color: var(--marketing-glass-line);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.site-shell :is(
+  .protocol-hero__status,
+  .protocol-glass-card,
+  .protocol-flow-panel,
+  .protocol-code-card,
+  .protocol-resources,
+  .network-hero__status,
+  .network-glass-card,
+  .network-flow-panel,
+  .network-code-card,
+  .network-resources,
+  .network-use-cases article,
+  .research-card__grid > div,
+  .research-map,
+  .research-audit-card,
+  .architecture-diagram__node,
+  .exit-model,
+  .protocol-mechanics,
+  .protocol-steps li,
+  .protocol-faq details,
+  .operator-requirements article
+) {
+  border-radius: var(--marketing-radius-card);
+}
+
+.site-shell .protocol-mechanics {
+  border-color: var(--marketing-glass-line);
+  background: rgba(24, 24, 25, 0.72);
+  box-shadow: var(--marketing-glass-edge), 0 18px 46px rgba(0, 0, 0, 0.25);
+  -webkit-backdrop-filter: blur(14px) saturate(112%);
+  backdrop-filter: blur(14px) saturate(112%);
+}
+
+.site-shell .protocol-mechanics article {
+  background: transparent;
+}
+
+.site-shell .protocol-strip {
+  gap: 10px;
+  border-bottom: 0;
+}
+
+.site-shell .protocol-strip > div {
+  min-height: 96px;
+  border: 1px solid var(--marketing-glass-line);
+  border-radius: var(--marketing-radius-card);
+  background: var(--marketing-glass-fill);
+  box-shadow: var(--marketing-glass-edge), 0 12px 34px rgba(0, 0, 0, 0.22);
+  -webkit-backdrop-filter: blur(12px) saturate(108%);
+  backdrop-filter: blur(12px) saturate(108%);
+}
+
+.site-shell .architecture-diagram__node,
+.site-shell .network-use-cases article,
+.site-shell .protocol-glass-card,
+.site-shell .network-glass-card {
+  background-color: rgba(30, 30, 30, 0.7);
+  box-shadow: var(--marketing-glass-edge), 0 18px 48px rgba(0, 0, 0, 0.24);
+  -webkit-backdrop-filter: blur(14px) saturate(112%);
+  backdrop-filter: blur(14px) saturate(112%);
+}
+
+@media (max-width: 1050px) {
+  .site-shell .marketing-nav__inner {
+    border-radius: 24px;
+  }
+
+  .site-shell .marketing-nav__links.is-open {
+    top: calc(100% + 8px);
+    right: 0;
+    left: 0;
+    gap: 4px;
+    padding: 14px;
+    border: 1px solid var(--marketing-glass-line);
+    border-radius: 22px;
+    background: rgba(9, 10, 12, 0.94);
+    box-shadow: var(--marketing-glass-edge), 0 20px 52px rgba(0, 0, 0, 0.38);
+    -webkit-backdrop-filter: blur(20px) saturate(115%);
+    backdrop-filter: blur(20px) saturate(115%);
+  }
+
+  .site-shell .marketing-nav__links.is-open a {
+    width: 100%;
+    min-height: 46px;
+    padding-inline: 14px;
+    border-bottom: 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .site-shell .marketing-nav__inner {
+    padding-inline: 10px;
+  }
+
+  .site-shell .marketing-nav__actions .button {
+    padding-inline: 12px;
+  }
+
+  .site-shell .protocol-strip {
+    gap: 6px;
+  }
+
+  .site-shell .protocol-strip > div {
+    min-height: 84px;
+    padding: 14px 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-shell .marketing-nav__links a {
+    transition-duration: 1ms;
+  }
+}

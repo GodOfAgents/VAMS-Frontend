@@ -29,9 +29,9 @@
 }
 
 .motion-chapter {
-  border: 1px solid var(--line);
-  background: rgba(14, 14, 14, .82);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 25px 70px rgba(0, 0, 0, .23);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .architecture-grid article.is-reading {

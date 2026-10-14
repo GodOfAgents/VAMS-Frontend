@@ -78,6 +78,14 @@ This renderer is a decorative, interactive neural background. It is not a protoc
 
 Console and evidence routes do not import or execute Three.js at runtime.
 
+The marketing navigation may add one bounded liquidGL lens at desktop widths. It
+captures only its small CSS topology backdrop; it does not snapshot the document
+or the live Three.js canvas. The dependency loads only in the marketing shell
+for fine-pointer desktops without reduced motion or a detected low-power device.
+Initialization failures, hidden-document transitions, context loss, and sustained
+slow frames restore the CSS glass treatment. Public pages never depend on WebGPU
+or WebGL availability for navigation or content.
+
 The marketing hero renders a deterministic shader-displaced neural topography:
 
 - `wide`, `desktop`, `tablet`, and `mobile` profiles independently cap geometry and device pixel ratio;

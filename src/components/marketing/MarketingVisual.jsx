@@ -11,11 +11,15 @@ import {
   calculateSceneThemeMix,
   readSceneChapterMetrics,
 } from '../../motion/sceneProgress.js'
+import { calculateNetworkProgress } from '../../motion/planetaryNetwork.js'
+import { calculateMorphProgress } from '../../motion/globeMorph.js'
 import '../../styles/homeScene.css'
 
 const NeuralField = lazy(() => import('./NeuralField.jsx'))
 
 const initialSceneState = {
+  morphProgress: 0,
+  networkProgress: 0,
   activeChapter: 'intro',
   chapterFrom: 0,
   chapterMix: 0,
@@ -27,7 +31,7 @@ const initialSceneState = {
   themeMix: 1,
 }
 
-export function MarketingVisual({ proofSignal = 0 }) {
+export function MarketingVisual({ proofSignal = 0, globeStateRef, onRendererState }) {
   const requestedQuality = useHeroQuality()
   const { theme } = useTheme()
   const lowPower = useMemo(() => isLowPowerDevice(), [])
@@ -72,6 +76,8 @@ export function MarketingVisual({ proofSignal = 0 }) {
   )
   const rendererState = failed || effectiveTier === 'static' ? 'fallback' : ready ? 'ready' : 'loading'
 
+  useEffect(() => { onRendererState?.(rendererState) }, [onRendererState, rendererState])
+
   useEffect(() => {
     const documentThemeMix = theme === 'dark' ? 1 : 0
     sceneStateRef.current.documentThemeMix = documentThemeMix
@@ -88,12 +94,18 @@ export function MarketingVisual({ proofSignal = 0 }) {
     if (!sceneElement || !root) return undefined
 
     let chapters = []
+    let globeStart = window.innerHeight * 2
+    let globeElement = null
+    let networkStatus = null
     let scrollFrame = null
     let resizeFrame = null
 
     const measure = () => {
       resizeFrame = null
       chapters = readSceneChapterMetrics(root)
+      globeElement = root.querySelector('[data-globe-chapter]')
+      networkStatus = root.querySelector('[data-network-status]')
+      if (globeElement) globeStart = globeElement.getBoundingClientRect().top + window.scrollY
     }
 
     const update = () => {
@@ -108,7 +120,20 @@ export function MarketingVisual({ proofSignal = 0 }) {
         ...state,
         documentThemeMix: sceneStateRef.current.documentThemeMix,
       })
-      Object.assign(sceneStateRef.current, state, { themeMix })
+      const morphProgress = calculateMorphProgress({ scrollY: window.scrollY, viewportHeight: window.innerHeight, globeStart })
+      const networkProgress = calculateNetworkProgress({ scrollY: window.scrollY, viewportHeight: window.innerHeight, globeStart })
+      Object.assign(sceneStateRef.current, state, { themeMix, morphProgress, networkProgress })
+      const networkStage = networkProgress < 0.32 ? 'local' : networkProgress < 0.7 ? 'regional' : 'planetary'
+      if (globeElement) {
+        globeElement.style.setProperty('--network-progress', networkProgress.toFixed(4))
+        globeElement.dataset.networkStage = networkStage
+      }
+      if (networkStatus) {
+        const label = networkProgress < 0.01 ? 'Scroll to grow the network' : networkStage === 'local' ? 'Local nodes awakening' : networkStage === 'regional' ? 'Connections crossing continents' : 'A planetary network taking shape'
+        if (networkStatus.textContent !== label) networkStatus.textContent = label
+      }
+      sceneElement.dataset.networkProgress = networkProgress.toFixed(4)
+      sceneElement.dataset.morphProgress = morphProgress.toFixed(4)
       sceneElement.dataset.sceneActive = state.activeChapter
       sceneElement.dataset.sceneNext = state.nextChapter
       sceneElement.dataset.sceneMix = state.chapterMix.toFixed(3)
@@ -171,6 +196,7 @@ export function MarketingVisual({ proofSignal = 0 }) {
             proofSignal={proofSignal}
             quality={quality}
             sceneStateRef={sceneStateRef}
+            globeStateRef={globeStateRef}
           />
         </Suspense>
       )}

@@ -6,6 +6,8 @@ All notable frontend changes are documented here following Keep a Changelog.
 
 ### Added
 
+- A reversible neural-to-Earth morph with bundled coastlines, an India/Bangladesh starting view, and accessible globe controls.
+- Scroll-grown illustrative junctions, raised connections, and orbital paths, with a sticky planetary chapter and reduced-motion fallback.
 - Distinct Protocol, Network, Build, Operate, and Research public-page compositions with clearer builder and operator pathways.
 - A persistent animation preference and improved public navigation focus, dismissal, and route-title behavior.
 
@@ -28,6 +30,7 @@ All notable frontend changes are documented here following Keep a Changelog.
 
 ### Changed
 
+- Refined the planetary network with steadier route luminance, quieter orbital guides, eased progress feedback, and mobile evolution labels that stay in the content flow.
 - Art-directed the public homepage around the “Design the Exit” continuity question, a conceptual provider-change model, evidence-first calls to action, and clearer audience routes. The model explicitly labels deployment as pending and makes no live handoff claim.
 - Carried the exit-test campaign through Protocol, Network, Build, Operate, and Research with a shared responsive motif and page-specific questions, requirements, and verification links.
 - Reframed the homepage around one fluid neural-topography experience with scroll chapters, pointer lift, and evidence-aware explanatory content.

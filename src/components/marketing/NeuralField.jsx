@@ -6,6 +6,10 @@ import {
   getViewportHeroTier,
   HERO_QUALITY_ORDER,
 } from '../../motion/heroQuality.js'
+import { createPlanetaryConnections } from './PlanetaryConnections.js'
+import earthView from '../../data/earth-view.json'
+import { isLand, coastlineSegments } from '../../motion/earthGeography.js'
+import { createGridEdges, sphereTarget } from '../../motion/globeMorph.js'
 import { createTerrainPointerProjector } from '../../motion/neuralPointer.js'
 
 const qualityProfiles = {
@@ -44,6 +48,21 @@ const terrainVertexShader = `
   uniform float uChapterTo;
   uniform float uChapterMix;
   uniform float uMotionScale;
+  uniform float uMorph;
+  uniform float uGlobeScale;
+  uniform vec4 uGlobeQuaternion;
+  attribute float aLand;
+  varying float vLand;
+  attribute vec3 aTarget;
+  #ifdef EDGE_PASS
+    attribute vec3 aSourceTo;
+    attribute vec3 aTargetTo;
+    attribute vec2 aUvTo;
+    attribute float aDensityTo;
+    attribute float aEdgeT;
+  #endif
+  varying float vFront;
+  varying float vMorph;
   uniform vec2 uPointer;
   attribute float aDensity;
   attribute float aShade;
@@ -115,39 +134,87 @@ const terrainVertexShader = `
     return cta;
   }
 
-  void main() {
-    float time = uTime * uMotionScale;
-    float elevationFrom = chapterElevation(uChapterFrom, position, uv, time);
-    float elevationTo = chapterElevation(uChapterTo, position, uv, time);
-    float elevation = mix(elevationFrom, elevationTo, smoothstep(0.0, 1.0, uChapterMix));
-    float pointerDistance = distance(position.xy, uPointer);
-    float pointerLift = smoothstep(uPointerRadius, 0.0, pointerDistance) * uPointerStrength * 2.35;
-    float pointerRipple = sin(pointerDistance * 1.45 - uTime * 1.15)
-      * smoothstep(uPointerRadius * 1.35, 0.0, pointerDistance) * uPointerStrength * 0.14;
-    float pointerEcho = sin(pointerDistance * 2.8 - uTime * 0.72)
-      * smoothstep(uPointerRadius * 1.7, 0.0, pointerDistance) * uPointerStrength * 0.07;
-    float proofPath = uv.x * 0.76 + (1.0 - uv.y) * 0.24;
-    float proofDistance = proofPath - uProofProgress;
-    float proofWave = exp(-pow(proofDistance * 18.0, 2.0))
+  vec3 rotateQuaternion(vec3 p, vec4 q) {
+    return p + 2.0 * cross(q.xyz, cross(q.xyz, p) + q.w * p);
+  }
+
+  float proofAt(vec2 texcoord) {
+    float distance = texcoord.x * 0.76 + (1.0 - texcoord.y) * 0.24 - uProofProgress;
+    return exp(-pow(distance * 18.0, 2.0))
       * smoothstep(0.0, 0.12, uProofProgress)
       * (1.0 - smoothstep(0.92, 1.12, uProofProgress));
-
-    vec3 transformed = position;
-    transformed.z = elevation + pointerLift + pointerRipple + pointerEcho + proofWave * (0.7 + sin(uv.y * 20.0) * 0.12);
-    vec4 modelPosition = modelMatrix * vec4(transformed, 1.0);
-    vec4 viewPosition = viewMatrix * modelPosition;
-    vDepth = clamp((-viewPosition.z - 4.0) / 30.0, 0.0, 1.0);
-    // Keep emission tied to the underlying neural topography, not the cursor's temporary lift.
-    vElevation = elevation;
-    vProof = proofWave;
-    vShade = aShade;
-    vVisible = step(aDensity, uPointDensity);
-    vPointer = clamp(pointerLift / 2.35, 0.0, 1.0);
-    vUv = uv;
-    gl_Position = projectionMatrix * viewPosition;
-    gl_PointSize = max(1.0, uPointScale * uPixelRatio * (14.0 / max(3.5, -viewPosition.z))
-      * (1.0 + vPointer * 0.85) * vVisible);
   }
+
+  vec3 neuralAt(vec3 source, vec2 texcoord) {
+    float time = uTime * uMotionScale;
+    float elevation = mix(chapterElevation(uChapterFrom, source, texcoord, time),
+      chapterElevation(uChapterTo, source, texcoord, time), smoothstep(0.0, 1.0, uChapterMix));
+    float distance = length(source.xy - uPointer);
+    float influence = 1.0 - smoothstep(0.0, uPointerRadius, distance);
+    float lift = influence * uPointerStrength * 2.35;
+    float ripple = sin(distance * 1.45 - uTime * 1.15)
+      * (1.0 - smoothstep(0.0, uPointerRadius * 1.35, distance)) * uPointerStrength * 0.14;
+    return vec3(source.xy, elevation + lift + ripple + proofAt(texcoord) * 0.7);
+  }
+
+  vec3 globeAt(vec3 target) {
+    return rotateQuaternion(target * uGlobeScale, uGlobeQuaternion) + vec3(0.0, -0.8, 0.0);
+  }
+
+  vec3 morphAt(vec3 source, vec2 texcoord, vec3 target, float m) {
+    vec3 original = (modelMatrix * vec4(neuralAt(source, texcoord), 1.0)).xyz;
+    // This displacement depends on progress, so reversing the scroll retraces it.
+    float envelope = 16.0 * uMorph * uMorph * (1.0-uMorph) * (1.0-uMorph);
+    float phase = texcoord.x * 6.2831853 + uMorph * 3.14159265;
+    vec3 swirl = vec3(sin(phase) * cos(texcoord.y * 5.0),
+      sin(texcoord.y * 6.2831853 + uMorph * 4.0) * 0.45,
+      cos(phase) * sin(texcoord.y * 3.14159265)) * 1.1;
+    return mix(original, globeAt(target), m) + envelope * swirl;
+  }
+
+  vec3 arcAt(vec3 a, vec3 b, float t) {
+    float cosine = clamp(dot(normalize(a), normalize(b)), -0.9999, 0.9999);
+    float angle = acos(cosine);
+    // All retained grid edges are local; the small-angle branch avoids 0/0.
+    if (angle < 0.02) return normalize(mix(a, b, t)) * length(a);
+    return (sin((1.0-t)*angle) * a + sin(t*angle) * b) / sin(angle);
+  }
+
+  void main() {
+    float m = uMorph*uMorph*uMorph*(uMorph*(uMorph*6.0-15.0)+10.0);
+    vec3 target = aTarget;
+    vec3 world = morphAt(position, uv, aTarget, m);
+    vec2 texcoord = uv;
+    float density = aDensity;
+    #ifdef EDGE_PASS
+      vec3 end = morphAt(aSourceTo, aUvTo, aTargetTo, m);
+      vec3 chord = mix(globeAt(aTarget), globeAt(aTargetTo), aEdgeT);
+      vec3 arc = globeAt(arcAt(aTarget, aTargetTo, aEdgeT));
+      world = mix(world, end, aEdgeT) + m * (arc - chord);
+      target = arcAt(aTarget, aTargetTo, aEdgeT);
+      texcoord = mix(uv, aUvTo, aEdgeT);
+      density = max(aDensity, aDensityTo);
+    #endif
+    vec4 viewPosition = viewMatrix * vec4(world, 1.0);
+    vec3 globePosition = globeAt(target);
+    vec3 normal = normalize(globePosition - vec3(0.0,-0.8,0.0));
+    float facing = dot(normal, normalize(cameraPosition-globePosition));
+    vFront = mix(1.0, mix(0.015, 1.0, smoothstep(-0.04,0.18,facing)), m);
+    vLand = aLand;
+    vMorph = m;
+    vDepth = clamp((-viewPosition.z - 4.0) / 30.0, 0.0, 1.0);
+    vElevation = mix(neuralAt(position, uv).z, 0.4, m);
+    vProof = proofAt(texcoord) * (1.0-m);
+    vShade = aShade;
+    vVisible = step(density, uPointDensity);
+    vPointer = (1.0-smoothstep(0.0,uPointerRadius,length(position.xy-uPointer)))
+      * uPointerStrength * (1.0-m);
+    vUv = texcoord;
+    gl_Position = projectionMatrix * viewPosition;
+    gl_PointSize = clamp(uPointScale * uPixelRatio * (14.0 / max(3.5, -viewPosition.z))
+      * (1.0 + vPointer * 0.85) * mix(1.0, mix(0.65, 1.15, aLand), m), 1.0, 12.0);
+  }
+
 `
 
 const pointFragmentShader = `
@@ -161,6 +228,9 @@ const pointFragmentShader = `
   varying float vVisible;
   varying float vPointer;
   varying vec2 vUv;
+  varying float vFront;
+  varying float vMorph;
+  varying float vLand;
 
   void main() {
     if (vVisible < 0.5) discard;
@@ -176,15 +246,18 @@ const pointFragmentShader = `
     // Light is emitted by the nodes that were lifted, not by a cursor sprite.
     float bioluminescence = clamp(elevatedNode * shimmer + vProof * 0.72
       + vPointer * (0.78 + shimmer * 0.34), 0.0, 1.0);
+    bioluminescence *= mix(1.0, 0.45, vMorph);
     float shade = clamp(vShade * elevationLight + vProof * 0.34 + bioluminescence * 0.32, 0.18, 1.0);
     vec3 lightPoint = vec3(0.88) * shade;
     vec3 darkPoint = vec3(0.08 + (1.0 - shade) * 0.18);
     vec3 pointColor = mix(darkPoint, lightPoint, uThemeMix);
-    vec3 cyanGlow = vec3(0.04, 0.82, 1.0) * (0.82 + uThemeMix * 0.18);
-    pointColor = mix(pointColor, cyanGlow, min(1.0, bioluminescence * 1.12));
-    pointColor += cyanGlow * bioluminescence * 0.62;
-    float alpha = pointEdge * horizonFog * edgeFadeX * edgeFadeY * uOpacity
+    vec3 neutralGlow = vec3(0.92) * (0.82 + uThemeMix * 0.18);
+    pointColor = mix(pointColor, neutralGlow, min(1.0, bioluminescence * 1.12));
+    pointColor += neutralGlow * bioluminescence * 0.62;
+    float alpha = pointEdge * horizonFog * mix(edgeFadeX * edgeFadeY, 1.0, vMorph) * vFront * uOpacity
       * (1.0 + vProof * 0.42 + bioluminescence * 2.1);
+    pointColor = mix(pointColor, vec3(0.94), vMorph * vLand * 0.72);
+    alpha *= mix(1.0, mix(0.045, 1.25, vLand), vMorph);
     gl_FragColor = vec4(pointColor, alpha);
   }
 `
@@ -197,15 +270,19 @@ const lineFragmentShader = `
   varying float vProof;
   varying float vShade;
   varying float vPointer;
+  varying float vVisible;
+  varying float vFront;
+  varying float vMorph;
 
   void main() {
+    if (vVisible < 0.5) discard;
     float topography = smoothstep(-0.12, 0.82, vElevation);
     float fog = 1.0 - smoothstep(0.2, 1.0, vDepth);
     float signal = clamp(topography * 0.62 + vProof * 0.72 + vPointer * 0.58, 0.0, 1.0);
-    vec3 quietLine = mix(vec3(0.08, 0.12, 0.16), vec3(0.42), uThemeMix);
-    vec3 activeLine = vec3(0.06, 0.5, 0.72);
+    vec3 quietLine = mix(vec3(0.12), vec3(0.62), uThemeMix);
+    vec3 activeLine = vec3(0.9);
     vec3 lineColor = mix(quietLine, activeLine, signal * 0.78 + vShade * 0.08);
-    float alpha = uLineOpacity * fog * (0.52 + signal * 0.92);
+    float alpha = uLineOpacity * fog * vFront * (0.7 + signal * 0.92 + vMorph * 0.8) * mix(1.0, 0.16, vMorph);
     gl_FragColor = vec4(lineColor, alpha);
   }
 `
@@ -231,34 +308,49 @@ function createTerrainGeometry(profile) {
   geometry.setAttribute('aDensity', new THREE.BufferAttribute(densities, 1))
   geometry.setAttribute('aShade', new THREE.BufferAttribute(shades, 1))
 
-  const linePositions = []
-  const lineDensities = []
-  const lineShades = []
-  const lineUvs = []
-  const rowSize = segmentsX + 1
+  const targets = new Float32Array(positions.count * 3)
+  const landMask = new Float32Array(positions.count)
+  for (let id = 0; id < positions.count; id += 1) {
+    const target = sphereTarget(id, segmentsX + 1, segmentsY + 1)
+    targets.set(target, id * 3)
+    const longitude = Math.atan2(target[0], target[2]) * 180 / Math.PI
+    const latitude = Math.asin(target[1] / 3.5) * 180 / Math.PI
+    landMask[id] = isLand(longitude, latitude) ? 1 : 0
+    // Edge anchors remain visible with their points during density degradation.
+  }
   const step = segmentsX > 100 ? 4 : 3
-  const appendConnection = (from, to) => {
-    for (const index of [from, to]) {
-      linePositions.push(positions.getX(index), positions.getY(index), positions.getZ(index))
-      lineDensities.push(densities[index])
-      lineShades.push(shades[index])
-      lineUvs.push(geometry.attributes.uv.getX(index), geometry.attributes.uv.getY(index))
+  const edges = createGridEdges(segmentsX, segmentsY, step)
+  for (const [from, to] of edges) {
+    densities[from] = Math.min(densities[from], 0.3)
+    densities[to] = Math.min(densities[to], 0.3)
+  }
+  geometry.setAttribute('aLand', new THREE.BufferAttribute(landMask, 1))
+  geometry.setAttribute('aTarget', new THREE.BufferAttribute(targets, 3))
+  const data = { position: [], uv: [], aTarget: [], aSourceTo: [], aTargetTo: [], aUvTo: [], aDensity: [], aDensityTo: [], aShade: [], aEdgeT: [] }
+  const subdivisions = 12
+  for (const [from, to] of edges) {
+    for (let segment = 0; segment < subdivisions; segment += 1) {
+      for (const t of [segment / subdivisions, (segment + 1) / subdivisions]) {
+        data.position.push(positions.getX(from), positions.getY(from), positions.getZ(from))
+        data.aSourceTo.push(positions.getX(to), positions.getY(to), positions.getZ(to))
+        data.aTarget.push(...targets.subarray(from * 3, from * 3 + 3))
+        data.aTargetTo.push(...targets.subarray(to * 3, to * 3 + 3))
+        data.uv.push(geometry.attributes.uv.getX(from), geometry.attributes.uv.getY(from))
+        data.aUvTo.push(geometry.attributes.uv.getX(to), geometry.attributes.uv.getY(to))
+        data.aDensity.push(densities[from])
+        data.aDensityTo.push(densities[to])
+        data.aShade.push(shades[from])
+        data.aEdgeT.push(t)
+      }
     }
   }
-
-  for (let y = 0; y <= segmentsY; y += step) {
-    for (let x = 0; x <= segmentsX; x += step) {
-      const index = y * rowSize + x
-      if (x + step <= segmentsX) appendConnection(index, index + step)
-      if (y + step <= segmentsY) appendConnection(index, index + step * rowSize)
-    }
-  }
-
   const lines = new THREE.BufferGeometry()
-  lines.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3))
-  lines.setAttribute('aDensity', new THREE.Float32BufferAttribute(lineDensities, 1))
-  lines.setAttribute('aShade', new THREE.Float32BufferAttribute(lineShades, 1))
-  lines.setAttribute('uv', new THREE.Float32BufferAttribute(lineUvs, 2))
+  for (const [key, values] of Object.entries(data)) {
+    const size = ['position', 'aTarget', 'aSourceTo', 'aTargetTo'].includes(key) ? 3 : ['uv', 'aUvTo'].includes(key) ? 2 : 1
+    lines.setAttribute(key, new THREE.Float32BufferAttribute(values, size))
+  }
+  lines.userData.edgeCount = edges.length
+  geometry.userData.nodeCount = positions.count
   return { lines, points: geometry }
 }
 
@@ -269,10 +361,14 @@ export default function NeuralField({
   proofSignal = 0,
   quality,
   sceneStateRef,
+  globeStateRef,
 }) {
   const mountRef = useRef(null)
   const proofSignalRef = useRef(proofSignal)
   const triggerProofRef = useRef(null)
+  const qualityRef = useRef(quality)
+
+  useEffect(() => { qualityRef.current = quality }, [quality])
 
   useEffect(() => {
     proofSignalRef.current = proofSignal
@@ -281,7 +377,8 @@ export default function NeuralField({
 
   useEffect(() => {
     const container = mountRef.current
-    const tier = quality?.tier || 'high'
+    const initialQuality = qualityRef.current
+    const tier = initialQuality?.tier || 'high'
     const profile = qualityProfiles[tier] || qualityProfiles.high
     if (!container) return undefined
 
@@ -303,7 +400,7 @@ export default function NeuralField({
     camera.lookAt(0, -0.8, 0)
     renderer.outputColorSpace = THREE.SRGBColorSpace
     renderer.setClearAlpha(0)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, quality.maxDpr))
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, qualityRef.current.maxDpr))
     renderer.setSize(container.clientWidth, container.clientHeight)
     container.appendChild(renderer.domElement)
 
@@ -315,6 +412,9 @@ export default function NeuralField({
     const initialChapterFrom = Math.floor(renderedChapterPosition)
     const initialChapterTo = Math.min(initialChapterFrom + 1, 5)
     const uniforms = {
+      uMorph: { value: initialSceneState.morphProgress || 0 },
+      uGlobeScale: { value: 1 },
+      uGlobeQuaternion: { value: new THREE.Vector4(0, 0, 0, 1) },
       uChapterFrom: { value: initialChapterFrom },
       uChapterMix: { value: renderedChapterPosition - initialChapterFrom },
       uChapterTo: { value: initialChapterTo },
@@ -322,7 +422,7 @@ export default function NeuralField({
       uMotionScale: { value: tier === 'low' ? 0.58 : tier === 'medium' ? 0.76 : 1 },
       uOpacity: { value: profile.opacity },
       uPageProgress: { value: initialSceneState.pageProgress },
-      uPixelRatio: { value: Math.min(window.devicePixelRatio, quality.maxDpr) },
+      uPixelRatio: { value: Math.min(window.devicePixelRatio, qualityRef.current.maxDpr) },
       uPointDensity: { value: profile.density },
       uPointer: { value: new THREE.Vector2(0, 0) },
       uPointerRadius: { value: profile.pointerRadius },
@@ -341,7 +441,8 @@ export default function NeuralField({
       vertexShader: terrainVertexShader,
     })
     const lineMaterial = new THREE.ShaderMaterial({
-      blending: THREE.AdditiveBlending,
+      defines: { EDGE_PASS: 1 },
+      blending: THREE.NormalBlending,
       depthWrite: false,
       fragmentShader: lineFragmentShader,
       transparent: true,
@@ -350,17 +451,92 @@ export default function NeuralField({
     })
     const terrain = new THREE.Points(pointGeometry, material)
     const network = new THREE.LineSegments(lineGeometry, lineMaterial)
+    // Shader positions span both the source terrain and a world-space sphere.
+    terrain.frustumCulled = false
+    network.frustumCulled = false
     terrain.position.set(...profile.position)
     terrain.rotation.x = profile.rotation
     network.position.copy(terrain.position)
     network.rotation.copy(terrain.rotation)
+    terrain.renderOrder = 2
+    network.renderOrder = 2
     scene.add(terrain)
     scene.add(network)
 
-    const frameBudget = createFrameBudgetController({ thresholdMs: profile.budgetMs })
+    const coastlineGeometry = new THREE.BufferGeometry()
+    coastlineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(coastlineSegments(), 3))
+    const coastlineMaterial = new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false,
+      uniforms: {
+        uGlobeScale: uniforms.uGlobeScale,
+        uGlobeQuaternion: uniforms.uGlobeQuaternion,
+        uOpacity: { value: 0 },
+      },
+      vertexShader: `uniform float uGlobeScale; uniform vec4 uGlobeQuaternion; varying float vFacing;
+        void main() {
+          vec3 q = uGlobeQuaternion.xyz;
+          vec3 p = position*uGlobeScale;
+          vec3 rotated = p + 2.0*cross(q,cross(q,p)+uGlobeQuaternion.w*p);
+          vec3 world = rotated+vec3(0.0,-0.8,0.0);
+          vFacing=dot(normalize(rotated),normalize(cameraPosition-world));
+          gl_Position=projectionMatrix*viewMatrix*vec4(world,1.0);
+        }`,
+      fragmentShader: `uniform float uOpacity; varying float vFacing;
+        void main() { float front=smoothstep(0.0,0.16,vFacing);
+          gl_FragColor=vec4(vec3(0.86),front*uOpacity); }`,
+    })
+    const coastlines = new THREE.LineSegments(coastlineGeometry, coastlineMaterial)
+    coastlines.frustumCulled = false
+    coastlines.renderOrder = 3
+    scene.add(coastlines)
+
+    const oceanGeometry = new THREE.SphereGeometry(3.485, 64, 40)
+    const oceanMaterial = new THREE.MeshBasicMaterial({ color: 0x080808, transparent: true, opacity: 0, depthWrite: false })
+    const ocean = new THREE.Mesh(oceanGeometry, oceanMaterial)
+    ocean.position.set(0,-0.8,0)
+    ocean.renderOrder = 1
+    scene.add(ocean)
+
+    const atmosphereMaterial = new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false, side: THREE.BackSide,
+      uniforms: { uMorph: uniforms.uMorph, uOpacity: { value: 0 } },
+      vertexShader: `varying vec3 vNormal; varying vec3 vView;
+        void main() { vec4 p=modelViewMatrix*vec4(position,1.0); vNormal=normalize(normalMatrix*normal); vView=normalize(-p.xyz); gl_Position=projectionMatrix*p; }`,
+      fragmentShader: `uniform float uOpacity; varying vec3 vNormal; varying vec3 vView;
+        void main() { float rim=pow(1.0-abs(dot(normalize(vNormal),normalize(vView))),3.5);
+        gl_FragColor=vec4(vec3(0.88),rim*uOpacity); }`,
+    })
+    const atmosphereGeometry = new THREE.SphereGeometry(3.56, 64, 40)
+    const atmosphere = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial)
+    atmosphere.position.set(0,-0.8,0)
+    atmosphere.frustumCulled = false
+    scene.add(atmosphere)
+    const planetaryConnections = createPlanetaryConnections(pointGeometry, profile.segments, uniforms)
+    scene.add(planetaryConnections.group)
+    container.dataset.networkHubs = String(planetaryConnections.group.userData.hubCount)
+    container.dataset.networkRoutes = String(planetaryConnections.group.userData.routeCount)
+    let renderedNetworkProgress = initialSceneState.networkProgress || 0
+    const rotation = new THREE.Quaternion()
+    const userRotation = new THREE.Quaternion()
+    const identity = new THREE.Quaternion()
+    const globeEuler = new THREE.Euler(0, 0, 0, 'YXZ')
+    const homeRotation = new THREE.Quaternion().setFromEuler(new THREE.Euler(
+      THREE.MathUtils.degToRad(earthView.latitude),
+      -THREE.MathUtils.degToRad(earthView.longitude),
+      0, 'XYZ',
+    ))
+    let idleRotation = 0
+    let globeCompleteFor = 0
+    let resetVersion = globeStateRef.current.resetVersion
+    let elapsedTime = 0
+    container.dataset.nodeCount = String(pointGeometry.userData.nodeCount)
+    container.dataset.edgeCount = String(lineGeometry.userData.edgeCount)
+
+    let frameBudget = createFrameBudgetController({ thresholdMs: profile.budgetMs })
+    let budgetTier = tier
     const pointerTarget = new THREE.Vector2(0, 0)
     const projectPointer = createTerrainPointerProjector(camera, terrain)
-    const minimumFrameInterval = quality.targetFps ? 1000 / quality.targetFps : 0
+    const minimumFrameInterval = 0
     let degradeRequested = false
     let lastAnimationAt = null
     let lastRenderAt = Number.NEGATIVE_INFINITY
@@ -385,23 +561,70 @@ export default function NeuralField({
 
     const render = (animationTime = performance.now()) => {
       if (!pageVisible) return
+      if (budgetTier !== qualityRef.current.tier) {
+        budgetTier = qualityRef.current.tier
+        frameBudget = createFrameBudgetController({ thresholdMs: (qualityProfiles[budgetTier] || qualityProfiles.low).budgetMs })
+        degradeRequested = false
+        lastAnimationAt = null
+      }
       if (lastAnimationAt !== null && !degradeRequested) {
         const frameInterval = animationTime - lastAnimationAt
         if (frameBudget.record(frameInterval, animationTime)) {
           degradeRequested = true
-          onDegrade?.(getNextLowerHeroTier(tier))
+          onDegrade?.(getNextLowerHeroTier(qualityRef.current.tier))
         }
       }
       lastAnimationAt = animationTime
       if (animationTime - lastRenderAt < minimumFrameInterval - 0.5) return
       lastRenderAt = animationTime
 
-      const time = animationTime * 0.001
       const sceneState = sceneStateRef.current
       const deltaSeconds = previousRenderAt === null
         ? 1 / 60
         : Math.min(0.1, Math.max(0, (animationTime - previousRenderAt) / 1000))
       previousRenderAt = animationTime
+      const globeState = globeStateRef.current
+      const morphTarget = sceneState.morphProgress || 0
+      if (resetVersion !== globeState.resetVersion) {
+        idleRotation = 0
+        globeCompleteFor = 0
+        resetVersion = globeState.resetVersion
+      }
+      if (!globeState.paused && !globeState.exploring) {
+        elapsedTime += deltaSeconds
+        // Reading the hero must not rotate the destination before it forms.
+        globeCompleteFor = morphTarget >= 1 ? globeCompleteFor + deltaSeconds : 0
+        if (globeCompleteFor > 6 && (sceneState.networkProgress || 0) > 0.98) idleRotation += deltaSeconds * 0.045
+      }
+      const time = elapsedTime
+      // Pause freezes ambient time, never the scroll-controlled transformation.
+      uniforms.uMorph.value += (morphTarget - uniforms.uMorph.value) * (1-Math.exp(-12*deltaSeconds))
+      if (Math.abs(morphTarget-uniforms.uMorph.value) < 0.0001) uniforms.uMorph.value = morphTarget
+      const morph = uniforms.uMorph.value
+      const networkTarget = sceneState.networkProgress || 0
+      renderedNetworkProgress += (networkTarget-renderedNetworkProgress)*(1-Math.exp(-8*deltaSeconds))
+      if (Math.abs(networkTarget-renderedNetworkProgress)<0.0001) renderedNetworkProgress=networkTarget
+      container.dataset.networkProgress = renderedNetworkProgress.toFixed(4)
+      globeEuler.set(globeState.pitch, globeState.yaw + idleRotation, 0)
+      userRotation.setFromEuler(globeEuler).multiply(homeRotation)
+      rotation.copy(identity).slerp(userRotation, morph)
+      uniforms.uGlobeQuaternion.value.set(rotation.x, rotation.y, rotation.z, rotation.w)
+      uniforms.uGlobeScale.value += (globeState.zoom - uniforms.uGlobeScale.value) * (1-Math.exp(-10*deltaSeconds))
+      atmosphere.scale.setScalar(uniforms.uGlobeScale.value)
+      ocean.scale.setScalar(uniforms.uGlobeScale.value)
+      coastlineMaterial.uniforms.uOpacity.value = THREE.MathUtils.smoothstep(morph, 0.6, 1) * 0.78
+      oceanMaterial.opacity = THREE.MathUtils.smoothstep(morph, 0.65, 1) * 0.94
+      atmosphereMaterial.uniforms.uOpacity.value = morph ** 3 * 0.19
+      const activeQuality = qualityRef.current
+      const desiredDpr = Math.min(window.devicePixelRatio, activeQuality.maxDpr)
+      if (renderer.getPixelRatio() !== desiredDpr) renderer.setPixelRatio(desiredDpr)
+      uniforms.uPixelRatio.value = renderer.getPixelRatio()
+      const activeTier = activeQuality.tier
+      const densityScale = { wide: 1, high: 0.94, medium: 0.82, low: 0.64 }
+      uniforms.uPointDensity.value = densityScale[activeTier] || 0.64
+      container.dataset.morphProgress = morph.toFixed(4)
+      container.dataset.globeYaw = globeState.yaw.toFixed(4)
+      container.dataset.globeZoom = globeState.zoom.toFixed(3)
       const chapterAlpha = 1 - Math.exp(-5 * deltaSeconds)
       const ambientAlpha = 1 - Math.exp(-4 * deltaSeconds)
       const targetChapterPosition = sceneState.chapterPosition
@@ -431,13 +654,22 @@ export default function NeuralField({
         }
       }
 
-      const scrollDrift = quality.scrollEnabled ? uniforms.uPageProgress.value : 0
-      camera.position.x = profile.camera[0] + Math.sin(time * 0.08) * (tier === 'low' ? 0.2 : 0.66)
-      camera.position.y = profile.camera[1] + Math.cos(time * 0.065) * 0.12 + scrollDrift * 0.12
-      camera.position.z = profile.camera[2] + Math.sin(time * 0.045) * 0.1 - scrollDrift * profile.camera[2] * 0.03
-      camera.lookAt(0, -0.8, 0)
+      const scrollDrift = activeQuality.scrollEnabled ? uniforms.uPageProgress.value : 0
+      const cameraMorph = morph*morph*(3-2*morph)
+      const mobile = container.clientWidth < 768
+      camera.position.x = (profile.camera[0] + Math.sin(time * 0.08) * 0.5) * (1-cameraMorph)
+      camera.position.y = (profile.camera[1] + Math.cos(time * 0.065) * 0.12 + scrollDrift * 0.12) * (1-cameraMorph)
+      // Fit the same sphere on narrow displays without clipping its silhouette.
+      const globeDistance = mobile ? Math.max(10.5, 4.3 / Math.max(0.25,camera.aspect) / Math.tan(Math.PI/6)) : 10.6
+      camera.position.z = THREE.MathUtils.lerp(profile.camera[2], globeDistance, cameraMorph)
+      camera.lookAt(0, -0.8 + cameraMorph*0.5, 0)
       const footerFade = 1 - THREE.MathUtils.smoothstep(sceneState.pageProgress, 0.94, 1)
       uniforms.uOpacity.value = profile.opacity * footerFade
+      uniforms.uLineOpacity.value = profile.opacity * THREE.MathUtils.lerp(0.16, 0.27, morph)
+      atmosphereMaterial.uniforms.uOpacity.value *= footerFade
+      coastlineMaterial.uniforms.uOpacity.value *= footerFade
+      oceanMaterial.opacity *= footerFade
+      planetaryConnections.update(renderedNetworkProgress, footerFade * morph ** 4 * 0.92)
       renderer.render(scene, camera)
 
       if (!readyReported) {
@@ -463,6 +695,7 @@ export default function NeuralField({
     }
 
     const handlePointerMove = (event) => {
+      if ((sceneStateRef.current.morphProgress || 0) > 0.8) return
       const sceneElement = container.closest('.marketing-scene')
       const bounds = sceneElement?.getBoundingClientRect()
       const withinScene = bounds && event.clientX >= bounds.left && event.clientX <= bounds.right
@@ -527,6 +760,8 @@ export default function NeuralField({
 
     const handleVisibility = () => {
       pageVisible = document.visibilityState === 'visible'
+      lastAnimationAt = null
+      previousRenderAt = null
       updateLoop()
     }
     const handleContextLost = (event) => {
@@ -540,11 +775,10 @@ export default function NeuralField({
       if (HERO_QUALITY_ORDER.indexOf(viewportTier) < HERO_QUALITY_ORDER.indexOf(tier)) {
         degradeRequested = true
         onDegrade?.(viewportTier)
-        return
       }
       camera.aspect = container.clientWidth / container.clientHeight
       camera.updateProjectionMatrix()
-      const pixelRatio = Math.min(window.devicePixelRatio, quality.maxDpr)
+      const pixelRatio = Math.min(window.devicePixelRatio, qualityRef.current.maxDpr)
       renderer.setPixelRatio(pixelRatio)
       uniforms.uPixelRatio.value = pixelRatio
       renderer.setSize(container.clientWidth, container.clientHeight)
@@ -554,14 +788,14 @@ export default function NeuralField({
     resizeObserver.observe(container)
     document.addEventListener('visibilitychange', handleVisibility)
     renderer.domElement.addEventListener('webglcontextlost', handleContextLost)
-    if (quality.pointerEnabled) window.addEventListener('pointermove', handlePointerMove, { passive: true })
-    if (quality.pointerEnabled) window.addEventListener('pointerdown', handlePointerDown, { passive: true })
-    if (quality.pointerEnabled) window.addEventListener('pointerup', handlePointerEnd, { passive: true })
-    if (quality.pointerEnabled) window.addEventListener('pointercancel', handlePointerEnd, { passive: true })
-    if (quality.pointerEnabled) window.addEventListener('pointerout', handlePointerOut, { passive: true })
-    if (quality.pointerEnabled) window.addEventListener('touchstart', handleTouchStart, { passive: true })
-    if (quality.pointerEnabled) window.addEventListener('touchmove', handleTouchMove, { passive: true })
-    if (quality.pointerEnabled) window.addEventListener('touchend', handleTouchEnd, { passive: true })
+    if (qualityRef.current.pointerEnabled) window.addEventListener('pointermove', handlePointerMove, { passive: true })
+    if (qualityRef.current.pointerEnabled) window.addEventListener('pointerdown', handlePointerDown, { passive: true })
+    if (qualityRef.current.pointerEnabled) window.addEventListener('pointerup', handlePointerEnd, { passive: true })
+    if (qualityRef.current.pointerEnabled) window.addEventListener('pointercancel', handlePointerEnd, { passive: true })
+    if (qualityRef.current.pointerEnabled) window.addEventListener('pointerout', handlePointerOut, { passive: true })
+    if (qualityRef.current.pointerEnabled) window.addEventListener('touchstart', handleTouchStart, { passive: true })
+    if (qualityRef.current.pointerEnabled) window.addEventListener('touchmove', handleTouchMove, { passive: true })
+    if (qualityRef.current.pointerEnabled) window.addEventListener('touchend', handleTouchEnd, { passive: true })
     updateLoop()
 
     return () => {
@@ -579,6 +813,13 @@ export default function NeuralField({
       window.removeEventListener('touchend', handleTouchEnd)
       if (triggerProofRef.current === triggerProof) triggerProofRef.current = null
       if (touchResetTimer !== null) window.clearTimeout(touchResetTimer)
+      planetaryConnections.dispose()
+      coastlineGeometry.dispose()
+      coastlineMaterial.dispose()
+      oceanGeometry.dispose()
+      oceanMaterial.dispose()
+      atmosphereGeometry.dispose()
+      atmosphereMaterial.dispose()
       lineGeometry.dispose()
       pointGeometry.dispose()
       lineMaterial.dispose()
@@ -587,7 +828,7 @@ export default function NeuralField({
       renderer.forceContextLoss()
       if (renderer.domElement.isConnected) renderer.domElement.remove()
     }
-  }, [onDegrade, onFailure, onReady, quality, sceneStateRef])
+  }, [onDegrade, onFailure, onReady, sceneStateRef, globeStateRef])
 
   return (
     <div

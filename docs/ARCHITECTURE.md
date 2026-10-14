@@ -72,19 +72,22 @@ The explorer is always read-only.
 
 ## Neural renderer boundary
 
-`three` is imported only by `components/marketing/NeuralField.jsx`. The component is dynamically imported, rendered only on the marketing home page, skipped when reduced motion is requested, and emitted as `three-marketing` in production builds.
+Three.js is isolated in the lazy marketing-home renderer and its pointer helper. The renderer stays on one canvas while the shader-displaced neural topography converges into a planetary network. Console and evidence routes do not import or execute Three.js at runtime.
 
-This renderer is a decorative, interactive neural background. It is not a protocol map, entity graph, or representation of protocol topology.
+This scene is an illustrative network, not a protocol map, entity graph, or representation of deployed infrastructure. It does not read ExplorerClient data.
 
-Console and evidence routes do not import or execute Three.js at runtime.
+- Source node IDs and the original sparse grid edge pairs remain stable during scroll, rotation, resize, and quality degradation.
+- Equal-area spherical rings preserve source-grid locality without duplicate poles or a duplicated longitude seam. Both points and subdivided spherical edges evaluate the same GLSL morph function.
+- A native scroll interval ends at the dedicated planetary chapter. Reversing scroll restores the source field; pause only freezes ambient motion.
+- `GlobeChapter` provides a scoped drag region, keyboard rotation, bounded zoom, pause, reset, and explicit touch exploration. Accessible controls remain outside the aria-hidden visual backdrop. Wheel input continues scrolling the document.
+- `wide`, `high`, `medium`, and `low` profiles cap initial geometry and DPR. A quality change reduces density or DPR without recreating the renderer or changing node IDs.
+- Reduced motion and WebGL failures retain the CSS topology and a static planetary composition, with no unusable interaction controls.
+- Rendering stops when the document is hidden. Geometry, materials, observers, listeners, and the canvas are disposed on home exit. Context loss switches to the fallback.
+- A monochrome shader rim supplies restrained atmosphere without additional rendering dependencies. Bundled public-domain Natural Earth land coordinates classify the existing nodes and add coastlines that share the globe orientation and zoom. Ocean nodes and grid lines recede during closure; the same geography supplies the static fallback. Photographic textures, live geographic markers, and full atmospheric-scattering packages remain outside this change.
+- After globe completion, a second reversible scroll interval grows an illustrative network outward from India and Bangladesh. Forty-three geographic anchors reuse existing grid node IDs; raised great-circle routes connect local, regional, and distant junctions before two orbital paths appear. The geometry is allocated once and follows the same rotation and zoom uniforms. These anchors do not represent deployment locations.
+- The planetary chapter occupies 280 viewport heights with a sticky viewport stage. Network growth spans 1.45 viewport heights after a short completed-globe pause. Reduced motion and renderer fallback remove the extended sticky sequence. Browser coverage specifies growth, reversal, canvas identity, and stage visibility; running that coverage requires the browser QA environment.
 
-The marketing hero renders a deterministic shader-displaced neural topography:
-
-- `wide`, `desktop`, `tablet`, and `mobile` profiles independently cap geometry and device pixel ratio;
-- widths below `360px`, reduced-motion clients, low-power devices, and WebGL failures use the complete CSS topology;
-- pointer proof waves are available only to fine pointers;
-- rendering pauses when the hero or browser document is not visible;
-- geometry, materials, renderer state, observers, and the canvas are disposed on teardown.
+The hosted preview is a separate Site; publishing it does not update vams.network or the GitHub repository. Browser/device visual and performance verification must be recorded separately from unit tests and build results.
 
 ## Responsive composition boundary
 

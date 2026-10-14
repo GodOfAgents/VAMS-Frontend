@@ -2,6 +2,7 @@ import { ArrowDown, ArrowRight, Boxes, Braces, Cpu, FileCheck2, Globe2, ShieldCh
 import { useCallback, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { LifecycleEnhancer } from '../../components/marketing/LifecycleEnhancer.jsx'
+import { GlobeChapter } from '../../components/marketing/GlobeChapter.jsx'
 import { MarketingVisual } from '../../components/marketing/MarketingVisual.jsx'
 import { ArchitectureDiagram } from '../../components/marketing/ArchitectureDiagram.jsx'
 import { ArchitectureFocus } from '../../components/marketing/ArchitectureFocus.jsx'
@@ -30,6 +31,8 @@ const architecture = [
 ]
 
 export function HomePage() {
+  const globeStateRef = useRef({ yaw: 0, pitch: 0, zoom: 1, paused: false, exploring: false, resetVersion: 0 })
+  const [rendererState, setRendererState] = useState('loading')
   const lifecycleRef = useRef(null)
   const architectureRef = useRef(null)
   const [proofSignal, setProofSignal] = useState(0)
@@ -37,7 +40,7 @@ export function HomePage() {
 
   return (
     <div className="marketing-home">
-      <MarketingVisual proofSignal={proofSignal} />
+      <MarketingVisual proofSignal={proofSignal} globeStateRef={globeStateRef} onRendererState={setRendererState} />
       <section className="hero" data-scene-chapter="intro">
         <div className="hero__content">
           <div className="hero__copy">
@@ -67,6 +70,8 @@ export function HomePage() {
         <StaggerItem><span>Current mode</span><strong>Research and development</strong></StaggerItem>
         <StaggerItem><span>Public surface</span><strong>Read-only</strong></StaggerItem>
       </StaggerGroup>
+
+      <GlobeChapter globeStateRef={globeStateRef} rendererState={rendererState} />
 
       <ExpandingChapter className="editorial-section continuity-section">
         <ArchitectureDiagram variant="continuity" />

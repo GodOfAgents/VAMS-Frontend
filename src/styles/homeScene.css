@@ -42,8 +42,8 @@
   inset: -12%;
   z-index: 1;
   background:
-    radial-gradient(ellipse at 50% calc(112% - (var(--scene-page-progress) * 52%)), rgba(111, 205, 255, .08), transparent 42%),
-    linear-gradient(180deg, rgba(4, 10, 18, 0) 24%, rgba(4, 10, 18, calc(.05 + (var(--scene-page-progress) * .08))) 100%);
+    radial-gradient(ellipse at 50% calc(112% - (var(--scene-page-progress) * 52%)), rgba(220, 220, 220, .04), transparent 42%),
+    linear-gradient(180deg, rgba(5, 5, 5, 0) 24%, rgba(5, 5, 5, calc(.05 + (var(--scene-page-progress) * .08))) 100%);
   content: "";
   opacity: .9;
   transform: translate3d(0, calc(var(--scene-page-progress) * -1.2%), 0);
@@ -217,4 +217,103 @@
   .scene-progress__ticks i {
     transition: none;
   }
+}
+
+.planetary-chapter {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto minmax(280px, 1fr) auto;
+  padding: clamp(70px, 9vh, 108px) var(--page-gutter) 34px;
+  color: #ededeb;
+  text-align: center;
+  background: transparent;
+}
+.planetary-chapter__heading { pointer-events: none; position: relative; z-index: 2; }
+.planetary-chapter__heading .eyebrow { color: #aaa; font-size: 10px; letter-spacing: .2em; }
+.planetary-chapter__heading h2 { margin: 16px 0 0; font-size: clamp(30px, 3.1vw, 54px); font-weight: 400; line-height: 1.1; letter-spacing: -.045em; }
+.planetary-chapter__heading h2 em { font-family: var(--font-serif, 'Playfair Display', Georgia, serif); color: #a5a5a0; font-weight: 400; }
+.globe-interaction { width: min(720px, 88vw); min-height: 280px; justify-self: center; align-self: stretch; border-radius: 50%; cursor: grab; outline: none; touch-action: pan-y pinch-zoom; user-select: none; -webkit-user-select: none; }
+.globe-interaction:focus-visible { outline: 1px solid #aaa; outline-offset: 8px; }
+.globe-interaction--dragging { cursor: grabbing; }
+.globe-interaction--exploring { touch-action: none; }
+.planetary-chapter__footer { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 13px; }
+.globe-caption { display: flex; gap: 8px; align-items: center; margin: 0; font-family: 'JetBrains Mono', monospace; color: #a6a6a2; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; }
+.globe-caption > span { width: 4px; height: 4px; background: #c7c7c1; border-radius: 50%; box-shadow: 0 0 9px #ffffff55; }
+.globe-controls { display: flex; align-items: center; padding: 5px; gap: 2px; border: 1px solid #ffffff20; border-radius: 99px; background: #101010cc; backdrop-filter: blur(14px); }
+.globe-controls button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-width: 38px; min-height: 38px; padding: 0 10px; border: 0; border-radius: 50%; background: transparent; color: #c7c7c3; cursor: pointer; font: inherit; font-size: 13px; transition: background-color 160ms, color 160ms; }
+.globe-controls button:hover, .globe-controls button[aria-pressed='true'] { background: #ffffff14; color: #fff; }
+.globe-controls button:focus-visible { outline: 2px solid #eee; outline-offset: 2px; }
+.globe-controls .globe-controls__explore { border-radius: 99px; padding: 0 13px; font-size: 11px; }
+.globe-controls__separator { height: 15px; width: 1px; background: #ffffff20; margin: 0 4px; }
+.globe-instructions { margin: 0; color: #93938f; font-size: 10px; letter-spacing: .04em; }
+.globe-static-orb { position: relative; width: min(320px, 65vw); aspect-ratio: 1; border-radius: 50%; border: 1px solid #dadad744; margin: 24px auto; overflow: hidden; background: radial-gradient(circle at 36% 28%, #ffffff0e, transparent 65%); }
+.globe-static-orb::before, .globe-static-orb::after, .globe-static-orb i { content: ''; position: absolute; inset: 0; border: 1px solid #dadad72b; border-radius: 50%; }
+.globe-static-orb::before { transform: scaleX(.35); }
+.globe-static-orb::after { transform: scaleX(.72); }
+.globe-static-orb i:nth-child(1) { transform: scaleY(.24); }
+.globe-static-orb i:nth-child(2) { transform: scaleY(.64); }
+.globe-static-orb i:nth-child(3) { transform: rotate(35deg) scaleX(.45); }
+.globe-static-orb i:nth-child(4) { transform: rotate(-35deg) scaleX(.45); }
+.globe-static-orb i:nth-child(5) { background: radial-gradient(circle, #deded8 0 .8px, transparent 1px) 0 0 / 17px 17px; opacity: .3; }
+@media (max-width: 767px) {
+  .planetary-chapter { min-height: 92svh; padding-top: 76px; padding-bottom: 24px; grid-template-rows: auto minmax(240px, 1fr) auto; }
+  .planetary-chapter__heading .eyebrow { font-size: 8px; }
+  .globe-interaction { width: 90vw; min-height: 240px; }
+  .globe-controls { gap: 0; }
+  .globe-controls button { min-width: 34px; padding: 0 7px; }
+  .globe-controls__separator { margin: 0 2px; }
+  .globe-instructions { font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .globe-controls button { transition: none; }
+}
+@media (max-width: 479px) {
+  .globe-controls { flex-wrap: wrap; justify-content: center; max-width: calc(100vw - 40px); border-radius: 20px; }
+  .globe-controls .globe-controls__explore { flex-basis: 100%; border-radius: 14px; }
+}
+
+.globe-static-orb { border: 0; background: transparent; }
+.globe-static-orb::before, .globe-static-orb::after { display: none; }
+.globe-static-orb img { display: block; width: 100%; height: auto; }
+
+/* A native sticky chapter gives each scroll stage room without hijacking input. */
+.planetary-chapter { display: block; min-height: 280svh; padding: 0; --network-progress: 0; }
+.planetary-chapter__stage { position: sticky; top: 0; height: 100svh; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; padding: clamp(64px, 8vh, 96px) var(--page-gutter) 24px; }
+.planetary-chapter__stage .globe-interaction { min-height: 0; }
+.planetary-chapter__stage .planetary-chapter__heading h2 { font-size: clamp(28px, 2.8vw, 46px); }
+.network-evolution { position: absolute; left: var(--page-gutter); top: 45%; text-align: left; pointer-events: none; font-family: 'JetBrains Mono', monospace; }
+.network-evolution__kicker { color: #858580; font-size: 8px; letter-spacing: .2em; }
+.network-evolution ol { display: flex; flex-direction: column; gap: 15px; margin: 24px 0; padding: 0; list-style: none; }
+.network-evolution li { color: #666663; font-size: 10px; letter-spacing: .04em; transition: color 350ms; }
+.network-evolution li > span { margin-right: 12px; color: #777773; font-size: 8px; }
+.planetary-chapter[data-network-stage='local'] [data-network-step='local'],
+.planetary-chapter[data-network-stage='regional'] [data-network-step='regional'],
+.planetary-chapter[data-network-stage='planetary'] [data-network-step='planetary'] { color: #f0f0eb; }
+.network-evolution__track { display: block; width: 140px; height: 1px; background: #ffffff20; }
+.network-evolution__track i { display: block; width: 100%; height: 1px; background: #d4d4cf; transform: scaleX(var(--network-progress)); transform-origin: left; transition: transform 220ms linear; }
+.network-evolution__status { margin: 0; font-size: 10px; color: #cacac5; letter-spacing: .08em; }
+.planetary-chapter--static { min-height: 100svh; }
+.planetary-chapter--static .planetary-chapter__stage { position: relative; min-height: 100svh; height: auto; grid-template-rows: auto minmax(260px, 1fr) auto; }
+@media (max-width: 1000px) {
+  .network-evolution { position: static; grid-row: 3; justify-self: center; text-align: center; width: min(360px, 90vw); padding-bottom: 16px; }
+  .network-evolution__kicker, .network-evolution__track { display: none; }
+  .network-evolution ol { flex-direction: row; gap: 14px; justify-content: center; margin: 0; }
+  .network-evolution li { font-size: 8px; }
+  .network-evolution li > span { display: none; }
+  .planetary-chapter__stage { padding-top: 70px; padding-bottom: max(20px, env(safe-area-inset-bottom)); grid-template-rows: auto minmax(0, 1fr) auto auto; }
+  .planetary-chapter__stage .globe-interaction { grid-row: 2; }
+  .planetary-chapter__stage .planetary-chapter__footer { grid-row: 4; }
+}
+@media (max-height: 650px) {
+  .planetary-chapter__stage { padding-top: 54px; padding-bottom: 12px; }
+  .planetary-chapter__stage .planetary-chapter__heading h2 { font-size: 26px; }
+  .planetary-chapter__heading .eyebrow { font-size: 8px; }
+  .planetary-chapter__footer { gap: 7px; }
+  .network-evolution { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .network-evolution__track i { transition: none; }
+  .planetary-chapter { min-height: 100svh; }
+  .planetary-chapter__stage { position: relative; height: auto; min-height: 100svh; }
 }

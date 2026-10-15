@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import process from 'node:process'
 
 test('one adaptive neural scene carries the homepage topology from hero through CTA', async ({ page }, testInfo) => {
   await page.setViewportSize({ width: 1440, height: 900 })
@@ -72,20 +73,26 @@ test('compact mobile uses the low-quality neural scene and keeps the first CTA i
 })
 
 test('touch excites the mobile neural field and releases after a short afterglow', async ({ browser }, testInfo) => {
-  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 3 })
+  const page = await browser.newPage({
+    viewport: { width: 390, height: 844 },
+    isMobile: true,
+    hasTouch: true,
+    deviceScaleFactor: 3,
+    baseURL: process.env.VAMS_AUDIT_MARKETING_ORIGIN
+      ?? `http://127.0.0.1:${process.env.VAMS_AUDIT_MARKETING_PORT ?? '4373'}`,
+  })
   try {
-    const page = await context.newPage()
     await page.goto('/', { waitUntil: 'domcontentloaded' })
     const scene = page.locator('[data-marketing-scene]')
     await expect(scene).toHaveAttribute('data-hero-renderer', /^(ready|fallback)$/)
     test.skip(await scene.getAttribute('data-hero-renderer') === 'fallback', 'WebGL unavailable in this browser')
 
-    await page.touchscreen.tap(300, 650)
+    await page.touchscreen.tap(8, 400)
     await expect(scene).toHaveCSS('--scene-pointer-opacity', '1')
     await page.screenshot({ path: testInfo.outputPath('mobile-neural-touch.png'), animations: 'disabled' })
     await expect.poll(() => scene.evaluate((element) => element.style.getPropertyValue('--scene-pointer-opacity')), { timeout: 3000 }).toBe('0')
   } finally {
-    await context.close()
+    await page.close()
   }
 })
 
@@ -115,5 +122,5 @@ test('public surfaces share fluid hover treatment without mounting a protocol sc
 
   await page.goto('/build', { waitUntil: 'commit' })
   const migrationStep = page.locator('.migration-path li').first()
-  await expect(migrationStep).toHaveCSS('transition-property', /transform/)
+  await expect(migrationStep).toHaveCSS('transition-property', /padding-left/)
 })

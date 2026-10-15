@@ -12,6 +12,8 @@ Documentation remains generated from repository Markdown.
 
 ## Route boundary
 
+All current surfaces are served from `https://www.vams.network`. The Vercel SPA rewrite sends application routes to `index.html`, while Vercel serves existing static files first. `app.vams.network` and `status.vams.network` remain planned destinations until separately deployed.
+
 Marketing:
 
 ```text
@@ -55,6 +57,8 @@ When the Gateway origin is absent, unreachable, or malformed:
 1. the request fails closed;
 2. an unavailable state is rendered;
 3. no synthetic data is substituted.
+
+The public preview distinguishes an unconfigured Gateway, a connection or retryable HTTP failure, a rejected HTTP response, a malformed envelope, an empty collection, and loaded records. Retry appears only when the failure can plausibly recover without configuration changes. Website availability is reported independently from Gateway availability.
 
 Simulation is enabled only by `VITE_VAMS_SIMULATION_ENABLED=true` or `npm run dev:simulation`. It renders a persistent disclosure and marks every result `SIMULATED`.
 

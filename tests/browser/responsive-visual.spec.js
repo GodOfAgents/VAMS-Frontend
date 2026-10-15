@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test'
+import process from 'node:process'
 
 const viewportBaselines = [
   { name: '320x568', width: 320, height: 568 },
@@ -75,7 +76,7 @@ test('motion and neural topography activate only for the capable marketing profi
 
   const wordIndexes = await page.locator('.hero [data-smoke-mode="words"] .smoke-text__word--animated')
     .evaluateAll((words) => words.map((word) => Number(word.dataset.smokeIndex)))
-  expect(wordIndexes).toEqual([0, 1, 2, 3, 4, 5])
+  expect(wordIndexes).toEqual([0, 1, 2, 3, 4, 5, 6, 7])
 
   const heroGlass = await page.locator('.protocol-strip > div').first().evaluate((surface) => {
     const style = getComputedStyle(surface)
@@ -127,7 +128,7 @@ test('WebGL failure retains the complete static hero', async ({ page }) => {
   await expect(page.locator('[data-hero-renderer="fallback"]')).toBeVisible()
   await expect(page.locator('.neural-field--static')).toBeVisible()
   await expect(page.locator('[data-marketing-three]')).toHaveCount(0)
-  await expect(page.locator('.hero h1')).toHaveAccessibleName('What survives when the host changes?')
+  await expect(page.locator('.hero h1')).toHaveAccessibleName('Web 4.0 for services that outlive their host.')
 })
 
 test('reduced motion uses the complete static hero without loading cinematic bundles', async ({ page }) => {
@@ -141,14 +142,14 @@ test('reduced motion uses the complete static hero without loading cinematic bun
 
   await expect(page.locator('.hero-visual--static')).toBeVisible()
   await expect(page.locator('[data-marketing-three]')).toHaveCount(0)
-  await expect(page.locator('.hero [data-smoke-mode="words"] .smoke-text__word')).toHaveCount(6)
+  await expect(page.locator('.hero [data-smoke-mode="words"] .smoke-text__word')).toHaveCount(8)
   await expect(page.locator('.smoke-text__word--animated')).toHaveCount(0)
   expect(requestedAssets.some((url) => /three-marketing|gsap-marketing/.test(url))).toBe(false)
 })
 
 for (const surface of [
-  { name: 'console', port: 4374, path: '/overview' },
-  { name: 'status', port: 4375, path: '/status' },
+  { name: 'console', port: Number(process.env.VAMS_AUDIT_CONSOLE_PORT || 4374), path: '/overview' },
+  { name: 'status', port: Number(process.env.VAMS_AUDIT_STATUS_PORT || 4375), path: '/status' },
 ]) {
   test(`${surface.name} mobile surface excludes cinematic bundles`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 })

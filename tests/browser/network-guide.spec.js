@@ -1,8 +1,10 @@
 import { expect, test } from '@playwright/test'
+import process from 'node:process'
 import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
 const axeScript = require.resolve('axe-core/axe.min.js')
+const marketingOrigin = process.env.VAMS_AUDIT_MARKETING_ORIGIN || 'http://127.0.0.1:4373'
 
 test('network guide fits mobile, tablet, desktop, and enlarged text', async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
@@ -40,7 +42,7 @@ test('network code controls, FAQ, sources, and accessibility work', async ({ pag
   await expect(page.getByText(/fresh, authenticated telemetry/i)).toBeVisible()
   await expect(page.locator('a[href$="docs/API_REFERENCE.md"]').first()).toBeVisible()
   await page.route('**/__axe__.js', (request) => request.fulfill({ path: axeScript, contentType: 'application/javascript' }))
-  await page.addScriptTag({ url: 'http://127.0.0.1:4373/__axe__.js' })
+  await page.addScriptTag({ url: `${marketingOrigin}/__axe__.js` })
   const violations = await page.evaluate(async () => (await window.axe.run(document, { resultTypes: ['violations'] })).violations.filter(({ impact }) => ['critical', 'serious'].includes(impact)).map(({ id, impact }) => ({ id, impact })))
   expect(violations).toEqual([])
 })

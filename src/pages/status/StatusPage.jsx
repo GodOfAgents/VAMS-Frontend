@@ -18,11 +18,11 @@ export function StatusPage() {
       <div className="status-columns">
         <section className="status-column">
           <div className="status-column__head"><Activity aria-hidden="true" /><div><p className="eyebrow">Runtime observation</p><h2>Operational status</h2></div></div>
+          <div className="operational-row"><span>Website frontend</span><StatusBadge state="ONLINE" /></div>
           <DataBoundary resource={meta} onRetry={() => load('meta')}>
             {(data, envelope) => (
               <>
                 <div className="operational-row"><span>Gateway</span><StatusBadge state={data.gateway_status} /></div>
-                <div className="operational-row"><span>Frontend</span><StatusBadge state="ONLINE" /></div>
                 <div className="operational-row"><span>Deployment observation</span><StatusBadge state="UNKNOWN" /></div>
                 <Provenance envelope={envelope} />
               </>
@@ -31,7 +31,7 @@ export function StatusPage() {
         </section>
         <section className="status-column status-column--readiness">
           <div className="status-column__head"><ShieldAlert aria-hidden="true" /><div><p className="eyebrow">Release qualification</p><h2>Readiness status</h2></div></div>
-          <div className="readiness-summary"><StatusBadge state="BLOCKED" /><p>Public-testnet exposure requires browser security, accessibility, phishing, CSP, Gateway, and commit-bound evidence gates.</p></div>
+          <div className="readiness-summary"><StatusBadge state="BLOCKED" /><p>Repository readiness snapshot dated 2026-07-25. Public-testnet exposure requires browser security, accessibility, phishing, CSP, Gateway, and commit-bound evidence gates; this snapshot is not live Gateway data.</p></div>
           <Link className="text-link" to="/evidence">Open detailed evidence register →</Link>
         </section>
       </div>

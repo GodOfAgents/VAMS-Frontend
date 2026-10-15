@@ -102,13 +102,14 @@ export function BlueprintDetailPage() {
   const resource = useResource('blueprints')
   const { load } = useProtocol()
   return (
+    <>
+    <PageHeader eyebrow="Blueprint detail" title={blueprintId} description="Inspectable workload definition, requirements, and available evidence."><Link className="text-link" to="/blueprints">← Back to blueprints</Link></PageHeader>
     <DataBoundary resource={resource} onRetry={() => load('blueprints')}>
       {(rows, envelope) => {
         const blueprint = rows.find((item) => item.id === blueprintId)
         if (!blueprint) return <div className="data-state">Blueprint <code>{blueprintId}</code> is not visible.</div>
         return (
           <>
-            <PageHeader eyebrow="Blueprint detail" title={blueprint.name} description={blueprint.purpose}><StatusBadge state="READ_ONLY" /></PageHeader>
             <div className="detail-grid">
               <section className="panel">
                 <p className="eyebrow">Workload</p><h2>Required compute</h2>
@@ -128,10 +129,11 @@ export function BlueprintDetailPage() {
               <CompositionSimulator blueprint={blueprint} />
             </div>
             <Provenance envelope={envelope} />
-            <Link className="text-link" to="/blueprints">← Back to blueprints</Link>
+            <StatusBadge state="READ_ONLY" />
           </>
         )
       }}
     </DataBoundary>
+    </>
   )
 }

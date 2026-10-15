@@ -45,8 +45,8 @@ const content = {
 }
 
 const campaignQuestions = {
-  build: { number: '03 / Build', question: 'What must your service carry?', answer: 'Map identity, permissions, state, and irreversible effects before composing providers.', terms: ['Identity', 'Permissions', 'State'], to: '/protocol', action: 'Inspect the architecture' },
-  operate: { number: '04 / Operate', question: 'What must a provider prove?', answer: 'Declared capabilities and telemetry are only the start; live readiness remains gated by evidence.', terms: ['Capabilities', 'Telemetry', 'Proof'], to: '/status', action: 'Review readiness' },
+  build: { number: '03 / Build', question: 'What must your service carry?', answer: 'Map identity, permissions, state, and irreversible effects before composing providers.', terms: ['Identity', 'Permissions', 'State'], to: '/protocol#integration', action: 'Start developer integration' },
+  operate: { number: '04 / Operate', question: 'What must a provider prove?', answer: 'Declared capabilities and telemetry are only the start; live readiness remains gated by evidence.', terms: ['Capabilities', 'Telemetry', 'Proof'], to: '/operate#requirements', action: 'Review operator requirements' },
 }
 
 const migrationSteps = [
@@ -59,13 +59,13 @@ const migrationSteps = [
 function TopicComposition({ topic, page }) {
   if (topic === 'build') return (
     <section className="migration-path" aria-label="Migration stages">
-      <div className="topic-section-intro"><p className="eyebrow">An incremental path</p><h2>Keep the service.<br />Expand its freedom.</h2><p>Start with one capability. Preserve identity, permissions, state, and recovery.</p><Link to="/blueprints" className="text-link">Inspect blueprints <ArrowRight size={16} aria-hidden="true" /></Link></div>
+      <div className="topic-section-intro"><p className="eyebrow">An incremental path</p><h2>Keep the service.<br />Expand its freedom.</h2><p>Start with one capability. Preserve identity, permissions, state, and recovery.</p><Link to="/protocol#integration" className="button">Start developer integration <ArrowRight size={16} aria-hidden="true" /></Link><Link to="/blueprints" className="text-link">Inspect blueprints <ArrowRight size={16} aria-hidden="true" /></Link></div>
       <ol>{migrationSteps.map(([title, detail, boundary], index) => <li key={title}><span className="topic-number">0{index + 1}</span><div><h3>{title}</h3><p>{detail}</p><small>{boundary}</small></div></li>)}</ol>
     </section>
   )
   if (topic === 'operate') return (
     <section className="operator-readiness" aria-label="Operator requirements and release gates">
-      <div className="operator-requirements"><p className="eyebrow">Prepare to participate</p><h2>Capability requires accountability.</h2>{page.pillars.slice(0, 2).map(([title, detail]) => <article key={title}><h3>{title}</h3><p>{detail}</p></article>)}<Link className="text-link" to="/nodes">Inspect node records <ArrowRight size={16} aria-hidden="true" /></Link></div>
+      <div className="operator-requirements" id="requirements"><p className="eyebrow">Prepare to participate</p><h2>Capability requires accountability.</h2>{page.pillars.slice(0, 2).map(([title, detail]) => <article key={title}><h3>{title}</h3><p>{detail}</p></article>)}<Link className="button" to="/status">Review operator release gates <ArrowRight size={16} aria-hidden="true" /></Link><Link className="text-link" to="/nodes">Inspect node records <ArrowRight size={16} aria-hidden="true" /></Link></div>
       <div className="release-gates"><p className="eyebrow">Before live participation</p><h2>Release gates</h2><ul>{[['Identity and transport', 'Authorization, telemetry, and fail-closed dependencies require verified deployment evidence.'], ['Independent providers', 'Mock adapters are not staging or production evidence.'], ['Economic actions', 'Registration, staking, rewards, and settlement remain unavailable on this surface.']].map(([title, detail]) => <li key={title}><CircleDashed aria-hidden="true" size={20} /><div><h3>{title}</h3><p>{detail}</p></div></li>)}</ul><Link to="/status" className="text-link">Review verification status <ArrowRight size={16} aria-hidden="true" /></Link></div>
     </section>
   )

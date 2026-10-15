@@ -26,5 +26,13 @@ describe('route metadata', () => {
     expect(document.querySelector('meta[name="description"]')?.content).toMatch(/maturity states/i)
     expect(document.querySelector('meta[property="og:title"]')?.content).toBe(document.title)
     expect(document.querySelector('meta[name="twitter:description"]')?.content).toMatch(/pre-testnet gates/i)
+    expect(document.querySelector('link[rel="canonical"]')?.href).toBe('https://www.vams.network/research')
+    expect(document.querySelector('meta[property="og:url"]')?.content).toBe('https://www.vams.network/research')
+    expect(document.querySelector('meta[name="robots"]')?.content).toBe('index, follow')
+  })
+
+  it('excludes console routes from indexing', () => {
+    applyRouteMetadata('/service-blocks/sb_example')
+    expect(document.querySelector('meta[name="robots"]')?.content).toBe('noindex, nofollow')
   })
 })

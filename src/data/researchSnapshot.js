@@ -92,7 +92,7 @@ export const implementationMap = [
 ]
 
 export const projectUpdates = [
-  { id: 'unreleased', label: 'Unreleased', date: '2026-07-25', detail: 'Current public status and testnet readiness gates were reconciled against source-backed implementation reality.', surface: 'Repository status', evidenceTier: 'source implemented', source: 'REPO_STATUS_REPORT.md' },
+  { id: 'unreleased', label: 'Repository snapshot', date: '2026-07-25', detail: 'Public status and testnet readiness gates were reconciled against source-backed implementation reality as of this dated repository snapshot.', surface: 'Repository status', evidenceTier: 'source implemented', source: 'REPO_STATUS_REPORT.md' },
   { id: 'v0.8.0', label: 'v0.8.0', date: '2026-06-23', detail: 'CHC cognitive profiles and 6-axis Composer scoring were added with dynamic weight normalization and enriched telemetry.', surface: 'Composer / cognitive layer', evidenceTier: 'source implemented', source: 'docs/CHANGELOG.md' },
   { id: 'v1.3.0-oms', label: 'v1.3.0-oms', date: '2026-05-06', detail: 'OMS identity, Trails transport, ERC-4337 session keys, Coinme rails, insurance yield, and stablecoin payout boundaries were added.', surface: 'Identity / economics', evidenceTier: 'source implemented', source: 'docs/CHANGELOG.md' },
   { id: 'v1.2.0-autoskill', label: 'v1.2.0-autoskill', date: '2026-04-29', detail: 'AUTOSKILL intelligence modules, activation steering, skill discovery, and anomaly detection were added.', surface: 'Intelligence layer', evidenceTier: 'source implemented', source: 'docs/CHANGELOG.md' },
@@ -102,7 +102,7 @@ export const projectUpdates = [
 
 export const auditPosture = {
   historical: { label: 'Historical audit baseline', value: '68 / 68 findings resolved', detail: 'The v0.6.0 audit baseline is historical evidence, not current deployment proof.', source: 'audit.md' },
-  current: { label: 'Current readiness', value: '3 implemented · 29 partial · 4 blocked · 0 verified', detail: 'The public-testnet candidate remains fail-closed until commit-bound CI, deployment, and independent evidence gates pass.', source: 'REPO_STATUS_REPORT.md' },
+  current: { label: 'Readiness snapshot · 2026-07-25', value: '3 implemented · 29 partial · 4 blocked · 0 verified', detail: 'This dated repository snapshot records a public-testnet candidate blocked until commit-bound CI, deployment, and independent evidence gates pass. It is not a live status feed.', source: 'REPO_STATUS_REPORT.md' },
   gates: [
     ['Local verification', 'Implemented local test suites pass across the major protocol surfaces.', 'locally verified'],
     ['CI-bound evidence', 'Exact-commit CI reruns and security evidence remain required before release promotion.', 'verification pending'],

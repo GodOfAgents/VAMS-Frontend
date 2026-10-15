@@ -6,6 +6,9 @@ All notable frontend changes are documented here following Keep a Changelog.
 
 ### Added
 
+- Vercel SPA route rewrites, public-route sitemap, console exclusion rules, canonical URLs, and absolute share images.
+- A Radix Dialog mobile console drawer, persistent reduced-motion control, post-hero audience shortcuts, and explicit missing-Gateway guidance.
+
 - A reversible neural-to-Earth morph with bundled coastlines, an India/Bangladesh starting view, and accessible globe controls.
 - Scroll-grown illustrative junctions, raised connections, and orbital paths, with a sticky planetary chapter and reduced-motion fallback.
 - Distinct Protocol, Network, Build, Operate, and Research public-page compositions with clearer builder and operator pathways.
@@ -29,6 +32,11 @@ All notable frontend changes are documented here following Keep a Changelog.
 - A fixed full-homepage neural scene with lifecycle, architecture, evidence, journey, and CTA chapter art direction.
 
 ### Changed
+
+- Research filters preserve query, section anchor, and reading position; readiness copy now marks the July 2026 repository snapshot as dated evidence.
+- The public preview reports website availability separately from Gateway availability and offers retries only for recoverable failures.
+- Research controls reflow inside narrow viewports, the continuity animation clips its decorative surface, and console/status headings render immediately.
+- The single active website origin is documented accurately; the app and status subdomains remain planned destinations.
 
 - Refined the planetary network with steadier route luminance, quieter orbital guides, eased progress feedback, and mobile evolution labels that stay in the content flow.
 - Art-directed the public homepage around the “Design the Exit” continuity question, a conceptual provider-change model, evidence-first calls to action, and clearer audience routes. The model explicitly labels deployment as pending and makes no live handoff claim.

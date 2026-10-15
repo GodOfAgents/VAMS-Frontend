@@ -17,9 +17,9 @@ export function ExpandingChapter({ children, className = '' }) {
     <m.section
       className={`motion-chapter ${className}`}
       ref={ref}
-      style={motion.reducedMotion ? undefined : { clipPath }}
     >
-      {children}
+      <m.div className="motion-chapter__surface" aria-hidden="true" style={motion.reducedMotion ? undefined : { clipPath }} />
+      <div className="motion-chapter__content">{children}</div>
     </m.section>
   )
 }

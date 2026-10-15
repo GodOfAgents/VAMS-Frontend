@@ -1,6 +1,26 @@
+// @vitest-environment jsdom
+
 import { describe, expect, it } from 'vitest'
+import '@testing-library/jest-dom/vitest'
+import { fireEvent, render, screen } from '@testing-library/react'
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { researchReferences } from '../../data/researchSnapshot.js'
-import { filterResearchReferences } from './ResearchPage.jsx'
+import { filterResearchReferences, ResearchPage } from './ResearchPage.jsx'
+
+const TestIntersectionObserver = class {
+  constructor(callback) { this.callback = callback }
+  observe(target) { this.callback?.([{ isIntersecting: true, target }], this) }
+  unobserve() {}
+  disconnect() {}
+  takeRecords() { return [] }
+}
+globalThis.IntersectionObserver = TestIntersectionObserver
+window.IntersectionObserver = TestIntersectionObserver
+
+function LocationOutput() {
+  const { pathname, search, hash } = useLocation()
+  return <output aria-label="Current location">{pathname}{search}{hash}</output>
+}
 
 describe('ResearchPage filtering', () => {
   it('filters by family and maturity together', () => {
@@ -16,5 +36,19 @@ describe('ResearchPage filtering', () => {
 
   it('returns an empty result for an unknown query', () => {
     expect(filterResearchReferences(researchReferences, { query: 'no-such-research-record' })).toEqual([])
+  })
+
+  it('preserves the research section anchor while filters change and clear', () => {
+    render(
+      <MemoryRouter initialEntries={['/research#ledger']}>
+        <LocationOutput />
+        <Routes><Route path="/research" element={<ResearchPage />} /></Routes>
+      </MemoryRouter>,
+    )
+
+    fireEvent.change(screen.getByRole('textbox', { name: 'Search research' }), { target: { value: 'no-such-research-record' } })
+    expect(screen.getByLabelText('Current location')).toHaveTextContent('/research?q=no-such-research-record#ledger')
+    fireEvent.click(screen.getByRole('button', { name: 'Clear filters' }))
+    expect(screen.getByLabelText('Current location')).toHaveTextContent('/research#ledger')
   })
 })

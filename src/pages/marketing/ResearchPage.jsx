@@ -1,6 +1,6 @@
 import { ArrowUpRight, BookOpen, CheckCircle2, CircleDashed, GitBranch, History, Search, ShieldCheck } from 'lucide-react'
 import { useMemo } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { PageHeader } from '../../components/ui/PageHeader.jsx'
 import { CampaignBridge } from '../../components/marketing/CampaignBridge.jsx'
 import { Reveal, StaggerGroup, StaggerItem } from '../../motion/primitives.jsx'
@@ -56,7 +56,9 @@ function ResearchCard({ anchorId, entry }) {
 }
 
 function ResearchFilters() {
-  const [params, setParams] = useSearchParams()
+  const [params] = useSearchParams()
+  const location = useLocation()
+  const navigate = useNavigate()
   const query = params.get('q') || ''
   const family = params.get('family') || 'all'
   const maturity = params.get('maturity') || 'all'
@@ -65,7 +67,15 @@ function ResearchFilters() {
     const next = new URLSearchParams(params)
     if (!value || value === 'all') next.delete(key)
     else next.set(key, value)
-    setParams(next, { replace: true })
+    const hash = window.location.hash || location.hash
+    navigate({ pathname: location.pathname, search: next.size ? `?${next}` : '', hash }, { replace: true, preventScrollReset: true })
+  }
+
+  const clear = () => {
+    const next = new URLSearchParams(params)
+    for (const key of ['q', 'family', 'maturity']) next.delete(key)
+    const hash = window.location.hash || location.hash
+    navigate({ pathname: location.pathname, search: next.size ? `?${next}` : '', hash }, { replace: true, preventScrollReset: true })
   }
 
   return (
@@ -73,6 +83,7 @@ function ResearchFilters() {
       <label className="research-search"><Search aria-hidden="true" size={16} /><span className="sr-only">Search research</span><input value={query} onChange={(event) => update('q', event.target.value)} placeholder="Search papers, systems, or IDs" /></label>
       <label><span className="research-label">Family</span><select value={family} onChange={(event) => update('family', event.target.value)}><option value="all">All families</option>{researchFamilies.map((item) => <option value={item.id} key={item.id}>{item.id} · {item.title}</option>)}</select></label>
       <label><span className="research-label">Maturity</span><select value={maturity} onChange={(event) => update('maturity', event.target.value)}>{maturityOptions.map((item) => <option value={item} key={item}>{item === 'all' ? 'All maturity states' : label(item)}</option>)}</select></label>
+      {(query || family !== 'all' || maturity !== 'all') && <button className="text-button research-clear" type="button" onClick={clear}>Clear filters</button>}
     </div>
   )
 }
@@ -95,7 +106,7 @@ export function ResearchPage() {
   return (
     <div className="research-hub">
       <PageHeader eyebrow="Research and evidence" title="Questions. Sources. Proof." description="A clear view of what informs VAMS, what exists in code, and what remains unproven." smoke>
-        <span className="topic-lifecycle">{researchSnapshotMeta.architecture} · Snapshot {researchSnapshotMeta.snapshotDate}</span>
+        <span className="topic-lifecycle">{researchSnapshotMeta.architecture} · Repository snapshot {researchSnapshotMeta.snapshotDate}</span>
       </PageHeader>
 
       <CampaignBridge number="05 / Research" question="What counts as proof?" answer="Keep research, implementation, verification, deployment, and live observation distinct when evaluating continuity claims." terms={['Question', 'Source', 'Evidence']} to="/status" action="Inspect verification status" />
@@ -110,16 +121,16 @@ export function ResearchPage() {
       </nav>
 
       <section className="research-posture" id="posture" aria-labelledby="research-posture-title">
-        <div className="research-section-heading"><p className="eyebrow">Current research posture</p><h2 id="research-posture-title">Promise is not proof.</h2><p>These five research areas shape the current VAMS design.</p></div>
+        <div className="research-section-heading"><p className="eyebrow">Research posture · repository snapshot</p><h2 id="research-posture-title">Promise is not proof.</h2><p>These five research areas shape the VAMS design. Snapshot dated {researchSnapshotMeta.snapshotDate}; not live repository synchronization.</p></div>
         <StaggerGroup className="research-frontier-grid">
           {postureFamilies.map((id) => { const familyData = researchFamilies.find((item) => item.id === id); return <StaggerItem as="article" className="research-frontier" key={id}><span className="research-card__id">{id}</span><h3>{familyData.title}</h3><p>{familyData.description}</p><a className="text-link" href={`#ledger-${id}`}>Inspect ledger <ArrowUpRight aria-hidden="true" size={15} /></a></StaggerItem> })}
         </StaggerGroup>
       </section>
 
       <section className="research-ledger-section" id="ledger" aria-labelledby="research-ledger-title">
-        <div className="research-section-heading"><p className="eyebrow">Academic research ledger</p><h2 id="research-ledger-title">{researchReferences.length} references, mapped.</h2><p>A citation shows influence—not implementation or deployment.</p></div>
+        <div className="research-section-heading"><p className="eyebrow">Academic research ledger</p><h2 id="research-ledger-title">{researchReferences.length} references, mapped.</h2><p>A citation shows influence—not implementation or deployment. Bundled repository snapshot dated {researchSnapshotMeta.snapshotDate}.</p></div>
         <ResearchFilters />
-        <div className="research-ledger-meta" aria-live="polite"><span>{filteredReferences.length} of {researchReferences.length} references</span><span>Bundled snapshot dated {researchSnapshotMeta.snapshotDate}</span></div>
+        <div className="research-ledger-meta" aria-live="polite"><span>{filteredReferences.length} of {researchReferences.length} references</span><span>Verification dates are preserved in each source record.</span></div>
         <div className="research-ledger">
           {filteredReferences.length ? filteredReferences.map((entry, index) => <ResearchCard anchorId={index === 0 || filteredReferences[index - 1].family !== entry.family ? `ledger-${entry.family}` : undefined} entry={entry} key={entry.id} />) : <div className="research-empty"><Search aria-hidden="true" size={22} /><h3>No research references match those filters.</h3><p>Clear the search or choose “All” to restore the complete ledger.</p></div>}
         </div>

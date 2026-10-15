@@ -39,13 +39,14 @@ export function ServiceBlockDetailPage() {
   const resource = useResource('serviceBlocks')
   const { load } = useProtocol()
   return (
+    <>
+    <PageHeader eyebrow="Service Block detail" title={serviceBlockId} description="Capability declaration, provenance, and compatibility boundaries."><Link className="text-link" to="/service-blocks">← Back to service blocks</Link></PageHeader>
     <DataBoundary resource={resource} onRetry={() => load('serviceBlocks')}>
       {(rows, envelope) => {
         const block = rows.find((item) => item.id === serviceBlockId)
         if (!block) return <div className="data-state">Service Block <code>{serviceBlockId}</code> is not visible.</div>
         return (
           <>
-            <PageHeader eyebrow={block.category} title={block.name} description={block.description}><StatusBadge state={block.provenance} /></PageHeader>
             <div className="detail-grid">
               <section className="panel">
                 <p className="eyebrow">Integration</p><h2>{block.integration_state}</h2>
@@ -57,10 +58,11 @@ export function ServiceBlockDetailPage() {
               </section>
             </div>
             <Provenance envelope={envelope} />
-            <Link className="text-link" to="/service-blocks">← Back to Service Blocks</Link>
+            <StatusBadge state={block.provenance} />
           </>
         )
       }}
     </DataBoundary>
+    </>
   )
 }

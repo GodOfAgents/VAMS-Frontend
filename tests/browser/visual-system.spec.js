@@ -1,17 +1,21 @@
 import { expect, test } from '@playwright/test'
+import process from 'node:process'
 import { createRequire } from 'node:module'
 
 const require = createRequire(import.meta.url)
 const axeScript = require.resolve('axe-core/axe.min.js')
+const marketingOrigin = process.env.VAMS_AUDIT_MARKETING_ORIGIN || 'http://127.0.0.1:4373'
+const consoleOrigin = process.env.VAMS_AUDIT_CONSOLE_ORIGIN || 'http://127.0.0.1:4374'
+const statusOrigin = process.env.VAMS_AUDIT_STATUS_ORIGIN || 'http://127.0.0.1:4375'
 
 const widths = [320, 375, 768, 1440, 1920]
 const routes = [
-  { name: 'homepage', origin: 'http://127.0.0.1:4373', path: '/' },
-  { name: 'protocol', origin: 'http://127.0.0.1:4373', path: '/protocol' },
-  { name: 'research', origin: 'http://127.0.0.1:4373', path: '/research' },
-  { name: 'status', origin: 'http://127.0.0.1:4375', path: '/status' },
-  { name: 'overview', origin: 'http://127.0.0.1:4374', path: '/overview' },
-  { name: 'service-block-detail', origin: 'http://127.0.0.1:4374', path: '/service-blocks/sb_oms_v1' },
+  { name: 'homepage', origin: marketingOrigin, path: '/' },
+  { name: 'protocol', origin: marketingOrigin, path: '/protocol' },
+  { name: 'research', origin: marketingOrigin, path: '/research' },
+  { name: 'status', origin: statusOrigin, path: '/status' },
+  { name: 'overview', origin: consoleOrigin, path: '/overview' },
+  { name: 'service-block-detail', origin: consoleOrigin, path: '/service-blocks/sb_oms_v1' },
 ]
 
 test('public, research, status, and console routes fit the target viewport widths', async ({ page }, testInfo) => {

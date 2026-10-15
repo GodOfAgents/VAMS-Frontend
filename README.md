@@ -6,9 +6,11 @@ One React/Vite source tree for the VAMS protocol website, read-only explorer, an
 
 | Build | Intended host | Default route |
 | --- | --- | --- |
-| Marketing | `vams.network` | `/` |
-| Console | `app.vams.network` | `/overview` |
-| Status | `status.vams.network` | `/status` |
+| Marketing | `https://www.vams.network` | `/` |
+| Read-only console | `https://www.vams.network` | `/overview` |
+| Status | `https://www.vams.network` | `/status` |
+
+`app.vams.network` and `status.vams.network` are planned destinations. They are not presented as active hosts until their deployments are established.
 
 Documentation remains repository-generated and is linked from the interface.
 

@@ -2,6 +2,7 @@ import { ExternalLink } from 'lucide-react'
 import { Link, Outlet } from 'react-router-dom'
 import { Brand } from '../components/navigation/Brand.jsx'
 import { SimulationBanner } from '../components/disclosures/SimulationBanner.jsx'
+import { MotionPreferenceToggle } from '../components/ui/MotionPreferenceToggle.jsx'
 import { RouteMotion } from '../motion/primitives.jsx'
 import '../styles/publicPages.css'
 
@@ -14,6 +15,7 @@ export function StatusLayout() {
         <Brand to="/status" />
         <span className="status-nav__title">VERIFICATION STATUS</span>
         <div>
+          <MotionPreferenceToggle />
           <Link to="/">Protocol home</Link>
           <a href="https://github.com/GodOfAgents/VAMS">Source <ExternalLink aria-hidden="true" size={13} /></a>
           <Link to="/overview">Console</Link>

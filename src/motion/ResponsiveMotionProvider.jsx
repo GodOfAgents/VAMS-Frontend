@@ -51,6 +51,9 @@ function describeMotionEnvironment(environment) {
 
 export function ResponsiveMotionProvider({ children }) {
   const [environment, setEnvironment] = useState(readMotionEnvironment)
+  const [userReducedMotion, setUserReducedMotion] = useState(() => {
+    try { return typeof window !== 'undefined' && window.localStorage.getItem('vams-reduce-motion') === 'true' } catch { return false }
+  })
 
   useEffect(() => {
     if (typeof window.matchMedia !== 'function') return undefined
@@ -82,9 +85,15 @@ export function ResponsiveMotionProvider({ children }) {
   }, [])
 
   const value = useMemo(() => ({
-    ...describeMotionEnvironment(environment),
+    ...describeMotionEnvironment({ ...environment, reducedMotion: environment.reducedMotion || userReducedMotion }),
     systemReducedMotion: environment.reducedMotion,
-  }), [environment])
+    userReducedMotion,
+    setUserReducedMotion,
+  }), [environment, userReducedMotion])
+
+  useEffect(() => {
+    try { window.localStorage.setItem('vams-reduce-motion', String(userReducedMotion)) } catch { /* Storage can be unavailable in private contexts. */ }
+  }, [userReducedMotion])
 
   useEffect(() => {
     document.documentElement.dataset.motion = value.reducedMotion ? 'reduced' : 'full'

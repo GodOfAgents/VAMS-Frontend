@@ -29,9 +29,22 @@
 }
 
 .motion-chapter {
+  position: relative;
+  isolation: isolate;
+}
+
+.motion-chapter__surface {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
   border: 1px solid var(--line);
   background: rgba(14, 14, 14, .82);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .07), 0 25px 70px rgba(0, 0, 0, .23);
+  pointer-events: none;
+}
+
+.motion-chapter__content {
+  position: relative;
 }
 
 .architecture-grid article.is-reading {
@@ -86,4 +99,13 @@ html[data-goo-cursor="active"] :not(input):not(textarea):not(select):not([conten
   ::view-transition-new(root),
   ::view-transition-old(vams-page-title),
   ::view-transition-new(vams-page-title) { animation-duration: 1ms !important; }
+}
+
+html[data-motion="reduced"] *,
+html[data-motion="reduced"] *::before,
+html[data-motion="reduced"] *::after {
+  scroll-behavior: auto !important;
+  animation-duration: .01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: .01ms !important;
 }

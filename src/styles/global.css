@@ -9,7 +9,7 @@ html {
 
 body {
   margin: 0;
-  min-width: 320px;
+  min-width: 0;
   min-height: 100vh;
   background: var(--canvas);
   color: var(--ink);
@@ -830,6 +830,27 @@ pre {
   flex-direction: column;
   border-right: 1px solid var(--line);
   background: var(--canvas-elevated);
+}
+
+.console-dialog-overlay {
+  position: fixed;
+  z-index: 89;
+  inset: 0;
+  background: rgba(0, 0, 0, .68);
+  backdrop-filter: blur(3px);
+}
+
+.console-dialog-content {
+  position: fixed;
+  z-index: 90;
+  inset: 0 auto 0 0;
+  display: flex;
+  width: min(84vw, 320px);
+  flex-direction: column;
+  border-right: 1px solid var(--line);
+  background: var(--canvas-elevated);
+  box-shadow: var(--shadow);
+  outline: none;
 }
 
 .console-shell > .simulation-banner + .console-sidebar {
@@ -1760,14 +1781,7 @@ pre {
   }
 
   .console-sidebar {
-    width: min(84vw, 320px);
-    transform: translateX(-105%);
-    transition: transform 200ms ease;
-  }
-
-  .console-sidebar.is-open {
-    box-shadow: var(--shadow);
-    transform: translateX(0);
+    display: none;
   }
 
   .console-close,
@@ -3220,7 +3234,13 @@ body {
     box-shadow: var(--glass-highlight), var(--glass-shadow-panel);
     -webkit-backdrop-filter: blur(var(--glass-blur-strong)) saturate(112%);
     backdrop-filter: blur(var(--glass-blur-strong)) saturate(112%);
+    max-height: calc(100dvh - 74px);
+    overflow-y: auto;
   }
+}
+
+@media (max-width: 800px) and (max-height: 560px) {
+  .marketing-nav__links.is-open { max-height: calc(100dvh - 64px); }
 }
 
 @media (max-width: 560px) {
@@ -3254,8 +3274,24 @@ body {
 
 @media (max-height: 520px) and (min-width: 561px) and (max-width: 1199px) {
   .hero__content {
-    padding-top: 18px;
-    padding-bottom: 64px;
+    padding-top: 0;
+    padding-bottom: 32px;
+  }
+
+  .hero__kicker {
+    margin: 8px 0 6px;
+  }
+
+  .hero h1,
+  .hero .smoke-text {
+    font-size: clamp(2.8rem, 6vw, 3.2rem);
+    line-height: 0.86;
+  }
+
+  .hero__lede {
+    margin: 10px 0;
+    font-size: 0.9rem;
+    line-height: 1.35;
   }
 }
 

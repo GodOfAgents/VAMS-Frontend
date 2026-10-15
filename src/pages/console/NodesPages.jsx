@@ -47,16 +47,15 @@ export function NodeDetailPage() {
   const { load } = useProtocol()
 
   return (
-    <DataBoundary resource={resource} onRetry={() => load('nodes')}>
+    <>
+      <PageHeader eyebrow="Node detail" title={nodeId} description="Public identity, resources, trust, skills, cognitive profile, cost, and freshness."><Link className="text-link" to="/nodes">← Back to nodes</Link></PageHeader>
+      <DataBoundary resource={resource} onRetry={() => load('nodes')}>
       {(nodes, envelope) => {
         const node = nodes.find((item) => item.id === nodeId)
         if (!node) return <div className="data-state">Node <code>{nodeId}</code> is not visible in this environment.</div>
 
         return (
           <>
-            <PageHeader eyebrow="Node detail" title={node.id} description="Public identity, resources, trust, skills, cognitive profile, cost, and freshness.">
-              <StatusBadge state={node.status} />
-            </PageHeader>
             <div className="detail-metrics">
               <div><MapPin aria-hidden="true" /><span>Region</span><strong>{node.region}</strong></div>
               <div><Cpu aria-hidden="true" /><span>Resources</span><strong>{node.resources.cpu_cores} CPU · {node.resources.memory_gb} GB</strong></div>
@@ -79,10 +78,11 @@ export function NodeDetailPage() {
               </section>
             </div>
             <Provenance envelope={envelope} />
-            <Link className="text-link" to="/nodes">← Back to nodes</Link>
+            <StatusBadge state={node.status} />
           </>
         )
       }}
-    </DataBoundary>
+      </DataBoundary>
+    </>
   )
 }

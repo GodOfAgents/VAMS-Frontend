@@ -1,6 +1,6 @@
 import { Reveal, SmokeText } from '../../motion/primitives.jsx'
 
-export function PageHeader({ eyebrow, title, description, children, smoke = true }) {
+export function PageHeader({ eyebrow, title, description, children, smoke = false }) {
   return (
     <Reveal as="header" className="page-header">
       <p className="eyebrow">{eyebrow}</p>

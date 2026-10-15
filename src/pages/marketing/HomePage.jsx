@@ -64,6 +64,14 @@ export function HomePage() {
         <div className="hero__scroll"><ArrowDown aria-hidden="true" /> Explore the exit test</div>
       </section>
 
+      <nav className="audience-shortcuts" aria-label="Explore VAMS by role">
+        <span>Explore by role</span>
+        <Link to="/build">Builders <ArrowRight aria-hidden="true" size={15} /></Link>
+        <Link to="/operate">Operators <ArrowRight aria-hidden="true" size={15} /></Link>
+        <Link to="/protocol">Organizations <ArrowRight aria-hidden="true" size={15} /></Link>
+        <Link to="/research">Researchers <ArrowRight aria-hidden="true" size={15} /></Link>
+      </nav>
+
       <StaggerGroup as="section" className="protocol-strip" aria-label="Protocol lifecycle state">
         <StaggerItem><span>Architecture</span><strong>v0.8.0</strong></StaggerItem>
         <StaggerItem><span>Lifecycle</span><strong>Hardened pre-testnet</strong></StaggerItem>

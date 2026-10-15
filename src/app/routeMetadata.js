@@ -3,6 +3,8 @@ const DEFAULT_METADATA = {
   description: 'VAMS is building sovereign infrastructure for durable, verifiable digital services across independent providers.',
 }
 
+const SITE_ORIGIN = 'https://www.vams.network'
+
 const routeMetadata = {
   '/': {
     title: 'What survives when the host changes? | VAMS',
@@ -73,12 +75,11 @@ export function getRouteMetadata(pathname) {
   return detailRoutes.find(([pattern]) => pattern.test(pathname))?.[1] || DEFAULT_METADATA
 }
 
-function setMeta(selector, attribute, value) {
+function setMeta(selector, attribute, attributeValue, value) {
   let element = document.head.querySelector(selector)
   if (!element) {
     element = document.createElement('meta')
-    const [name, content] = attribute
-    element.setAttribute(name, content)
+    element.setAttribute(attribute, attributeValue)
     document.head.append(element)
   }
   element.setAttribute('content', value)
@@ -86,10 +87,17 @@ function setMeta(selector, attribute, value) {
 
 export function applyRouteMetadata(pathname) {
   const metadata = getRouteMetadata(pathname)
+  const privateRoute = /^\/(overview|nodes|blueprints|service-blocks|data-availability|evidence|system)(\/|$)/.test(pathname)
   document.title = metadata.title
-  setMeta('meta[name="description"]', ['name', 'description'], metadata.description)
-  setMeta('meta[property="og:title"]', ['property', 'og:title'], metadata.title)
-  setMeta('meta[property="og:description"]', ['property', 'og:description'], metadata.description)
-  setMeta('meta[name="twitter:title"]', ['name', 'twitter:title'], metadata.title)
-  setMeta('meta[name="twitter:description"]', ['name', 'twitter:description'], metadata.description)
+  setMeta('meta[name="description"]', 'name', 'description', metadata.description)
+  setMeta('meta[property="og:title"]', 'property', 'og:title', metadata.title)
+  setMeta('meta[property="og:description"]', 'property', 'og:description', metadata.description)
+  setMeta('meta[name="twitter:title"]', 'name', 'twitter:title', metadata.title)
+  setMeta('meta[name="twitter:description"]', 'name', 'twitter:description', metadata.description)
+  setMeta('meta[name="robots"]', 'name', 'robots', privateRoute ? 'noindex, nofollow' : 'index, follow')
+  const canonical = document.head.querySelector('link[rel="canonical"]') || document.createElement('link')
+  canonical.setAttribute('rel', 'canonical')
+  canonical.setAttribute('href', `${SITE_ORIGIN}${pathname}`)
+  if (!canonical.isConnected) document.head.append(canonical)
+  setMeta('meta[property="og:url"]', 'property', 'og:url', `${SITE_ORIGIN}${pathname}`)
 }
